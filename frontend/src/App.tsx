@@ -1,49 +1,40 @@
-import { useState } from 'react';
-import { Sidebar } from './components/clinical/Sidebar';
-import { StepContent } from './components/clinical/StepContent';
-import { mockPatient, mockAssessment, mockEvidence, mockTreatments, mockCases, mockFactors, mockReflection } from './mockData';
+import type { ReactNode } from 'react';
+import { WorkflowProvider, useWorkflow } from './context/WorkflowContext';
+import { Sidebar } from './components/layout/Sidebar';
+import { PatientOverview } from './pages/PatientOverview';
+import { HumanAssessment } from './pages/HumanAssessment';
+import { EvidenceReview } from './pages/EvidenceReview';
+import { TreatmentComparison } from './pages/TreatmentComparison';
+import { SimilarCases } from './pages/SimilarCases';
+import { DecisionFactors } from './pages/DecisionFactors';
+import { FinalReflection } from './pages/FinalReflection';
 
-const steps = [
-  'Patient Overview',
-  'Human Assessment',
-  'Evidence Review',
-  'Treatment Comparison',
-  'Similar Cases',
-  'Decision Factors',
-  'Final Reflection',
-] as const;
+function WorkflowContent() {
+  const { currentStep } = useWorkflow();
 
-type Step = (typeof steps)[number];
-
-function App() {
-  const [activeStep, setActiveStep] = useState<Step>('Patient Overview');
+  const pages: Record<string, ReactNode> = {
+    overview: <PatientOverview />,
+    assessment: <HumanAssessment />,
+    evidence: <EvidenceReview />,
+    treatment: <TreatmentComparison />,
+    similar: <SimilarCases />,
+    decision: <DecisionFactors />,
+    reflection: <FinalReflection />,
+  };
 
   return (
     <div className="app-shell">
-      <Sidebar steps={steps} activeStep={activeStep} onStepChange={setActiveStep} />
-      <main className="content-area">
-        <header className="topbar">
-          <div>
-            <p className="eyebrow">Clinical decision support</p>
-            <h1>Illusion of Understanding</h1>
-          </div>
-          <div className="status-card">
-            <span>Patient status</span>
-            <strong>Stable</strong>
-          </div>
-        </header>
-        <StepContent
-          step={activeStep}
-          patient={mockPatient}
-          assessment={mockAssessment}
-          evidence={mockEvidence}
-          treatments={mockTreatments}
-          similarCases={mockCases}
-          factors={mockFactors}
-          reflection={mockReflection}
-        />
-      </main>
+      <Sidebar />
+      <main className="main-content">{pages[currentStep]}</main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <WorkflowProvider>
+      <WorkflowContent />
+    </WorkflowProvider>
   );
 }
 
