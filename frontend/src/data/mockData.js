@@ -23,11 +23,11 @@ export function getAssessmentTreatmentLabel(id) {
     return option ? `${option.label} [${option.category}]` : id;
 }
 export const mockPatient = {
-    name: 'Margaret R. Holloway',
+    name: 'Max Mustermann',
     mrn: '4821-7734',
     dateOfBirth: '1958-03-14',
     age: 66,
-    gender: 'Female',
+    gender: 'Male',
     priority: 'HIGH',
     diagnosis: {
         primaryDiagnosis: 'Non-Small Cell Lung Cancer (NSCLC)',

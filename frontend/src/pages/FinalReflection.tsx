@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { assessmentTreatmentOptions, mockAiEvidence } from '../data/mockData';
+import { assessmentTreatmentOptions } from '../data/mockData';
 import { useWorkflow } from '../context/WorkflowContext';
 import type { FinalReflection } from '../types';
 import { PageHeader } from '../components/layout/PageHeader';
 import { FinalDecisionSummary } from '../components/cards/FinalDecisionSummary';
-import { BiasWarningBanner } from '../components/cards/BiasWarningBanner';
 
 const emptyReflection: FinalReflection = {
   changedMind: 'no',
@@ -17,11 +16,12 @@ const emptyReflection: FinalReflection = {
 };
 
 export function FinalReflection() {
-  const { assessment, evidence, reflection, submitReflection, biasWarnings } = useWorkflow();
+  const { assessment, evidence, reflection, submitReflection } = useWorkflow();
   const [form, setForm] = useState<FinalReflection>(
     reflection ?? { ...emptyReflection, finalTreatment: assessment?.selectedTreatment ?? '' },
   );
   const [submitted, setSubmitted] = useState(!!reflection);
+  const [notesOpen, setNotesOpen] = useState(false);
 
   if (!assessment) {
     return (
@@ -36,37 +36,23 @@ export function FinalReflection() {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const toggleSource = (source: string) => {
-    setForm((prev) => ({
-      ...prev,
-      sourcesChecked: prev.sourcesChecked.includes(source)
-        ? prev.sourcesChecked.filter((s) => s !== source)
-        : [...prev.sourcesChecked, source],
-    }));
-  };
-
   const handleSubmit = () => {
     submitReflection(form);
     setSubmitted(true);
   };
 
-  const isValid = Boolean(form.finalTreatment) && form.finalReasoning.trim().length >= 10;
+  // No strict validation — user can submit with just a treatment selected
+  const isValid = Boolean(form.finalTreatment);
 
   return (
     <div className="page">
-      <PageHeader
-        title="Final Reflection"
-        subtitle="Synthesize your decision — compare your judgment with AI evidence."
-        badge="Step 7"
-      />
+      <PageHeader title="Final Reflection" badge="Step 7" />
 
-      <BiasWarningBanner warnings={biasWarnings} />
-
-      <FinalDecisionSummary
-        assessment={assessment}
-        evidence={evidence}
-        reflection={submitted ? form : null}
-      />
+      {submitted ? (
+        <FinalDecisionSummary assessment={assessment} evidence={evidence} reflection={form} />
+      ) : (
+        <FinalDecisionSummary assessment={assessment} evidence={evidence} reflection={null} />
+      )}
 
       {!submitted && (
         <div className="reflection-form">
@@ -103,66 +89,57 @@ export function FinalReflection() {
             </select>
           </div>
 
-          <div className="form-section card">
-            <h4>What information mattered most?</h4>
-            <textarea
-              rows={2}
-              value={form.whatMatteredMost}
-              onChange={(e) => update('whatMatteredMost', e.target.value)}
-              placeholder="Which clinical factors or evidence were most influential?"
-            />
-          </div>
-
-          <div className="form-section card">
-            <h4>Final Reasoning</h4>
-            <textarea
-              rows={4}
-              value={form.finalReasoning}
-              onChange={(e) => update('finalReasoning', e.target.value)}
-              placeholder="Explain your final treatment decision..."
-            />
-          </div>
-
-          <div className="form-section card">
-            <h4>What uncertainty remains?</h4>
-            <textarea
-              rows={3}
-              value={form.remainingUncertainties}
-              onChange={(e) => update('remainingUncertainties', e.target.value)}
-              placeholder="What questions or gaps remain after this decision process?"
-            />
-          </div>
-
-          <div className="form-section card">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={form.patientPreferenceHonored}
-                onChange={(e) => update('patientPreferenceHonored', e.target.checked)}
-              />
-              Patient preferences were honored in the final decision
-            </label>
-          </div>
-
-          <div className="form-section card">
-            <h4>Sources Reviewed</h4>
-            <div className="source-checkboxes">
-              {mockAiEvidence.sources.map((s) => (
-                <label key={s.title} className="checkbox-label">
+          <details className="card" style={{ cursor: 'pointer' }} open={notesOpen}>
+            <summary
+              style={{ fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.85rem' }}
+              onClick={(e) => { e.preventDefault(); setNotesOpen(!notesOpen); }}
+            >
+              {notesOpen ? '−' : '+'} Add clinical reasoning notes
+            </summary>
+            {notesOpen && (
+              <div style={{ marginTop: '0.75rem', display: 'grid', gap: '0.75rem' }}>
+                <div className="form-section">
+                  <h4>What information mattered most?</h4>
+                  <textarea
+                    rows={2}
+                    value={form.whatMatteredMost}
+                    onChange={(e) => update('whatMatteredMost', e.target.value)}
+                    placeholder="Which clinical factors or evidence were most influential?"
+                  />
+                </div>
+                <div className="form-section">
+                  <h4>Final Reasoning</h4>
+                  <textarea
+                    rows={3}
+                    value={form.finalReasoning}
+                    onChange={(e) => update('finalReasoning', e.target.value)}
+                    placeholder="Explain your final treatment decision..."
+                  />
+                </div>
+                <div className="form-section">
+                  <h4>What uncertainty remains?</h4>
+                  <textarea
+                    rows={2}
+                    value={form.remainingUncertainties}
+                    onChange={(e) => update('remainingUncertainties', e.target.value)}
+                    placeholder="What questions or gaps remain?"
+                  />
+                </div>
+                <label className="checkbox-label">
                   <input
                     type="checkbox"
-                    checked={form.sourcesChecked.includes(s.title)}
-                    onChange={() => toggleSource(s.title)}
+                    checked={form.patientPreferenceHonored}
+                    onChange={(e) => update('patientPreferenceHonored', e.target.checked)}
                   />
-                  {s.title} ({s.year})
+                  Patient preferences were honored in the final decision
                 </label>
-              ))}
-            </div>
-          </div>
+              </div>
+            )}
+          </details>
 
           <button
             type="button"
-            className={`btn btn-primary btn-submit-reflection ${isValid ? 'btn-ready' : ''}`}
+            className={`btn ${isValid ? 'btn-primary btn-ready' : 'btn-primary'}`}
             onClick={handleSubmit}
             disabled={!isValid}
           >
@@ -174,10 +151,6 @@ export function FinalReflection() {
       {submitted && (
         <div className="reflection-complete card">
           <h4>Reflection Complete</h4>
-          <p>
-            Your decision process has been recorded. This prototype explores how explanations influence
-            clinical trust and decision-making — not automated diagnosis.
-          </p>
           {form.changedMind !== 'no' && (
             <p className="mind-change-note">
               You indicated your opinion {form.changedMind === 'yes' ? 'changed' : 'partially changed'} after reviewing AI evidence.

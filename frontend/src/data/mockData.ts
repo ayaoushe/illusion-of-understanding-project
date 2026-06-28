@@ -37,11 +37,11 @@ export function getAssessmentTreatmentLabel(id: string): string {
 }
 
 export const mockPatient: Patient = {
-  name: 'Margaret R. Holloway',
+  name: 'Max Mustermann',
   mrn: '4821-7734',
   dateOfBirth: '1958-03-14',
   age: 66,
-  gender: 'Female',
+  gender: 'Male',
   priority: 'HIGH',
 
   diagnosis: {

@@ -9,66 +9,62 @@ interface FinalDecisionSummaryProps {
 
 export function FinalDecisionSummary({ assessment, evidence, reflection }: FinalDecisionSummaryProps) {
   return (
-    <div className="final-summary">
-      <div className="summary-comparison">
-        <div className="summary-column">
-          <h4>Your Initial Assessment</h4>
-          <p className="summary-treatment">
-            {getAssessmentTreatmentLabel(assessment.selectedTreatment)}
-          </p>
-          {assessment.clinicalReasoning && (
-            <p className="summary-reasoning">{assessment.clinicalReasoning}</p>
-          )}
-        </div>
-
-        <div className="summary-divider">
-          <span>vs</span>
-        </div>
-
-        <div className="summary-column">
-          <h4>AI Evidence Summary</h4>
-          {evidence && (
-            <>
-              <p className="summary-uncertainty">
-                Uncertainty: <strong>{evidence.uncertaintyLevel}</strong>
-              </p>
-              <p className="summary-reasoning">{evidence.uncertaintyDescription}</p>
-              <p className="label">Key factors</p>
-              <ul className="bullet-list compact">
-                {evidence.keyReasoningFactors.slice(0, 4).map((f) => (
-                  <li key={f.factor}>
-                    {f.factor} ({f.direction})
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
+    <div className="final-summary-grid">
+      <div className="summary-column col-initial">
+        <h4>Initial Assessment</h4>
+        <p className="summary-treatment">
+          {getAssessmentTreatmentLabel(assessment.selectedTreatment)}
+        </p>
+        {assessment.clinicalReasoning && (
+          <p className="summary-reasoning">{assessment.clinicalReasoning}</p>
+        )}
       </div>
 
-      {reflection && (
-        <div className="summary-final">
-          <h4>Final Decision</h4>
-          <div className="final-decision-grid">
-            <div>
-              <p className="label">Changed Mind?</p>
-              <p className="value">{reflection.changedMind}</p>
+      <div className="summary-column col-evidence">
+        <h4>AI Evidence Summary</h4>
+        {evidence && (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+              <span className="label" style={{ marginBottom: 0 }}>Uncertainty</span>
+              <span className={`uncertainty-level uncertainty-${evidence.uncertaintyLevel}`} style={{ fontSize: '0.65rem' }}>
+                {evidence.uncertaintyLevel.toUpperCase()}
+              </span>
             </div>
-            <div>
-              <p className="label">Final Treatment</p>
-              <p className="value">{getAssessmentTreatmentLabel(reflection.finalTreatment)}</p>
+            <p className="summary-reasoning" style={{ fontSize: '0.8rem' }}>{evidence.uncertaintyDescription}</p>
+            <div className="bullet-list compact">
+              {evidence.keyReasoningFactors.slice(0, 3).map((f) => (
+                <li key={f.factor} style={{ fontSize: '0.8rem' }}>
+                  {f.factor} (<span className={`direction-${f.direction}`}>{f.direction}</span>)
+                </li>
+              ))}
             </div>
-            <div>
-              <p className="label">Patient Preference Honored</p>
-              <p className="value">{reflection.patientPreferenceHonored ? 'Yes' : 'No'}</p>
+          </>
+        )}
+      </div>
+
+      <div className="summary-column col-decision">
+        <h4>Final Decision</h4>
+        {reflection ? (
+          <>
+            <p className="summary-treatment">
+              {getAssessmentTreatmentLabel(reflection.finalTreatment)}
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                Changed mind: <strong>{reflection.changedMind}</strong>
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                Preferences honored: <strong>{reflection.patientPreferenceHonored ? 'Yes' : 'No'}</strong>
+              </span>
             </div>
-          </div>
-          <p className="label">Final Reasoning</p>
-          <p>{reflection.finalReasoning}</p>
-          <p className="label">Remaining Uncertainties</p>
-          <p>{reflection.remainingUncertainties}</p>
-        </div>
-      )}
+            <p className="summary-reasoning" style={{ fontSize: '0.8rem' }}>{reflection.finalReasoning}</p>
+          </>
+        ) : (
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+            Complete the form below to record your final decision.
+          </p>
+        )}
+      </div>
     </div>
   );
 }
