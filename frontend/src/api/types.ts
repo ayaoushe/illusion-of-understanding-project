@@ -38,6 +38,22 @@ export interface FeatureRow {
   name: string;
   weight: number;
   explanation: string;
+  value?: string;
+}
+
+export interface RegimeOption {
+  regime: string;
+  rank: number;
+  probability: number;
+  features: FeatureRow[];
+}
+
+export interface CaseRecord {
+  patient_id: string;
+  prediction: string;
+  confidence_percent: number;
+  probabilities: Record<string, number>;
+  options: RegimeOption[];
 }
 
 export interface AnalyzeResponse {

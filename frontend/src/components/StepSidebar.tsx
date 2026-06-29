@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { StepId } from "../api/types";
 import { useSession } from "../context/SessionContext";
+import { DEMO_MODE } from "../config";
 
 const STEPS: { id: StepId; label: string; icon: typeof UserCircle }[] = [
   { id: "patient", label: "Patient", icon: UserCircle },
@@ -19,7 +20,17 @@ const STEPS: { id: StepId; label: string; icon: typeof UserCircle }[] = [
 ];
 
 export function StepSidebar() {
-  const { step, setStep, canAccessPostPredictSteps, canAccessReflection } = useSession();
+  const {
+    step,
+    setStep,
+    canAccessPostPredictSteps,
+    canAccessReflection,
+    cases,
+    activeCaseId,
+    setActiveCase,
+  } = useSession();
+
+  const steps = DEMO_MODE ? STEPS.filter((s) => s.id !== "scenario") : STEPS;
 
   const locked = (id: StepId) => {
     if (id === "patient" || id === "assessment") return false;
@@ -29,13 +40,32 @@ export function StepSidebar() {
 
   return (
     <nav className="flex w-full shrink-0 flex-row gap-1 overflow-x-auto border-b border-slate-200/80 bg-white/70 px-2 py-2 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/50 md:w-56 md:flex-col md:gap-0 md:border-b-0 md:border-r md:px-0 md:py-4">
+      {cases.length > 0 && (
+        <label className="order-first w-44 shrink-0 px-2 md:order-none md:mb-3 md:w-auto md:px-3">
+          <span className="mb-1 hidden text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 md:block">
+            Demo case
+          </span>
+          <select
+            value={activeCaseId ?? ""}
+            onChange={(e) => setActiveCase(e.target.value)}
+            className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs dark:border-slate-600 dark:bg-slate-950"
+            title="Switching a case restarts the assessment"
+          >
+            {cases.map((c) => (
+              <option key={c.patient_id} value={c.patient_id}>
+                {c.patient_id}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <div className="hidden px-3 pb-3 md:block">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           Workflow
         </p>
       </div>
       <ul className="flex min-w-0 flex-row gap-0.5 px-1 md:flex-col md:px-2">
-        {STEPS.map(({ id, label, icon: Icon }) => {
+        {steps.map(({ id, label, icon: Icon }) => {
           const isActive = step === id;
           const isLocked = locked(id);
           return (

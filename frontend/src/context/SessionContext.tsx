@@ -2,12 +2,20 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
-import { postPredict } from "../api/client";
-import type { PatientPayload, PredictResponse, StepId, UserDecision } from "../api/types";
+import { fetchCases, postPredict } from "../api/client";
+import { SHOW_NUDGE } from "../config";
+import type {
+  CaseRecord,
+  PatientPayload,
+  PredictResponse,
+  StepId,
+  UserDecision,
+} from "../api/types";
 import type { ChatMessage } from "../types";
 
 const defaultPatient: PatientPayload = {
@@ -45,6 +53,10 @@ interface SessionContextValue {
   appendChatMessage: (m: ChatMessage) => void;
   canAccessPostPredictSteps: boolean;
   canAccessReflection: boolean;
+  cases: CaseRecord[];
+  activeCaseId: string | null;
+  activeCase: CaseRecord | null;
+  setActiveCase: (patientId: string) => void;
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -63,6 +75,47 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [reflection3, setReflection3] = useState("");
   const [showComparison, setShowComparison] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [cases, setCases] = useState<CaseRecord[]>([]);
+  const [activeCaseId, setActiveCaseId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const loaded = await fetchCases();
+        if (cancelled) return;
+        setCases(loaded);
+        if (loaded.length > 0) setActiveCaseId(loaded[0].patient_id);
+      } catch (e) {
+        console.error("Failed to load cases", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const activeCase = useMemo(
+    () => cases.find((c) => c.patient_id === activeCaseId) ?? null,
+    [cases, activeCaseId]
+  );
+
+  const setActiveCase = useCallback((patientId: string) => {
+    setActiveCaseId(patientId);
+    // Restart the Assessment-First flow cleanly so nothing from the previous case lingers.
+    setUserDecision(null);
+    setPrediction(null);
+    setPredictError(null);
+    setUncertaintyAcknowledged(false);
+    setNudgeDismissed(false);
+    setUserConfidence(70);
+    setReflection1("");
+    setReflection2("");
+    setReflection3("");
+    setShowComparison(false);
+    setChatMessages([]);
+    setStep("patient");
+  }, []);
 
   const setPatient = useCallback((p: Partial<PatientPayload>) => {
     setPatientState((prev) => ({ ...prev, ...p }));
@@ -94,7 +147,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const canAccessPostPredictSteps = prediction !== null;
   const canAccessReflection =
     prediction !== null &&
-    (!prediction.requires_uncertainty_acknowledgment || uncertaintyAcknowledged);
+    (!SHOW_NUDGE || !prediction.requires_uncertainty_acknowledgment || uncertaintyAcknowledged);
 
   const value = useMemo(
     () => ({
@@ -124,6 +177,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       appendChatMessage,
       canAccessPostPredictSteps,
       canAccessReflection,
+      cases,
+      activeCaseId,
+      activeCase,
+      setActiveCase,
     }),
     [
       step,
@@ -143,6 +200,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       appendChatMessage,
       canAccessPostPredictSteps,
       canAccessReflection,
+      cases,
+      activeCaseId,
+      activeCase,
+      setActiveCase,
     ]
   );
 

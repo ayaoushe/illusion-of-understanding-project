@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, type ReactNode } from "react";
 import { Moon, Sun } from "lucide-react";
 import type { StepId } from "../api/types";
 import { useSession } from "../context/SessionContext";
+import { DEMO_MODE } from "../config";
 import { ChatPanel } from "./ChatPanel";
 import { StepSidebar } from "./StepSidebar";
 import { PatientInputPage } from "../pages/PatientInputPage";
@@ -78,7 +79,9 @@ export function AppShell() {
         </header>
         <StepView step={step} />
       </div>
-      <ChatPanel collapsed={chatCollapsed} onToggleCollapse={() => setChatCollapsed((c) => !c)} />
+      {!DEMO_MODE && (
+        <ChatPanel collapsed={chatCollapsed} onToggleCollapse={() => setChatCollapsed((c) => !c)} />
+      )}
     </div>
   );
 }

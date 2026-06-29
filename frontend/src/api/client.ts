@@ -1,5 +1,6 @@
 import type {
   AnalyzeResponse,
+  CaseRecord,
   PatientPayload,
   PredictResponse,
   ScenarioResponse,
@@ -46,4 +47,10 @@ export function postScenario(
 
 export function postChat(message: string, patient: PatientPayload | null) {
   return post<{ reply: string }>("/chat", { message, patient });
+}
+
+export async function fetchCases(): Promise<CaseRecord[]> {
+  const res = await fetch("/predictions.json");
+  if (!res.ok) throw new Error(`Failed to load predictions.json: ${res.status}`);
+  return res.json() as Promise<CaseRecord[]>;
 }

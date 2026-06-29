@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { postScenario } from "../api/client";
 import type { ScenarioResponse } from "../api/types";
 import { useSession } from "../context/SessionContext";
+import { DEMO_MODE } from "../config";
 
 type Dim = "tumor_size" | "age" | "stage";
 
@@ -23,6 +24,7 @@ export function ScenarioExplorer() {
   }, [patient]);
 
   useEffect(() => {
+    if (DEMO_MODE) return;
     if (!prediction) return;
     let cancelled = false;
     const t = window.setTimeout(() => {
@@ -45,6 +47,14 @@ export function ScenarioExplorer() {
       window.clearTimeout(t);
     };
   }, [patient, prediction, variable, tumorSize, age, stage]);
+
+  if (DEMO_MODE) {
+    return (
+      <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200/90 bg-white/80 p-5 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300">
+        Scenario explorer is not available in demo mode (no live model backend).
+      </div>
+    );
+  }
 
   if (!prediction) {
     return (

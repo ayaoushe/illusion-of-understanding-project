@@ -1,5 +1,6 @@
 import { AlertTriangle, Sparkles } from "lucide-react";
 import { useSession } from "../context/SessionContext";
+import { DEMO_MODE, SHOW_LEGACY, SHOW_NUDGE } from "../config";
 
 export function ResultsDashboard() {
   const {
@@ -13,20 +14,10 @@ export function ResultsDashboard() {
     showComparison,
     setShowComparison,
     canAccessReflection,
+    activeCase,
   } = useSession();
 
-  if (!prediction) {
-    return (
-      <p className="text-sm text-slate-500">
-        Complete the assessment first.{" "}
-        <button type="button" className="text-indigo-600 underline" onClick={() => setStep("assessment")}>
-          Go to assessment
-        </button>
-      </p>
-    );
-  }
-
-  const showNudge = prediction.nudge.eligible && !nudgeDismissed;
+  const showNudge = SHOW_NUDGE && !!prediction && prediction.nudge.eligible && !nudgeDismissed;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -37,10 +28,36 @@ export function ResultsDashboard() {
         </p>
       </div>
 
+      {activeCase && (
+        <div className="rounded-2xl border border-indigo-200/90 bg-indigo-50/70 p-6 shadow-md dark:border-indigo-900/50 dark:bg-indigo-950/40">
+          <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700 dark:text-indigo-300">
+            AI recommendation
+          </p>
+          <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-50">
+            {activeCase.prediction}
+          </p>
+          <p className="mt-2 text-sm font-medium text-slate-600 dark:text-slate-400">
+            Confidence: {activeCase.confidence_percent}%
+          </p>
+        </div>
+      )}
+
+      {!prediction && !activeCase && (
+        <p className="text-sm text-slate-500">
+          Complete the assessment first.{" "}
+          <button type="button" className="text-indigo-600 underline" onClick={() => setStep("assessment")}>
+            Go to assessment
+          </button>
+        </p>
+      )}
+
+      {prediction && (
       <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/80 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/40 dark:text-emerald-100">
         Your decision: <strong>{prediction.user_decision}</strong>
       </div>
+      )}
 
+      {SHOW_LEGACY && prediction && (
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-slate-200/90 bg-white p-6 text-center shadow-md dark:border-slate-700 dark:bg-slate-900/80">
           <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{prediction.success_percent}%</p>
@@ -53,8 +70,9 @@ export function ResultsDashboard() {
           <p className="mt-1 text-xs font-medium text-slate-600 dark:text-slate-400">Model confidence</p>
         </div>
       </div>
+      )}
 
-      {prediction.warnings.map((w) => (
+      {SHOW_NUDGE && prediction?.warnings.map((w) => (
         <div
           key={w}
           className={`flex gap-2 rounded-2xl border px-4 py-3 text-sm ${
@@ -68,7 +86,7 @@ export function ResultsDashboard() {
         </div>
       ))}
 
-      {prediction.requires_uncertainty_acknowledgment && (
+      {SHOW_NUDGE && prediction?.requires_uncertainty_acknowledgment && (
         <label className="flex cursor-pointer items-start gap-2 rounded-2xl border border-slate-200 bg-white p-4 text-sm dark:border-slate-700 dark:bg-slate-900/80">
           <input
             type="checkbox"
@@ -85,7 +103,7 @@ export function ResultsDashboard() {
           <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
           <div className="flex-1">
             <p className="font-semibold">Critical thinking nudge</p>
-            <p className="mt-1 text-amber-900/95 dark:text-amber-100/90">{prediction.nudge.message}</p>
+            <p className="mt-1 text-amber-900/95 dark:text-amber-100/90">{prediction?.nudge.message}</p>
             <button
               type="button"
               onClick={() => setNudgeDismissed(true)}
@@ -97,6 +115,7 @@ export function ResultsDashboard() {
         </div>
       )}
 
+      {SHOW_LEGACY && (
       <div className="rounded-2xl border border-slate-200/90 bg-white/90 p-4 dark:border-slate-700 dark:bg-slate-900/80">
         <button
           type="button"
@@ -105,7 +124,7 @@ export function ResultsDashboard() {
         >
           {showComparison ? "Hide" : "Show"} comparative analysis
         </button>
-        {showComparison && (
+        {showComparison && prediction && (
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-950/60">
               <p className="font-semibold text-slate-800 dark:text-slate-200">Current patient</p>
@@ -129,6 +148,7 @@ export function ResultsDashboard() {
           </div>
         )}
       </div>
+      )}
 
       <div className="flex flex-wrap gap-2">
         <button
@@ -138,6 +158,7 @@ export function ResultsDashboard() {
         >
           Feature explanation
         </button>
+        {!DEMO_MODE && (
         <button
           type="button"
           onClick={() => setStep("scenario")}
@@ -145,6 +166,7 @@ export function ResultsDashboard() {
         >
           Explore scenarios
         </button>
+        )}
         <button
           type="button"
           disabled={!canAccessReflection}
