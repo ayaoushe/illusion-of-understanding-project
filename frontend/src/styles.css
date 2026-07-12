@@ -1501,3 +1501,94 @@ body {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 3px; }
+/* ===== Startseite: Fallauswahl ===== */
+.case-selection {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-page);
+  padding: 2rem;
+}
+
+.case-selection-inner {
+  width: 100%;
+  max-width: 960px;
+}
+
+.case-selection-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.case-selection-header h1 {
+  margin: 0 0 0.5rem;
+  color: var(--text-dark);
+}
+
+.case-selection-error {
+  color: var(--danger);
+  text-align: center;
+}
+
+.case-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+}
+
+.case-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+  padding: 1.5rem;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+
+.case-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.case-card-badge {
+  align-self: flex-start;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+}
+
+.case-card-id {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.case-card-prediction {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+
+.case-card-confidence {
+  font-size: 0.8rem;
+  color: var(--success);
+  font-weight: 600;
+}
+
+.case-card-cta {
+  margin-top: auto;
+  font-weight: 600;
+  color: var(--primary);
+}

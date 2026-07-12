@@ -10,7 +10,12 @@ import { WORKFLOW_STEPS } from '../data/mockData';
 import { initialTelemetry, detectBiasWarnings, trackInteraction } from '../services/interactionService';
 import { fetchEvidenceSynthesis } from '../services/aiService';
 
+const SELECTED_PATIENT_KEY = 'selectedPatientId';
+
 interface WorkflowContextValue {
+  selectedPatientId: string | null;
+  selectPatient: (patientId: string) => void;
+  clearPatient: () => void;
   currentStep: WorkflowStepId;
   steps: typeof WORKFLOW_STEPS;
   assessment: HumanAssessment | null;
@@ -35,6 +40,9 @@ const WorkflowContext = createContext<WorkflowContextValue | null>(null);
 const GATED_STEPS: WorkflowStepId[] = ['evidence', 'treatment', 'similar', 'decision', 'reflection'];
 
 export function WorkflowProvider({ children }: { children: ReactNode }) {
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
+    () => localStorage.getItem(SELECTED_PATIENT_KEY),
+  );
   const [currentStep, setCurrentStep] = useState<WorkflowStepId>('overview');
   const [assessment, setAssessment] = useState<HumanAssessment | null>(null);
   const [evidence, setEvidence] = useState<AiEvidenceSynthesis | null>(null);
@@ -71,6 +79,18 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     if (prev) setCurrentStep(prev.id);
   }, [currentIndex]);
 
+  const selectPatient = useCallback((patientId: string) => {
+    localStorage.setItem(SELECTED_PATIENT_KEY, patientId);
+    setSelectedPatientId(patientId);
+    setCurrentStep('overview');
+  }, []);
+
+  const clearPatient = useCallback(() => {
+    localStorage.removeItem(SELECTED_PATIENT_KEY);
+    setSelectedPatientId(null);
+    setCurrentStep('overview');
+  }, []);
+
   const startAssessment = useCallback(() => {
     setTelemetry((t) => ({ ...t, assessmentStartTime: Date.now() }));
   }, []);
@@ -100,6 +120,9 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
   const biasWarnings = useMemo(() => detectBiasWarnings(telemetry), [telemetry]);
 
   const value: WorkflowContextValue = {
+    selectedPatientId,
+    selectPatient,
+    clearPatient,
     currentStep,
     steps: WORKFLOW_STEPS,
     assessment,

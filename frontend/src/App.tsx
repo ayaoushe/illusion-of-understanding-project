@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { WorkflowProvider, useWorkflow } from './context/WorkflowContext';
 import { Sidebar } from './components/layout/Sidebar';
+import { CaseSelection } from './pages/CaseSelection';
 import { PatientOverview } from './pages/PatientOverview';
 import { HumanAssessment } from './pages/HumanAssessment';
 import { EvidenceReview } from './pages/EvidenceReview';
@@ -10,7 +11,12 @@ import { DecisionFactors } from './pages/DecisionFactors';
 import { FinalReflection } from './pages/FinalReflection';
 
 function WorkflowContent() {
-  const { currentStep } = useWorkflow();
+  const { currentStep, selectedPatientId } = useWorkflow();
+
+  // Startseite: erst muss ein Patient ausgewählt werden.
+  if (!selectedPatientId) {
+    return <CaseSelection />;
+  }
 
   const pages: Record<string, ReactNode> = {
     overview: <PatientOverview />,
