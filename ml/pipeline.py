@@ -1,21 +1,3 @@
-"""
-Reproducible end-to-end ML pipeline for the OncoAI first-line breast-cancer regime model.
-
-Runs offline (no live serving). Given the MSK-CHORD cBioPortal export under
-data/msk_chord_2024/, it rebuilds everything the UI consumes:
-
-  data/derived/first_line_labels.csv   labels (breast-only, 10 regime classes)
-  data/derived/rf_model.joblib         trained RandomForest pipeline (imputer + RF)
-  data/derived/model_meta.json         feature names + classes + hyperparameters
-  data/derived/predictions.json        12 curated cases, top-3 options each, with SHAP
-  data/derived/validation_truth.json   patient_id -> true label (for our validation only)
-
-Everything is seeded with random_state=42 so results are reproducible.
-
-Run from the project root:
-    python ml/pipeline.py
-"""
-
 from __future__ import annotations
 
 import json
@@ -31,7 +13,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
-RANDOM_STATE = 42
+RANDOM_STATE = 42   # heißt das random_state immer dieselben zufälligen Zahlen generiert, damit wir es reproduzieren können für die Fälle die wir später präsentieren wolen
 DATA_DIR = "data/msk_chord_2024/"
 OUT_DIR = "data/derived/"
 
@@ -70,7 +52,7 @@ def build_labels(samp: pd.DataFrame, tl: pd.DataFrame) -> pd.DataFrame:
     )
 
     vc = reg.value_counts()
-    keep_regimes = set(vc[vc >= 100].index)  # exactly the 10 regimes with >=100 patients
+    keep_regimes = set(vc[vc >= 100].index)  # 10 klassen und somit >=100 patients
     labels = pd.concat([reg, fl_start], axis=1).reset_index()
     labels = labels[labels["regime_label"].isin(keep_regimes)].copy()
     labels = labels[["PATIENT_ID", "regime_label", "first_line_start_date"]].sort_values("PATIENT_ID")
@@ -137,7 +119,7 @@ def make_get_sv(sv):
 
 
 def select_cases(pred, pid_test, y_test, ptop, raw, X_test):
-    """Deterministic curation of 12 cases across categories A/B/C/D."""
+    """Deterministische Auswahl von 12 Fällen über 4 categories A/B/C/D."""
     sel = pd.DataFrame({
         "pos": np.arange(len(pred)), "patient_id": pid_test.values,
         "true": y_test.values, "pred": pred, "ptop": ptop,
@@ -236,7 +218,7 @@ def main():
         X, y, df["PATIENT_ID"], test_size=0.2, stratify=y, random_state=RANDOM_STATE
     )
     pipe = fit_model(X_train, y_train)
-    joblib.dump(pipe, OUT_DIR + "rf_model.joblib")
+    joblib.dump(pipe, OUT_DIR + "rf_model.joblib", compress=3)
     classes = list(pipe.named_steps["rf"].classes_)
     with open(OUT_DIR + "model_meta.json", "w") as f:
         json.dump({
