@@ -183,3 +183,32 @@ export interface DecisionFactor {
   description: string;
   impact: string;
 }
+
+// --- ML-Modell-Vorhersagen (frontend/public/study_cases.json) ---
+
+export interface PredictionFeature {
+  name: string;
+  value: string;
+  weight: number;
+  explanation: string;
+}
+
+export interface PredictionOption {
+  regime: string;
+  rank: number;
+  probability: number;
+  features: PredictionFeature[];
+}
+
+export interface CasePrediction {
+  patient_id: string;
+  prediction: string;
+  confidence_percent: number;
+  probabilities: Record<string, number>;
+  options: PredictionOption[];
+}
+
+// Ein Studienfall = Modell-Vorhersage plus Studien-Label (A–D).
+export interface StudyCase extends CasePrediction {
+  study_label: string;
+}
