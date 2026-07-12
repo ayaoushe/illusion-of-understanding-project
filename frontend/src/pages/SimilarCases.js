@@ -1,0 +1,17 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useEffect, useState } from 'react';
+import { mockSimilarCases } from '../data/mockData';
+import { useWorkflow } from '../context/WorkflowContext';
+import { PageHeader } from '../components/layout/PageHeader';
+import { StepFooter } from '../components/layout/StepFooter';
+export function SimilarCases() {
+    const { recordInteraction } = useWorkflow();
+    const [expandedCase, setExpandedCase] = useState(null);
+    useEffect(() => {
+        recordInteraction({ type: 'similar_cases_view' });
+    }, [recordInteraction]);
+    return (_jsxs("div", { className: "page", children: [_jsx(PageHeader, { title: "Similar & Rare Cases", badge: "Step 5" }), _jsx("div", { className: "similar-cases-grid", children: mockSimilarCases.map((c) => {
+                    const isExpanded = expandedCase === c.caseId;
+                    return (_jsxs("div", { className: `card similar-case-card ${c.isRare ? 'rare-case' : c.matchScore >= 80 ? 'supporting' : 'counterfactual'}`, children: [_jsxs("div", { className: "case-header", children: [_jsxs("div", { children: [_jsx("strong", { style: { fontSize: '0.9rem' }, children: c.caseId }), c.isRare && _jsx("span", { className: "rare-badge", children: "RARE" })] }), _jsxs("div", { className: "case-meta", children: [_jsxs("span", { className: "match-score", children: [c.matchScore, "% match"] }), _jsx("span", { className: "badge", style: c.matchScore >= 80 ? { background: 'rgba(22, 163, 74, 0.12)', color: 'var(--success)' } : { background: 'rgba(217, 119, 6, 0.12)', color: 'var(--warning)' }, children: c.matchScore >= 80 ? 'Supporting' : 'Counterfactual' })] })] }), _jsx("p", { style: { fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0 0 0.5rem' }, children: c.presentation }), _jsxs("div", { className: "match-criteria", children: [c.matchCriteria.slice(0, 4).map((crit) => (_jsx("span", { className: `criteria-chip ${crit.matched ? 'matched' : 'unmatched'}`, children: crit.label }, crit.label))), c.matchCriteria.length > 4 && (_jsxs("span", { style: { fontSize: '0.7rem', color: 'var(--text-muted)', padding: '0.2rem 0.4rem' }, children: ["+", c.matchCriteria.length - 4, " more"] }))] }), _jsxs("div", { style: { fontSize: '0.85rem', marginBottom: '0.35rem' }, children: [_jsx("strong", { children: "Treatment:" }), " ", c.treatmentUsed] }), _jsxs("div", { style: { fontSize: '0.85rem', marginBottom: '0.35rem' }, children: [_jsx("strong", { children: "Outcome:" }), " ", _jsx("span", { className: "outcome-text", children: c.outcome })] }), _jsxs("div", { style: { fontSize: '0.75rem', color: 'var(--text-muted)' }, children: ["Source: ", c.source] }), c.matchCriteria.length > 4 && (_jsxs("details", { style: { cursor: 'pointer', marginTop: '0.35rem' }, open: isExpanded, onToggle: () => setExpandedCase(isExpanded ? null : c.caseId), children: [_jsx("summary", { style: { fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }, children: isExpanded ? 'Hide details' : 'Show details' }), _jsx("div", { className: "match-criteria", style: { marginTop: '0.35rem' }, children: c.matchCriteria.slice(4).map((crit) => (_jsx("span", { className: `criteria-chip ${crit.matched ? 'matched' : 'unmatched'}`, children: crit.label }, crit.label))) })] })), c.isRare && (_jsx("div", { className: "rare-note", children: "Rare presentation \u2014 consider with caution. Limited comparative data." }))] }, c.caseId));
+                }) }), _jsx(StepFooter, {})] }));
+}

@@ -1,10 +1,41 @@
-import { SessionProvider } from "./context/SessionContext";
-import { AppShell } from "./components/AppShell";
+import type { ReactNode } from 'react';
+import { WorkflowProvider, useWorkflow } from './context/WorkflowContext';
+import { Sidebar } from './components/layout/Sidebar';
+import { PatientOverview } from './pages/PatientOverview';
+import { HumanAssessment } from './pages/HumanAssessment';
+import { EvidenceReview } from './pages/EvidenceReview';
+import { TreatmentComparison } from './pages/TreatmentComparison';
+import { SimilarCases } from './pages/SimilarCases';
+import { DecisionFactors } from './pages/DecisionFactors';
+import { FinalReflection } from './pages/FinalReflection';
 
-export function App() {
+function WorkflowContent() {
+  const { currentStep } = useWorkflow();
+
+  const pages: Record<string, ReactNode> = {
+    overview: <PatientOverview />,
+    assessment: <HumanAssessment />,
+    evidence: <EvidenceReview />,
+    treatment: <TreatmentComparison />,
+    similar: <SimilarCases />,
+    decision: <DecisionFactors />,
+    reflection: <FinalReflection />,
+  };
+
   return (
-    <SessionProvider>
-      <AppShell />
-    </SessionProvider>
+    <div className="app-shell">
+      <Sidebar />
+      <main className="main-content">{pages[currentStep]}</main>
+    </div>
   );
 }
+
+function App() {
+  return (
+    <WorkflowProvider>
+      <WorkflowContent />
+    </WorkflowProvider>
+  );
+}
+
+export default App;
