@@ -96,8 +96,19 @@ body {
 }
 
 .sidebar-brand {
-  padding: 0 1.25rem 1.25rem;
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
   border-bottom: 1px solid var(--sidebar-border);
+  padding: 0 1.25rem 1.25rem;
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+}
+
+.sidebar-brand:hover {
+  opacity: 0.85;
 }
 
 .sidebar-brand h1 {
@@ -1531,64 +1542,76 @@ body {
   text-align: center;
 }
 
-.case-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.25rem;
+/* Such-Dropdown (Combobox) */
+.case-combobox {
+  position: relative;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
-.case-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  text-align: left;
-  padding: 1.5rem;
+.case-combobox-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  color: var(--text-dark);
+  background: var(--bg-white);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  outline: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.case-combobox-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.case-listbox {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
   background: var(--bg-white);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
-}
-
-.case-card:hover {
-  transform: translateY(-3px);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
-  border-color: var(--primary);
+  max-height: 320px;
+  overflow-y: auto;
 }
 
-.case-card-badge {
-  align-self: flex-start;
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--primary);
-  background: var(--primary-light);
-  padding: 0.25rem 0.6rem;
+.case-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
   border-radius: var(--radius-sm);
+  cursor: pointer;
 }
 
-.case-card-id {
+.case-option.is-highlighted {
+  background: var(--primary-bg);
+}
+
+.case-option-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  white-space: nowrap;
+}
+
+.case-option-id {
   font-family: monospace;
   font-size: 0.9rem;
   color: var(--text-muted);
 }
 
-.case-card-prediction {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  font-size: 0.9rem;
-  color: var(--text-dark);
-}
-
-.case-card-confidence {
-  font-size: 0.8rem;
-  color: var(--success);
-  font-weight: 600;
-}
-
-.case-card-cta {
-  margin-top: auto;
-  font-weight: 600;
-  color: var(--primary);
+.case-option-empty {
+  padding: 0.7rem;
+  color: var(--text-muted);
+  text-align: center;
 }

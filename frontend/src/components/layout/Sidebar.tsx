@@ -3,14 +3,14 @@ import { useWorkflow } from '../../context/WorkflowContext';
 import { StepNavigation } from './StepNavigation';
 
 export function Sidebar() {
-  const { steps, currentStep, canAccessStep, goToStep } = useWorkflow();
+  const { steps, currentStep, canAccessStep, goToStep, clearPatient } = useWorkflow();
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-brand">
+      <button type="button" className="sidebar-brand" onClick={clearPatient} title="Zurück zur Patientenauswahl">
         <h1>OncoCDSS</h1>
         <p>Clinical Decision Support</p>
-      </div>
+      </button>
 
       <div className="sidebar-patient">
         <span className="sidebar-patient-label">Current Patient</span>
