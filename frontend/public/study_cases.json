@@ -1,0 +1,1462 @@
+[
+  {
+    "study_label": "A",
+    "patient_id": "P-0001568",
+    "prediction": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+    "confidence_percent": 79,
+    "probabilities": {
+      "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.79,
+      "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.0667,
+      "LETROZOLE": 0.0467,
+      "ANASTROZOLE": 0.0267,
+      "PACLITAXEL": 0.02,
+      "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.0167,
+      "TAMOXIFEN": 0.0167,
+      "LEUPROLIDE": 0.01,
+      "CAPECITABINE": 0.0067,
+      "LETROZOLE + PALBOCICLIB": 0
+    },
+    "options": [
+      {
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "rank": 1,
+        "probability": 0.79,
+        "features": [
+          {
+            "name": "HER2",
+            "value": "Yes",
+            "weight": 0.1712,
+            "explanation": "HER2 = Yes verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "BONE",
+            "value": "No",
+            "weight": 0.1287,
+            "explanation": "BONE = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": 0.1274,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "63",
+            "weight": 0.056,
+            "explanation": "CURRENT_AGE_DEID = 63 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "LYMPH_NODES",
+            "value": "Yes",
+            "weight": 0.0533,
+            "explanation": "LYMPH_NODES = Yes verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "11.092",
+            "weight": 0.0316,
+            "explanation": "TMB_NONSYNONYMOUS = 11.092 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": 0.0275,
+            "explanation": "HR = Yes verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "30",
+            "weight": 0.0216,
+            "explanation": "TUMOR_PURITY = 30 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "No",
+            "weight": 0.0173,
+            "explanation": "CNS_BRAIN = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": -0.0142,
+            "explanation": "LIVER = Yes verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": 0.014,
+            "explanation": "PLEURA = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Never",
+            "weight": 0.0131,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Never verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": 0.0109,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "OTHER",
+            "value": "Yes",
+            "weight": 0.0107,
+            "explanation": "OTHER = Yes verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": 0.0105,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "MSI_TYPE",
+            "value": "Stable",
+            "weight": 0.0074,
+            "explanation": "MSI_TYPE = Stable verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "No",
+            "weight": 0.0026,
+            "explanation": "ADRENAL_GLANDS = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "LUNG",
+            "value": "No",
+            "weight": 0.0003,
+            "explanation": "LUNG = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          }
+        ]
+      },
+      {
+        "regime": "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB",
+        "rank": 2,
+        "probability": 0.0667,
+        "features": [
+          {
+            "name": "HER2",
+            "value": "Yes",
+            "weight": 0.2007,
+            "explanation": "HER2 = Yes verschiebt Richtung PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": -0.1026,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt weg von PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": -0.0535,
+            "explanation": "HR = Yes verschiebt weg von PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "BONE",
+            "value": "No",
+            "weight": -0.0469,
+            "explanation": "BONE = No verschiebt weg von PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "11.092",
+            "weight": -0.0397,
+            "explanation": "TMB_NONSYNONYMOUS = 11.092 verschiebt weg von PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "63",
+            "weight": -0.0177,
+            "explanation": "CURRENT_AGE_DEID = 63 verschiebt weg von PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "30",
+            "weight": -0.0158,
+            "explanation": "TUMOR_PURITY = 30 verschiebt weg von PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "LUNG",
+            "value": "No",
+            "weight": 0.012,
+            "explanation": "LUNG = No verschiebt Richtung PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "LYMPH_NODES",
+            "value": "Yes",
+            "weight": 0.0111,
+            "explanation": "LYMPH_NODES = Yes verschiebt Richtung PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "No",
+            "weight": 0.0103,
+            "explanation": "CNS_BRAIN = No verschiebt Richtung PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": 0.0071,
+            "explanation": "PLEURA = No verschiebt Richtung PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "MSI_TYPE",
+            "value": "Stable",
+            "weight": 0.006,
+            "explanation": "MSI_TYPE = Stable verschiebt Richtung PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": -0.0053,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt weg von PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": 0.0045,
+            "explanation": "LIVER = Yes verschiebt Richtung PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Never",
+            "weight": -0.0043,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Never verschiebt weg von PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": 0.0028,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt Richtung PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "OTHER",
+            "value": "Yes",
+            "weight": -0.002,
+            "explanation": "OTHER = Yes verschiebt weg von PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "No",
+            "weight": 0.0002,
+            "explanation": "ADRENAL_GLANDS = No verschiebt Richtung PACLITAXEL + PERTUZUMAB + TRASTUZUMAB."
+          }
+        ]
+      },
+      {
+        "regime": "LETROZOLE",
+        "rank": 3,
+        "probability": 0.0467,
+        "features": [
+          {
+            "name": "HER2",
+            "value": "Yes",
+            "weight": -0.0788,
+            "explanation": "HER2 = Yes verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": 0.0187,
+            "explanation": "HR = Yes verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "63",
+            "weight": 0.0181,
+            "explanation": "CURRENT_AGE_DEID = 63 verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "LYMPH_NODES",
+            "value": "Yes",
+            "weight": -0.0169,
+            "explanation": "LYMPH_NODES = Yes verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": -0.0091,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "11.092",
+            "weight": 0.0075,
+            "explanation": "TMB_NONSYNONYMOUS = 11.092 verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "BONE",
+            "value": "No",
+            "weight": -0.0072,
+            "explanation": "BONE = No verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "LUNG",
+            "value": "No",
+            "weight": 0.0065,
+            "explanation": "LUNG = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": -0.006,
+            "explanation": "PLEURA = No verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "30",
+            "weight": 0.0058,
+            "explanation": "TUMOR_PURITY = 30 verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "MSI_TYPE",
+            "value": "Stable",
+            "weight": 0.0053,
+            "explanation": "MSI_TYPE = Stable verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": 0.0045,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": 0.0029,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "No",
+            "weight": -0.0021,
+            "explanation": "ADRENAL_GLANDS = No verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": -0.0018,
+            "explanation": "LIVER = Yes verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Never",
+            "weight": -0.0017,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Never verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "OTHER",
+            "value": "Yes",
+            "weight": 0.0007,
+            "explanation": "OTHER = Yes verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "No",
+            "weight": 0.0004,
+            "explanation": "CNS_BRAIN = No verschiebt Richtung LETROZOLE."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "study_label": "B",
+    "patient_id": "P-0000081",
+    "prediction": "LEUPROLIDE",
+    "confidence_percent": 19,
+    "probabilities": {
+      "LEUPROLIDE": 0.1933,
+      "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.1467,
+      "LETROZOLE": 0.1467,
+      "CAPECITABINE": 0.1267,
+      "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.1267,
+      "LETROZOLE + PALBOCICLIB": 0.1033,
+      "TAMOXIFEN": 0.09,
+      "ANASTROZOLE": 0.0633,
+      "PACLITAXEL": 0.0033,
+      "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0
+    },
+    "options": [
+      {
+        "regime": "LEUPROLIDE",
+        "rank": 1,
+        "probability": 0.1933,
+        "features": [
+          {
+            "name": "MSI_TYPE",
+            "value": "Instable",
+            "weight": 0.0522,
+            "explanation": "MSI_TYPE = Instable verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "50",
+            "weight": 0.0434,
+            "explanation": "CURRENT_AGE_DEID = 50 verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "LYMPH_NODES",
+            "value": "No",
+            "weight": -0.0211,
+            "explanation": "LYMPH_NODES = No verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": -0.0176,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "20",
+            "weight": -0.0167,
+            "explanation": "TUMOR_PURITY = 20 verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "OTHER",
+            "value": "No",
+            "weight": 0.0164,
+            "explanation": "OTHER = No verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "BONE",
+            "value": "Yes",
+            "weight": 0.0163,
+            "explanation": "BONE = Yes verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": 0.0161,
+            "explanation": "HR = Yes verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": 0.0095,
+            "explanation": "LIVER = Yes verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Never",
+            "weight": -0.0052,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Never verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "LUNG",
+            "value": "No",
+            "weight": 0.0052,
+            "explanation": "LUNG = No verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "HER2",
+            "value": "No",
+            "weight": 0.0036,
+            "explanation": "HER2 = No verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": -0.0033,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "Yes",
+            "weight": -0.0032,
+            "explanation": "CNS_BRAIN = Yes verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "6.655",
+            "weight": -0.0019,
+            "explanation": "TMB_NONSYNONYMOUS = 6.655 verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": -0.0012,
+            "explanation": "PLEURA = No verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": 0.0006,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "No",
+            "weight": 0.0005,
+            "explanation": "ADRENAL_GLANDS = No verschiebt Richtung LEUPROLIDE."
+          }
+        ]
+      },
+      {
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "rank": 2,
+        "probability": 0.1467,
+        "features": [
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": 0.0397,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "50",
+            "weight": 0.0305,
+            "explanation": "CURRENT_AGE_DEID = 50 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "LYMPH_NODES",
+            "value": "No",
+            "weight": -0.0256,
+            "explanation": "LYMPH_NODES = No verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "BONE",
+            "value": "Yes",
+            "weight": -0.016,
+            "explanation": "BONE = Yes verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Never",
+            "weight": 0.0117,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Never verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "20",
+            "weight": 0.0095,
+            "explanation": "TUMOR_PURITY = 20 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "HER2",
+            "value": "No",
+            "weight": -0.0095,
+            "explanation": "HER2 = No verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "6.655",
+            "weight": 0.009,
+            "explanation": "TMB_NONSYNONYMOUS = 6.655 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": -0.0086,
+            "explanation": "HR = Yes verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": 0.0078,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "MSI_TYPE",
+            "value": "Instable",
+            "weight": -0.0074,
+            "explanation": "MSI_TYPE = Instable verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "LUNG",
+            "value": "No",
+            "weight": -0.0047,
+            "explanation": "LUNG = No verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": 0.0038,
+            "explanation": "PLEURA = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": 0.0028,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "OTHER",
+            "value": "No",
+            "weight": 0.002,
+            "explanation": "OTHER = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": 0.0019,
+            "explanation": "LIVER = Yes verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "No",
+            "weight": -0.0003,
+            "explanation": "ADRENAL_GLANDS = No verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "Yes",
+            "weight": -0.0002,
+            "explanation": "CNS_BRAIN = Yes verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          }
+        ]
+      },
+      {
+        "regime": "LETROZOLE",
+        "rank": 3,
+        "probability": 0.1467,
+        "features": [
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "50",
+            "weight": -0.0303,
+            "explanation": "CURRENT_AGE_DEID = 50 verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "LYMPH_NODES",
+            "value": "No",
+            "weight": 0.0149,
+            "explanation": "LYMPH_NODES = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "6.655",
+            "weight": 0.0143,
+            "explanation": "TMB_NONSYNONYMOUS = 6.655 verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "MSI_TYPE",
+            "value": "Instable",
+            "weight": -0.0141,
+            "explanation": "MSI_TYPE = Instable verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": 0.0132,
+            "explanation": "HR = Yes verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": -0.0127,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "20",
+            "weight": 0.0099,
+            "explanation": "TUMOR_PURITY = 20 verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "BONE",
+            "value": "Yes",
+            "weight": 0.0083,
+            "explanation": "BONE = Yes verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "Yes",
+            "weight": 0.0083,
+            "explanation": "CNS_BRAIN = Yes verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": 0.0074,
+            "explanation": "LIVER = Yes verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": 0.0065,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "LUNG",
+            "value": "No",
+            "weight": 0.0064,
+            "explanation": "LUNG = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": 0.0039,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Never",
+            "weight": 0.0035,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Never verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "No",
+            "weight": 0.0025,
+            "explanation": "ADRENAL_GLANDS = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "OTHER",
+            "value": "No",
+            "weight": 0.0023,
+            "explanation": "OTHER = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "HER2",
+            "value": "No",
+            "weight": 0.0018,
+            "explanation": "HER2 = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": 0.001,
+            "explanation": "PLEURA = No verschiebt Richtung LETROZOLE."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "study_label": "C",
+    "patient_id": "P-0002566",
+    "prediction": "CAPECITABINE",
+    "confidence_percent": 54,
+    "probabilities": {
+      "CAPECITABINE": 0.54,
+      "LETROZOLE": 0.1267,
+      "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.0833,
+      "LETROZOLE + PALBOCICLIB": 0.0833,
+      "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.06,
+      "TAMOXIFEN": 0.0467,
+      "ANASTROZOLE": 0.03,
+      "LEUPROLIDE": 0.02,
+      "PACLITAXEL": 0.01,
+      "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0
+    },
+    "options": [
+      {
+        "regime": "CAPECITABINE",
+        "rank": 1,
+        "probability": 0.54,
+        "features": [
+          {
+            "name": "OTHER",
+            "value": "No",
+            "weight": 0.1075,
+            "explanation": "OTHER = No verschiebt Richtung CAPECITABINE."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": 0.0902,
+            "explanation": "LIVER = Yes verschiebt Richtung CAPECITABINE."
+          },
+          {
+            "name": "BONE",
+            "value": "Yes",
+            "weight": 0.069,
+            "explanation": "BONE = Yes verschiebt Richtung CAPECITABINE."
+          },
+          {
+            "name": "LYMPH_NODES",
+            "value": "No",
+            "weight": 0.0601,
+            "explanation": "LYMPH_NODES = No verschiebt Richtung CAPECITABINE."
+          },
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "73",
+            "weight": 0.057,
+            "explanation": "CURRENT_AGE_DEID = 73 verschiebt Richtung CAPECITABINE."
+          },
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": 0.0494,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt Richtung CAPECITABINE."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "20",
+            "weight": 0.0332,
+            "explanation": "TUMOR_PURITY = 20 verschiebt Richtung CAPECITABINE."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Unknown",
+            "weight": -0.0275,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Unknown verschiebt weg von CAPECITABINE."
+          },
+          {
+            "name": "HER2",
+            "value": "No",
+            "weight": 0.0225,
+            "explanation": "HER2 = No verschiebt Richtung CAPECITABINE."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "No",
+            "weight": -0.0129,
+            "explanation": "CNS_BRAIN = No verschiebt weg von CAPECITABINE."
+          },
+          {
+            "name": "LUNG",
+            "value": "No",
+            "weight": 0.0084,
+            "explanation": "LUNG = No verschiebt Richtung CAPECITABINE."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "3.327",
+            "weight": -0.0078,
+            "explanation": "TMB_NONSYNONYMOUS = 3.327 verschiebt weg von CAPECITABINE."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": -0.0072,
+            "explanation": "HR = Yes verschiebt weg von CAPECITABINE."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "No",
+            "weight": -0.0057,
+            "explanation": "ADRENAL_GLANDS = No verschiebt weg von CAPECITABINE."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": 0.0039,
+            "explanation": "PLEURA = No verschiebt Richtung CAPECITABINE."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": 0.0035,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt Richtung CAPECITABINE."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": -0.0021,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt weg von CAPECITABINE."
+          },
+          {
+            "name": "MSI_TYPE",
+            "value": "Stable",
+            "weight": -0.0015,
+            "explanation": "MSI_TYPE = Stable verschiebt weg von CAPECITABINE."
+          }
+        ]
+      },
+      {
+        "regime": "LETROZOLE",
+        "rank": 2,
+        "probability": 0.1267,
+        "features": [
+          {
+            "name": "OTHER",
+            "value": "No",
+            "weight": -0.0383,
+            "explanation": "OTHER = No verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "73",
+            "weight": 0.0282,
+            "explanation": "CURRENT_AGE_DEID = 73 verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": -0.0223,
+            "explanation": "LIVER = Yes verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "LYMPH_NODES",
+            "value": "No",
+            "weight": 0.0219,
+            "explanation": "LYMPH_NODES = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Unknown",
+            "weight": 0.0184,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Unknown verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": -0.0181,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": 0.0148,
+            "explanation": "HR = Yes verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "BONE",
+            "value": "Yes",
+            "weight": 0.0134,
+            "explanation": "BONE = Yes verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "20",
+            "weight": -0.009,
+            "explanation": "TUMOR_PURITY = 20 verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "No",
+            "weight": 0.0059,
+            "explanation": "CNS_BRAIN = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": 0.0055,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": -0.0053,
+            "explanation": "PLEURA = No verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "MSI_TYPE",
+            "value": "Stable",
+            "weight": 0.0051,
+            "explanation": "MSI_TYPE = Stable verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": 0.0042,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "LUNG",
+            "value": "No",
+            "weight": -0.0028,
+            "explanation": "LUNG = No verschiebt weg von LETROZOLE."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "No",
+            "weight": 0.0027,
+            "explanation": "ADRENAL_GLANDS = No verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "3.327",
+            "weight": 0.0019,
+            "explanation": "TMB_NONSYNONYMOUS = 3.327 verschiebt Richtung LETROZOLE."
+          },
+          {
+            "name": "HER2",
+            "value": "No",
+            "weight": 0.0009,
+            "explanation": "HER2 = No verschiebt Richtung LETROZOLE."
+          }
+        ]
+      },
+      {
+        "regime": "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE",
+        "rank": 3,
+        "probability": 0.0833,
+        "features": [
+          {
+            "name": "LYMPH_NODES",
+            "value": "No",
+            "weight": -0.0417,
+            "explanation": "LYMPH_NODES = No verschiebt weg von CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": 0.0347,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt Richtung CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "BONE",
+            "value": "Yes",
+            "weight": -0.0303,
+            "explanation": "BONE = Yes verschiebt weg von CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Unknown",
+            "weight": 0.0186,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Unknown verschiebt Richtung CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "20",
+            "weight": -0.0127,
+            "explanation": "TUMOR_PURITY = 20 verschiebt weg von CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "HER2",
+            "value": "No",
+            "weight": 0.012,
+            "explanation": "HER2 = No verschiebt Richtung CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "OTHER",
+            "value": "No",
+            "weight": -0.009,
+            "explanation": "OTHER = No verschiebt weg von CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": 0.0088,
+            "explanation": "HR = Yes verschiebt Richtung CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "73",
+            "weight": 0.0086,
+            "explanation": "CURRENT_AGE_DEID = 73 verschiebt Richtung CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "LUNG",
+            "value": "No",
+            "weight": -0.0064,
+            "explanation": "LUNG = No verschiebt weg von CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": -0.0037,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt weg von CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": 0.0035,
+            "explanation": "LIVER = Yes verschiebt Richtung CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "MSI_TYPE",
+            "value": "Stable",
+            "weight": -0.0028,
+            "explanation": "MSI_TYPE = Stable verschiebt weg von CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "No",
+            "weight": 0.0025,
+            "explanation": "CNS_BRAIN = No verschiebt Richtung CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "No",
+            "weight": 0.0017,
+            "explanation": "ADRENAL_GLANDS = No verschiebt Richtung CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": -0.0006,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt weg von CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": 0.0003,
+            "explanation": "PLEURA = No verschiebt Richtung CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "3.327",
+            "weight": -0.0002,
+            "explanation": "TMB_NONSYNONYMOUS = 3.327 verschiebt weg von CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "study_label": "D",
+    "patient_id": "P-0001862",
+    "prediction": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+    "confidence_percent": 28,
+    "probabilities": {
+      "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.28,
+      "ANASTROZOLE": 0.17,
+      "LEUPROLIDE": 0.17,
+      "LETROZOLE": 0.1667,
+      "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.12,
+      "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.0367,
+      "TAMOXIFEN": 0.0333,
+      "PACLITAXEL": 0.0167,
+      "CAPECITABINE": 0.0067,
+      "LETROZOLE + PALBOCICLIB": 0
+    },
+    "options": [
+      {
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "rank": 1,
+        "probability": 0.28,
+        "features": [
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": 0.0875,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "41",
+            "weight": 0.0239,
+            "explanation": "CURRENT_AGE_DEID = 41 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "HER2",
+            "value": "Yes",
+            "weight": -0.0236,
+            "explanation": "HER2 = Yes verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "Yes",
+            "weight": 0.0236,
+            "explanation": "ADRENAL_GLANDS = Yes verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "LUNG",
+            "value": "Yes",
+            "weight": 0.0214,
+            "explanation": "LUNG = Yes verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": 0.02,
+            "explanation": "PLEURA = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "Yes",
+            "weight": -0.0181,
+            "explanation": "CNS_BRAIN = Yes verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "BONE",
+            "value": "Yes",
+            "weight": -0.0175,
+            "explanation": "BONE = Yes verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "LYMPH_NODES",
+            "value": "Yes",
+            "weight": 0.0168,
+            "explanation": "LYMPH_NODES = Yes verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "1.109",
+            "weight": 0.0137,
+            "explanation": "TMB_NONSYNONYMOUS = 1.109 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": 0.0115,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Never",
+            "weight": 0.0113,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Never verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": 0.0074,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "40",
+            "weight": 0.0059,
+            "explanation": "TUMOR_PURITY = 40 verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": -0.0039,
+            "explanation": "HR = Yes verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": -0.0034,
+            "explanation": "LIVER = Yes verschiebt weg von CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "MSI_TYPE",
+            "value": "Stable",
+            "weight": 0.0019,
+            "explanation": "MSI_TYPE = Stable verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          },
+          {
+            "name": "OTHER",
+            "value": "Yes",
+            "weight": 0.0015,
+            "explanation": "OTHER = Yes verschiebt Richtung CYCLOPHOSPHAMIDE + DOXORUBICIN."
+          }
+        ]
+      },
+      {
+        "regime": "ANASTROZOLE",
+        "rank": 2,
+        "probability": 0.17,
+        "features": [
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": 0.0331,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "41",
+            "weight": -0.0223,
+            "explanation": "CURRENT_AGE_DEID = 41 verschiebt weg von ANASTROZOLE."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": 0.0177,
+            "explanation": "HR = Yes verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "LUNG",
+            "value": "Yes",
+            "weight": 0.0127,
+            "explanation": "LUNG = Yes verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "Yes",
+            "weight": -0.0099,
+            "explanation": "ADRENAL_GLANDS = Yes verschiebt weg von ANASTROZOLE."
+          },
+          {
+            "name": "HER2",
+            "value": "Yes",
+            "weight": 0.0086,
+            "explanation": "HER2 = Yes verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": 0.0059,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Never",
+            "weight": 0.0055,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Never verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": 0.0053,
+            "explanation": "LIVER = Yes verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "Yes",
+            "weight": 0.0046,
+            "explanation": "CNS_BRAIN = Yes verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": 0.0045,
+            "explanation": "PLEURA = No verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "MSI_TYPE",
+            "value": "Stable",
+            "weight": 0.0022,
+            "explanation": "MSI_TYPE = Stable verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": 0.002,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "BONE",
+            "value": "Yes",
+            "weight": -0.0012,
+            "explanation": "BONE = Yes verschiebt weg von ANASTROZOLE."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "1.109",
+            "weight": 0.001,
+            "explanation": "TMB_NONSYNONYMOUS = 1.109 verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "LYMPH_NODES",
+            "value": "Yes",
+            "weight": 0.001,
+            "explanation": "LYMPH_NODES = Yes verschiebt Richtung ANASTROZOLE."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "40",
+            "weight": -0.0007,
+            "explanation": "TUMOR_PURITY = 40 verschiebt weg von ANASTROZOLE."
+          },
+          {
+            "name": "OTHER",
+            "value": "Yes",
+            "weight": 0.0001,
+            "explanation": "OTHER = Yes verschiebt Richtung ANASTROZOLE."
+          }
+        ]
+      },
+      {
+        "regime": "LEUPROLIDE",
+        "rank": 3,
+        "probability": 0.17,
+        "features": [
+          {
+            "name": "CURRENT_AGE_DEID",
+            "value": "41",
+            "weight": 0.0756,
+            "explanation": "CURRENT_AGE_DEID = 41 verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "HR",
+            "value": "Yes",
+            "weight": 0.03,
+            "explanation": "HR = Yes verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "LUNG",
+            "value": "Yes",
+            "weight": -0.0218,
+            "explanation": "LUNG = Yes verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "TMB_NONSYNONYMOUS",
+            "value": "1.109",
+            "weight": 0.0174,
+            "explanation": "TMB_NONSYNONYMOUS = 1.109 verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "ADRENAL_GLANDS",
+            "value": "Yes",
+            "weight": -0.0151,
+            "explanation": "ADRENAL_GLANDS = Yes verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "PLEURA",
+            "value": "No",
+            "weight": -0.0135,
+            "explanation": "PLEURA = No verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "LIVER",
+            "value": "Yes",
+            "weight": -0.0126,
+            "explanation": "LIVER = Yes verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "HER2",
+            "value": "Yes",
+            "weight": -0.0094,
+            "explanation": "HER2 = Yes verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "CNS_BRAIN",
+            "value": "Yes",
+            "weight": 0.009,
+            "explanation": "CNS_BRAIN = Yes verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "REPRODUCTIVE_ORGANS",
+            "value": "No",
+            "weight": 0.0083,
+            "explanation": "REPRODUCTIVE_ORGANS = No verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "LYMPH_NODES",
+            "value": "Yes",
+            "weight": 0.006,
+            "explanation": "LYMPH_NODES = Yes verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "BONE",
+            "value": "Yes",
+            "weight": -0.0056,
+            "explanation": "BONE = Yes verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "OTHER",
+            "value": "Yes",
+            "weight": 0.0041,
+            "explanation": "OTHER = Yes verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "MSI_TYPE",
+            "value": "Stable",
+            "weight": -0.0024,
+            "explanation": "MSI_TYPE = Stable verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "SMOKING_PREDICTIONS_3_CLASSES",
+            "value": "Never",
+            "weight": 0.0022,
+            "explanation": "SMOKING_PREDICTIONS_3_CLASSES = Never verschiebt Richtung LEUPROLIDE."
+          },
+          {
+            "name": "STAGE_HIGHEST_RECORDED",
+            "value": "Stage 1-3",
+            "weight": -0.001,
+            "explanation": "STAGE_HIGHEST_RECORDED = Stage 1-3 verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "INTRA_ABDOMINAL",
+            "value": "No",
+            "weight": -0.0007,
+            "explanation": "INTRA_ABDOMINAL = No verschiebt weg von LEUPROLIDE."
+          },
+          {
+            "name": "TUMOR_PURITY",
+            "value": "40",
+            "weight": -0.0001,
+            "explanation": "TUMOR_PURITY = 40 verschiebt weg von LEUPROLIDE."
+          }
+        ]
+      }
+    ]
+  }
+]
