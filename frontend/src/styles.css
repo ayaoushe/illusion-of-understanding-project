@@ -245,6 +245,99 @@ body {
   padding-bottom: 80px;
 }
 
+.case-selection {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8fbff 0%, #e8f1ff 100%);
+}
+
+.case-selection-inner {
+  width: min(760px, 100%);
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 2rem;
+}
+
+.case-selection-header h1 {
+  margin: 0;
+  font-size: 1.7rem;
+  color: var(--text-dark);
+}
+
+.case-selection-header p {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted);
+}
+
+.case-combobox {
+  position: relative;
+  margin-top: 1rem;
+}
+
+.case-combobox-input {
+  width: 100%;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  background: #f8fafc;
+}
+
+.case-listbox {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  list-style: none;
+  padding: 0.35rem;
+  margin: 0;
+  z-index: 20;
+}
+
+.case-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.case-option.is-highlighted,
+.case-option:hover {
+  background: var(--primary-light);
+}
+
+.case-option-name {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.case-option-id {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.case-option-empty {
+  padding: 0.6rem 0.75rem;
+  color: var(--text-muted);
+}
+
+.case-selection-error {
+  margin-top: 1rem;
+  color: var(--danger);
+}
+
 .page {
   max-width: 1200px;
   margin: 0 auto;

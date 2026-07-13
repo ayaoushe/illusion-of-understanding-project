@@ -1,6 +1,6 @@
 import { jsx as _jsx } from "react/jsx-runtime";
 import { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import { WORKFLOW_STEPS } from '../data/mockData';
+import { WORKFLOW_STEPS, getPatientProfile } from '../data/mockData';
 import { initialTelemetry, detectBiasWarnings, trackInteraction } from '../services/interactionService';
 import { fetchEvidenceSynthesis } from '../services/aiService';
 const WorkflowContext = createContext(null);
@@ -12,7 +12,9 @@ export function WorkflowProvider({ children }) {
     const [evidenceLoading, setEvidenceLoading] = useState(false);
     const [reflection, setReflection] = useState(null);
     const [telemetry, setTelemetry] = useState(initialTelemetry);
+    const [selectedPatientId, setSelectedPatientId] = useState(null);
     const assessmentComplete = assessment !== null;
+    const selectedPatient = useMemo(() => getPatientProfile(selectedPatientId), [selectedPatientId]);
     const canAccessStep = useCallback((stepId) => {
         if (!GATED_STEPS.includes(stepId))
             return true;
@@ -38,18 +40,19 @@ export function WorkflowProvider({ children }) {
     }, []);
     const submitAssessment = useCallback(async (data) => {
         const completed = { ...data, completedAt: new Date().toISOString() };
+        const patientId = selectedPatientId ?? '4821-7734';
         setAssessment(completed);
         setTelemetry((t) => ({ ...t, assessmentSubmitTime: Date.now() }));
         setEvidenceLoading(true);
         try {
-            const synthesis = await fetchEvidenceSynthesis('4821-7734', completed);
+            const synthesis = await fetchEvidenceSynthesis(patientId, completed);
             setEvidence(synthesis);
         }
         finally {
             setEvidenceLoading(false);
         }
         setCurrentStep('evidence');
-    }, []);
+    }, [selectedPatientId]);
     const submitReflection = useCallback((data) => {
         setReflection(data);
     }, []);
@@ -57,6 +60,8 @@ export function WorkflowProvider({ children }) {
         setTelemetry((t) => trackInteraction(t, event));
     }, []);
     const selectPatient = useCallback((patientId) => {
+        setSelectedPatientId(patientId);
+        setCurrentStep('overview');
         setTelemetry((t) => ({ ...t, evidenceInteractions: [...t.evidenceInteractions, `selected:${patientId}`] }));
     }, []);
     const biasWarnings = useMemo(() => detectBiasWarnings(telemetry), [telemetry]);
@@ -69,6 +74,8 @@ export function WorkflowProvider({ children }) {
         evidenceLoading,
         reflection,
         telemetry,
+        selectedPatientId,
+        selectedPatient,
         biasWarnings,
         canAccessStep,
         goToStep,

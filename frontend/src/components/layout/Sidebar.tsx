@@ -3,7 +3,8 @@ import { useWorkflow } from '../../context/WorkflowContext';
 import { StepNavigation } from './StepNavigation';
 
 export function Sidebar() {
-  const { steps, currentStep, canAccessStep, goToStep } = useWorkflow();
+  const { steps, currentStep, canAccessStep, goToStep, selectedPatient } = useWorkflow();
+  const patient = selectedPatient ?? mockPatient;
 
   return (
     <aside className="sidebar">
@@ -14,8 +15,8 @@ export function Sidebar() {
 
       <div className="sidebar-patient">
         <span className="sidebar-patient-label">Current Patient</span>
-        <strong>{mockPatient.name}</strong>
-        <span className="sidebar-patient-mrn">MRN: {mockPatient.mrn}</span>
+        <strong>{patient.name}</strong>
+        <span className="sidebar-patient-mrn">MRN: {patient.mrn}</span>
       </div>
 
       <StepNavigation
@@ -27,8 +28,8 @@ export function Sidebar() {
 
       <div className="sidebar-footer">
         <div className="sidebar-clinician">
-          <span>{mockPatient.session.clinician}</span>
-          <span>{mockPatient.session.date}</span>
+          <span>{patient.session.clinician}</span>
+          <span>{patient.session.date}</span>
         </div>
         <p className="sidebar-research-note">
           Research prototype exploring how explanations influence clinical decision-making.

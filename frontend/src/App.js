@@ -8,8 +8,12 @@ import { TreatmentComparison } from './pages/TreatmentComparison';
 import { SimilarCases } from './pages/SimilarCases';
 import { DecisionFactors } from './pages/DecisionFactors';
 import { FinalReflection } from './pages/FinalReflection';
+import { CaseSelection } from './pages/CaseSelection';
 function WorkflowContent() {
-    const { currentStep } = useWorkflow();
+    const { currentStep, selectedPatientId } = useWorkflow();
+    if (!selectedPatientId) {
+        return _jsx(CaseSelection, {});
+    }
     const pages = {
         overview: _jsx(PatientOverview, {}),
         assessment: _jsx(HumanAssessment, {}),

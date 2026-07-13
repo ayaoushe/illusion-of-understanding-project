@@ -5,8 +5,9 @@ import type {
   FinalReflection,
   InteractionTelemetry,
   AiEvidenceSynthesis,
+  Patient,
 } from '../types';
-import { WORKFLOW_STEPS } from '../data/mockData';
+import { WORKFLOW_STEPS, getPatientProfile } from '../data/mockData';
 import { initialTelemetry, detectBiasWarnings, trackInteraction } from '../services/interactionService';
 import { fetchEvidenceSynthesis } from '../services/aiService';
 
@@ -19,6 +20,8 @@ interface WorkflowContextValue {
   evidenceLoading: boolean;
   reflection: FinalReflection | null;
   telemetry: InteractionTelemetry;
+  selectedPatientId: string | null;
+  selectedPatient: Patient | null;
   biasWarnings: ReturnType<typeof detectBiasWarnings>;
   canAccessStep: (stepId: WorkflowStepId) => boolean;
   goToStep: (stepId: WorkflowStepId) => void;
@@ -42,8 +45,10 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
   const [evidenceLoading, setEvidenceLoading] = useState(false);
   const [reflection, setReflection] = useState<FinalReflection | null>(null);
   const [telemetry, setTelemetry] = useState<InteractionTelemetry>(initialTelemetry);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
   const assessmentComplete = assessment !== null;
+  const selectedPatient = useMemo(() => getPatientProfile(selectedPatientId), [selectedPatientId]);
 
   const canAccessStep = useCallback(
     (stepId: WorkflowStepId) => {
@@ -78,17 +83,18 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
 
   const submitAssessment = useCallback(async (data: HumanAssessment) => {
     const completed: HumanAssessment = { ...data, completedAt: new Date().toISOString() };
+    const patientId = selectedPatientId ?? '4821-7734';
     setAssessment(completed);
     setTelemetry((t) => ({ ...t, assessmentSubmitTime: Date.now() }));
     setEvidenceLoading(true);
     try {
-      const synthesis = await fetchEvidenceSynthesis('4821-7734', completed);
+      const synthesis = await fetchEvidenceSynthesis(patientId, completed);
       setEvidence(synthesis);
     } finally {
       setEvidenceLoading(false);
     }
     setCurrentStep('evidence');
-  }, []);
+  }, [selectedPatientId]);
 
   const submitReflection = useCallback((data: FinalReflection) => {
     setReflection(data);
@@ -99,6 +105,8 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const selectPatient = useCallback((patientId: string) => {
+    setSelectedPatientId(patientId);
+    setCurrentStep('overview');
     setTelemetry((t) => ({ ...t, evidenceInteractions: [...t.evidenceInteractions, `selected:${patientId}`] }));
   }, []);
 
@@ -113,6 +121,8 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     evidenceLoading,
     reflection,
     telemetry,
+    selectedPatientId,
+    selectedPatient,
     biasWarnings,
     canAccessStep,
     goToStep,

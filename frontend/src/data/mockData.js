@@ -1,3 +1,4 @@
+import { mrnFromId } from '../config/studyCases';
 export const WORKFLOW_STEPS = [
     { id: 'overview', label: 'Patient Overview', shortLabel: 'Overview', number: 1 },
     { id: 'assessment', label: 'Human Initial Assessment', shortLabel: 'Assessment', number: 2 },
@@ -138,6 +139,62 @@ export const mockPatient = {
         version: 'OncoCDSS v2.0',
     },
 };
+const patientProfileOverrides = {
+    'P-0001568': {
+        name: 'Anna Seeler',
+        mrn: mrnFromId('P-0001568'),
+        age: 63,
+        gender: 'Female',
+        diagnosis: { primaryDiagnosis: 'Metastatic Breast Cancer', stage: 'IIA', histology: 'Ductal carcinoma', location: 'Right breast', icd10: 'C50.911', diagnosisDate: '2024-01-22' },
+        performance: { ecog: 1, ecogDescription: 'Restricted activity, in bed <50% of day', lastAssessed: '2025-03-08' },
+    },
+    'P-0000081': {
+        name: 'Bianca Stefen',
+        mrn: mrnFromId('P-0000081'),
+        age: 58,
+        gender: 'Female',
+        diagnosis: { primaryDiagnosis: 'Hormone-Receptor Positive Breast Cancer', stage: 'IIB', histology: 'Lobular carcinoma', location: 'Left breast', icd10: 'C50.812', diagnosisDate: '2023-11-10' },
+        performance: { ecog: 0, ecogDescription: 'Fully active', lastAssessed: '2025-04-01' },
+    },
+    'P-0002566': {
+        name: 'Clara Campista',
+        mrn: mrnFromId('P-0002566'),
+        age: 71,
+        gender: 'Female',
+        diagnosis: { primaryDiagnosis: 'Advanced Lung Adenocarcinoma', stage: 'IIIB', histology: 'Adenocarcinoma', location: 'Left upper lobe', icd10: 'C34.12', diagnosisDate: '2024-03-18' },
+        performance: { ecog: 2, ecogDescription: 'Ambulatory and capable of self-care, but unable to work', lastAssessed: '2025-05-05' },
+    },
+    'P-0001862': {
+        name: 'Diana Ernst',
+        mrn: mrnFromId('P-0001862'),
+        age: 67,
+        gender: 'Female',
+        diagnosis: { primaryDiagnosis: 'Oligometastatic NSCLC', stage: 'IVA', histology: 'Adenocarcinoma', location: 'Right lower lobe', icd10: 'C34.31', diagnosisDate: '2024-06-09' },
+        performance: { ecog: 1, ecogDescription: 'Restricted activity, in bed <50% of day', lastAssessed: '2025-04-20' },
+    },
+};
+export function getPatientProfile(patientId) {
+    if (!patientId)
+        return mockPatient;
+    const overrides = patientProfileOverrides[patientId];
+    if (!overrides)
+        return mockPatient;
+    return {
+        ...mockPatient,
+        ...overrides,
+        diagnosis: { ...mockPatient.diagnosis, ...(overrides.diagnosis ?? {}) },
+        performance: { ...mockPatient.performance, ...(overrides.performance ?? {}) },
+        molecular: {
+            ...mockPatient.molecular,
+            ...(overrides.molecular ?? {}),
+            egfr: { ...mockPatient.molecular.egfr, ...((overrides.molecular?.egfr) ?? {}) },
+            alk: { ...mockPatient.molecular.alk, ...((overrides.molecular?.alk) ?? {}) },
+            pdl1: { ...mockPatient.molecular.pdl1, ...((overrides.molecular?.pdl1) ?? {}) },
+            tmb: { ...mockPatient.molecular.tmb, ...((overrides.molecular?.tmb) ?? {}) },
+            kras: { ...mockPatient.molecular.kras, ...((overrides.molecular?.kras) ?? {}) },
+        },
+    };
+}
 export const mockRiskFlags = [
     {
         id: 'renal',
