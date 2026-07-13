@@ -122,15 +122,28 @@ export interface EvidenceItem {
   source?: string;
 }
 
+export interface PublishedCohort {
+  cohortName: string;
+  population: string;
+  similarityLevel: 'High' | 'Moderate' | 'Partial';
+  matchingFactors: string[];
+  limitationFactors: string[];
+  implication: string;
+  sourceLabel: string;
+  sourceUrl?: string;
+}
+
 export interface AiEvidenceSynthesis {
   title: string;
   disclaimer: string;
   uncertaintyLevel: 'low' | 'moderate' | 'high';
+  uncertaintySummary: string;
   uncertaintyDescription: string;
   evidenceFor: EvidenceItem[];
   evidenceAgainst: EvidenceItem[];
   missingData: string[];
   riskFlags: RiskFlag[];
+  publishedCohorts: PublishedCohort[];
   sources: Array<{
     title: string;
     year: number;
@@ -169,6 +182,13 @@ export interface SimilarCase {
   outcome: string;
   source: string;
   matchScore: number;
+}
+
+export interface StudyCase {
+  patient_id: string;
+  options: Array<{
+    features: Array<{ name: string; value: string }>;
+  }>;
 }
 
 export interface DecisionChangeFactor {

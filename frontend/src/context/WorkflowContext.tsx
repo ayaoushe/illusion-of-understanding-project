@@ -28,6 +28,7 @@ interface WorkflowContextValue {
   submitReflection: (data: FinalReflection) => void;
   recordInteraction: (event: { type: string; payload?: string }) => void;
   startAssessment: () => void;
+  selectPatient: (patientId: string) => void;
 }
 
 const WorkflowContext = createContext<WorkflowContextValue | null>(null);
@@ -97,6 +98,10 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     setTelemetry((t) => trackInteraction(t, event));
   }, []);
 
+  const selectPatient = useCallback((patientId: string) => {
+    setTelemetry((t) => ({ ...t, evidenceInteractions: [...t.evidenceInteractions, `selected:${patientId}`] }));
+  }, []);
+
   const biasWarnings = useMemo(() => detectBiasWarnings(telemetry), [telemetry]);
 
   const value: WorkflowContextValue = {
@@ -117,6 +122,7 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     submitReflection,
     recordInteraction,
     startAssessment,
+    selectPatient,
   };
 
   return <WorkflowContext.Provider value={value}>{children}</WorkflowContext.Provider>;

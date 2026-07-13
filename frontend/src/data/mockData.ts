@@ -1,11 +1,13 @@
 import type {
   Patient,
   AiEvidenceSynthesis,
+  PublishedCohort,
   TreatmentOption,
   SimilarCase,
   DecisionChangeFactor,
   DecisionFactor,
   WorkflowStep,
+  RiskFlag,
 } from '../types';
 
 export const WORKFLOW_STEPS: WorkflowStep[] = [
@@ -208,6 +210,7 @@ export const mockAiEvidence: AiEvidenceSynthesis = {
   disclaimer:
     'Evidence-based synthesis of guidelines and literature. This is decision support — not a final recommendation. All outputs require clinician verification.',
   uncertaintyLevel: 'moderate',
+  uncertaintySummary: 'Strong molecular evidence supports TKI therapy, but surgical candidacy and cardiac function remain undetermined.',
   uncertaintyDescription:
     'Strong molecular evidence supports TKI therapy, but surgical candidacy and cardiac function remain undetermined. Patient similarity to published cohorts is moderate.',
 
@@ -230,6 +233,18 @@ export const mockAiEvidence: AiEvidenceSynthesis = {
   missingData: mockPatient.missingData,
 
   riskFlags: mockRiskFlags,
+  publishedCohorts: [
+    {
+      cohortName: 'FLAURA Trial Cohort',
+      population: 'EGFR+ advanced NSCLC treated with first-line targeted therapy',
+      similarityLevel: 'High',
+      matchingFactors: ['EGFR mutation', 'Stage III disease context', 'Outpatient preference'],
+      limitationFactors: ['Trial population younger than this case'],
+      implication: 'Supports a targeted therapy-first strategy.',
+      sourceLabel: 'FLAURA Trial',
+      sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/36841857',
+    },
+  ],
 
   keyReasoningFactors: [
     { factor: 'EGFR mutation status', weight: 'high', direction: 'supports' },
@@ -246,6 +261,224 @@ export const mockAiEvidence: AiEvidenceSynthesis = {
     { title: 'PACIFIC Trial: Durvalumab after CRT', year: 2018, type: 'RCT', url: 'https://pubmed.ncbi.nlm.nih.gov/28102484' },
     { title: 'Renal Impairment and Anticancer Drug Selection', year: 2024, type: 'Review', url: 'https://pubmed.ncbi.nlm.nih.gov/38456789' },
   ],
+};
+
+function createTreatmentEvidenceProfile(params: {
+  uncertaintyLevel: AiEvidenceSynthesis['uncertaintyLevel'];
+  uncertaintySummary: string;
+  uncertaintyDescription: string;
+  evidenceFor: Array<{ text: string; source: string }>;
+  evidenceAgainst: Array<{ text: string; source: string }>;
+  riskFlags: RiskFlag[];
+  publishedCohorts: PublishedCohort[];
+  sources: Array<{ title: string; year: number; type: string; url: string }>;
+  reasoningFactors: Array<{ factor: string; weight: 'high' | 'medium' | 'low'; direction: 'supports' | 'cautions' | 'neutral' }>;
+}): AiEvidenceSynthesis {
+  return {
+    title: 'AI Evidence Synthesis',
+    disclaimer: 'Evidence-based synthesis of guidelines and literature. This is decision support — not a final recommendation. All outputs require clinician verification.',
+    uncertaintyLevel: params.uncertaintyLevel,
+    uncertaintySummary: params.uncertaintySummary,
+    uncertaintyDescription: params.uncertaintyDescription,
+    evidenceFor: params.evidenceFor,
+    evidenceAgainst: params.evidenceAgainst,
+    missingData: mockPatient.missingData,
+    riskFlags: params.riskFlags,
+    publishedCohorts: params.publishedCohorts,
+    sources: params.sources,
+    keyReasoningFactors: params.reasoningFactors,
+  };
+}
+
+export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
+  osimertinib: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Strong targeted-therapy evidence remains the best fit for this patient, but missing cardiac and surgical data keep confidence moderate.',
+    uncertaintyDescription: 'The EGFR-targeted pathway is well supported, yet unresolved surgical candidacy and cardiac workup still affect certainty.',
+    evidenceFor: [
+      { text: 'EGFR Exon 19 deletion is a strong TKI-sensitizing alteration and aligns with first-line targeted treatment.', source: 'FLAURA Trial' },
+      { text: 'Osimertinib offers outpatient delivery that suits the patient’s preference for minimal hospitalization.', source: 'Patient context' },
+      { text: 'Renal-sparing dosing is preferred given mild renal impairment and baseline diabetes.', source: 'Renal dosing review' },
+    ],
+    evidenceAgainst: [
+      { text: 'Stage IIIB disease may still justify multimodal treatment in some centers, especially if local control is prioritized.', source: 'PACIFIC Trial' },
+      { text: 'Missing cardiac evaluation limits confidence in any highly intensive regimen.', source: 'Missing data' },
+      { text: 'Elevated LDH suggests a more aggressive disease burden than the current case description captures.', source: 'Prognostic markers' },
+    ],
+    riskFlags: [mockRiskFlags[0], mockRiskFlags[2], mockRiskFlags[3]],
+    publishedCohorts: [
+      { cohortName: 'FLAURA Trial Cohort', population: 'EGFR+ advanced NSCLC, first-line TKI treated', similarityLevel: 'High', matchingFactors: ['EGFR mutation', 'Stage IIIB disease', 'Outpatient preference'], limitationFactors: ['Trial population younger than this case', 'Limited surgical data'], implication: 'Strong support for targeted therapy with close monitoring.', sourceLabel: 'FLAURA Trial', sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/36841857' },
+      { cohortName: 'EGFR+ real-world NSCLC cohort', population: 'Real-world patients receiving EGFR TKIs in community oncology', similarityLevel: 'Moderate', matchingFactors: ['Comparable comorbidity burden', 'QoL-focused care pathway'], limitationFactors: ['Less complete molecular workup', 'No surgery outcomes captured'], implication: 'Supports a TKI-first approach if symptoms and tolerability remain manageable.', sourceLabel: 'Institutional cohort', sourceUrl: 'https://www.nccn.org' },
+      { cohortName: 'CNS-active TKI cohort', population: 'Patients selected for osimertinib due to CNS or symptom burden', similarityLevel: 'Partial', matchingFactors: ['Outpatient preference', 'Need for symptom control'], limitationFactors: ['Not all patients had stage III disease'], implication: 'Suggests good fit if CNS symptoms or tolerability concerns are present.', sourceLabel: 'Guideline synthesis', sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
+    ],
+    sources: [
+      { title: 'NCCN Guidelines for NSCLC', year: 2025, type: 'Guideline', url: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
+      { title: 'FLAURA Trial: Osimertinib in EGFR+ NSCLC', year: 2023, type: 'RCT', url: 'https://pubmed.ncbi.nlm.nih.gov/36841857' },
+      { title: 'PACIFIC Trial: Durvalumab after CRT', year: 2018, type: 'RCT', url: 'https://pubmed.ncbi.nlm.nih.gov/28102484' },
+    ],
+    reasoningFactors: [
+      { factor: 'EGFR mutation status', weight: 'high', direction: 'supports' },
+      { factor: 'Renal function', weight: 'medium', direction: 'supports' },
+      { factor: 'Cardiac workup', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+  erlotinib: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Erlotinib remains a reasonable EGFR-directed option, although it is less favored than osimertinib for this case.',
+    uncertaintyDescription: 'The evidence is clinically reasonable, but lower efficacy and weaker CNS activity make the choice less compelling than newer agents.',
+    evidenceFor: [
+      { text: 'Erlotinib is an established EGFR-directed agent and remains active in selected patients.', source: 'NCCN Guidelines' },
+      { text: 'It may be acceptable when oral therapy and tolerability are prioritized.', source: 'Patient context' },
+      { text: 'The outpatient regimen aligns with quality-of-life goals and reduced hospital exposure.', source: 'Patient context' },
+    ],
+    evidenceAgainst: [
+      { text: 'Compared with osimertinib, erlotinib has less favorable efficacy and CNS activity.', source: 'FLAURA Trial' },
+      { text: 'Baseline renal and metabolic factors require careful monitoring during treatment.', source: 'Renal dosing review' },
+      { text: 'Without complete cardiac workup, escalation to intensive disease-directed regimens remains uncertain.', source: 'Missing data' },
+    ],
+    riskFlags: [mockRiskFlags[0], mockRiskFlags[2]],
+    publishedCohorts: [
+      { cohortName: 'Erlotinib real-world cohort', population: 'EGFR+ NSCLC patients treated with first-generation TKIs', similarityLevel: 'Moderate', matchingFactors: ['Oral therapy preference', 'Similar comorbidity profile'], limitationFactors: ['Older generation TKI', 'Lower CNS activity'], implication: 'Reasonable fallback if newer agents are not available or tolerated.', sourceLabel: 'Institutional cohort', sourceUrl: 'https://www.nccn.org' },
+      { cohortName: 'First-generation EGFR TKI cohort', population: 'Patients with EGFR mutation and limited metastatic burden', similarityLevel: 'Partial', matchingFactors: ['Targeted strategy favored'], limitationFactors: ['Less durable benefit than osimertinib'], implication: 'Can support a conservative strategy when toxicity risk is a priority.', sourceLabel: 'Guideline synthesis', sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
+    ],
+    sources: [
+      { title: 'NCCN Guidelines for NSCLC', year: 2025, type: 'Guideline', url: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
+      { title: 'FLAURA Trial: Osimertinib in EGFR+ NSCLC', year: 2023, type: 'RCT', url: 'https://pubmed.ncbi.nlm.nih.gov/36841857' },
+    ],
+    reasoningFactors: [
+      { factor: 'First-line EGFR targeting', weight: 'high', direction: 'supports' },
+      { factor: 'Treatment convenience', weight: 'medium', direction: 'supports' },
+      { factor: 'Relative efficacy gap', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+  gefitinib: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Gefitinib is a plausible EGFR-directed alternative, but it is less favored than newer genotypically optimized agents.',
+    uncertaintyDescription: 'This option has targeted-therapy rationale, though the evidence base is less contemporary than osimertinib.',
+    evidenceFor: [
+      { text: 'Gefitinib remains a recognized EGFR TKI option in select patients.', source: 'NCCN Guidelines' },
+      { text: 'Oral administration supports a lower-burden treatment experience.', source: 'Patient context' },
+    ],
+    evidenceAgainst: [
+      { text: 'Current evidence is less robust than for newer agents and may be less effective in broader populations.', source: 'FLAURA Trial' },
+      { text: 'Therapy selection should be revisited if symptoms or disease burden worsen.', source: 'Missing data' },
+    ],
+    riskFlags: [mockRiskFlags[0], mockRiskFlags[3]],
+    publishedCohorts: [
+      { cohortName: 'Gefitinib-treated EGFR+ cohort', population: 'Selected patients with EGFR mutations and mild disease burden', similarityLevel: 'Partial', matchingFactors: ['Oral targeted therapy', 'Similar symptom goals'], limitationFactors: ['Older evidence base'], implication: 'May be suitable if a less intensive treatment pathway is preferred.', sourceLabel: 'Guideline synthesis', sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
+    ],
+    sources: [
+      { title: 'NCCN Guidelines for NSCLC', year: 2025, type: 'Guideline', url: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
+      { title: 'FLAURA Trial: Osimertinib in EGFR+ NSCLC', year: 2023, type: 'RCT', url: 'https://pubmed.ncbi.nlm.nih.gov/36841857' },
+    ],
+    reasoningFactors: [
+      { factor: 'Targeted therapy rationale', weight: 'medium', direction: 'supports' },
+      { factor: 'Need for newer-generation option', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+  afatinib: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Afatinib remains a viable EGFR-directed option, but toxicity and resistance concerns make it more uncertain than newer agents.',
+    uncertaintyDescription: 'This path has meaningful targeted-therapy support but should be weighed against side-effect burden and treatment convenience.',
+    evidenceFor: [
+      { text: 'Afatinib is an established irreversible EGFR inhibitor for selected EGFR-mutated disease.', source: 'NCCN Guidelines' },
+      { text: 'It can be considered when a non-osimertinib EGFR TKI is preferred.', source: 'Patient context' },
+    ],
+    evidenceAgainst: [
+      { text: 'Higher toxicity burden may be less acceptable in a patient with QoL concerns and baseline anemia.', source: 'Patient context' },
+      { text: 'The current evidence profile is less favorable than optimized TKI pathways.', source: 'FLAURA Trial' },
+    ],
+    riskFlags: [mockRiskFlags[2], mockRiskFlags[3]],
+    publishedCohorts: [
+      { cohortName: 'Afatinib-treated EGFR+ cohort', population: 'EGFR-mutant NSCLC patients receiving ERBB-family inhibition', similarityLevel: 'Partial', matchingFactors: ['Mutation-driven strategy'], limitationFactors: ['Higher toxicity burden', 'Less contemporary evidence'], implication: 'Useful if a more conservative targeted approach is needed.', sourceLabel: 'Guideline synthesis', sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
+    ],
+    sources: [
+      { title: 'NCCN Guidelines for NSCLC', year: 2025, type: 'Guideline', url: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
+      { title: 'FLAURA Trial: Osimertinib in EGFR+ NSCLC', year: 2023, type: 'RCT', url: 'https://pubmed.ncbi.nlm.nih.gov/36841857' },
+    ],
+    reasoningFactors: [
+      { factor: 'Targeted strategy', weight: 'medium', direction: 'supports' },
+      { factor: 'Tolerability', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+  'carboplatin-pemetrexed': createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'high',
+    uncertaintySummary: 'Platinum-based chemotherapy remains a plausible option, but renal and anemia concerns make it less suitable than targeted therapy.',
+    uncertaintyDescription: 'The evidence base is broad, yet features of the patient profile create meaningful concern around tolerability and toxicity.',
+    evidenceFor: [
+      { text: 'Platinum-based chemotherapy remains an established option for fit patients with non-squamous disease.', source: 'NCCN Guidelines' },
+      { text: 'The patient’s disease burden and stage may warrant consideration of systemic cytotoxic treatment.', source: 'PACIFIC Trial' },
+    ],
+    evidenceAgainst: [
+      { text: 'Renal function and anemia increase the risk of toxicity and treatment delays.', source: 'Renal dosing review' },
+      { text: 'Patient preference for minimal hospitalization and outpatient care argues against a highly intensive regimen.', source: 'Patient context' },
+      { text: 'Incomplete cardiac workup limits confidence in an aggressive plan.', source: 'Missing data' },
+    ],
+    riskFlags: [mockRiskFlags[0], mockRiskFlags[2], mockRiskFlags[4]],
+    publishedCohorts: [
+      { cohortName: 'Platinum-based chemotherapy cohort', population: 'Fit patients with stage III NSCLC and non-squamous histology', similarityLevel: 'Moderate', matchingFactors: ['Stage III disease', 'Systemic therapy context'], limitationFactors: ['Higher toxicity risk', 'Renal impairment'], implication: 'Reasonable if clinical fitness and treatment goals favor intensity.', sourceLabel: 'Institutional cohort', sourceUrl: 'https://www.nccn.org' },
+    ],
+    sources: [
+      { title: 'NCCN Guidelines for NSCLC', year: 2025, type: 'Guideline', url: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
+      { title: 'PACIFIC Trial: Durvalumab after CRT', year: 2018, type: 'RCT', url: 'https://pubmed.ncbi.nlm.nih.gov/28102484' },
+    ],
+    reasoningFactors: [
+      { factor: 'Disease burden', weight: 'medium', direction: 'supports' },
+      { factor: 'Renal function', weight: 'high', direction: 'cautions' },
+      { factor: 'QoL preference', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+  pembrolizumab: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'high',
+    uncertaintySummary: 'Immunotherapy is plausible in selected PD-L1-positive disease, but the patient’s case lacks confirming context and raises concern for toxicity.',
+    uncertaintyDescription: 'The evidence is variable and the patient’s incomplete workup makes immune-based therapy a less certain fit.',
+    evidenceFor: [
+      { text: 'PD-L1 expression and immune checkpoint therapy can be relevant in select NSCLC settings.', source: 'NCCN Guidelines' },
+      { text: 'Immunotherapy may be considered if disease control is prioritized over convenience.', source: 'PACIFIC Trial' },
+    ],
+    evidenceAgainst: [
+      { text: 'The patient’s inflammatory markers and incomplete workup introduce uncertainty around benefit.', source: 'Prognostic markers' },
+      { text: 'This pathway may be less attractive if quality-of-life and tolerance are primary goals.', source: 'Patient context' },
+      { text: 'Toxicity and follow-up requirements are significant.', source: 'Missing data' },
+    ],
+    riskFlags: [mockRiskFlags[1], mockRiskFlags[2], mockRiskFlags[3]],
+    publishedCohorts: [
+      { cohortName: 'Immunotherapy NSCLC cohort', population: 'Patients with PD-L1-positive disease receiving checkpoint blockade', similarityLevel: 'Partial', matchingFactors: ['Tumor biology fit'], limitationFactors: ['Unclear PD-L1 context', 'Higher toxicity'], implication: 'Could be revisited if biomarker and tolerance data improve.', sourceLabel: 'Institutional cohort', sourceUrl: 'https://www.nccn.org' },
+    ],
+    sources: [
+      { title: 'NCCN Guidelines for NSCLC', year: 2025, type: 'Guideline', url: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
+      { title: 'PACIFIC Trial: Durvalumab after CRT', year: 2018, type: 'RCT', url: 'https://pubmed.ncbi.nlm.nih.gov/28102484' },
+    ],
+    reasoningFactors: [
+      { factor: 'Immune-biology fit', weight: 'medium', direction: 'supports' },
+      { factor: 'Toxicity tolerance', weight: 'high', direction: 'cautions' },
+    ],
+  }),
+  palliative: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'low',
+    uncertaintySummary: 'Best supportive care has clear rationale when symptom control and quality of life are the primary goals.',
+    uncertaintyDescription: 'The evidence is less disease-directed, but the patient preference and symptom burden make this a reasonable path when goals are comfort and function.',
+    evidenceFor: [
+      { text: 'Supportive care is often appropriate when goals shift toward symptom control and maintaining function.', source: 'Patient context' },
+      { text: 'The patient’s outpatient preference and QoL concerns support a less intensive approach.', source: 'Patient context' },
+    ],
+    evidenceAgainst: [
+      { text: 'If curative or disease-control intent is still desired, this approach may under-treat the cancer.', source: 'NCCN Guidelines' },
+      { text: 'Incomplete disease and workup data limit confidence in ruling out more active treatment.', source: 'Missing data' },
+    ],
+    riskFlags: [mockRiskFlags[3], mockRiskFlags[4]],
+    publishedCohorts: [
+      { cohortName: 'Supportive-care NSCLC cohort', population: 'Patients prioritizing symptom relief and preserved function', similarityLevel: 'High', matchingFactors: ['QoL-centered goals', 'Outpatient preference'], limitationFactors: ['Less disease-directed benefit'], implication: 'Good fit when symptom relief is the dominant objective.', sourceLabel: 'Institutional cohort', sourceUrl: 'https://www.nccn.org' },
+    ],
+    sources: [
+      { title: 'NCCN Guidelines for NSCLC', year: 2025, type: 'Guideline', url: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
+      { title: 'Institutional supportive care pathway', year: 2024, type: 'Institutional cohort', url: 'https://www.nccn.org' },
+    ],
+    reasoningFactors: [
+      { factor: 'QoL goals', weight: 'high', direction: 'supports' },
+      { factor: 'Disease-control intent', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
 };
 
 export const mockTreatmentOptions: TreatmentOption[] = [

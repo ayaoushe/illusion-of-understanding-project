@@ -56,6 +56,9 @@ export function WorkflowProvider({ children }) {
     const recordInteraction = useCallback((event) => {
         setTelemetry((t) => trackInteraction(t, event));
     }, []);
+    const selectPatient = useCallback((patientId) => {
+        setTelemetry((t) => ({ ...t, evidenceInteractions: [...t.evidenceInteractions, `selected:${patientId}`] }));
+    }, []);
     const biasWarnings = useMemo(() => detectBiasWarnings(telemetry), [telemetry]);
     const value = {
         currentStep,
@@ -75,6 +78,7 @@ export function WorkflowProvider({ children }) {
         submitReflection,
         recordInteraction,
         startAssessment,
+        selectPatient,
     };
     return _jsx(WorkflowContext.Provider, { value: value, children: children });
 }

@@ -1,19 +1,53 @@
-import { mockAiEvidence, mockTreatmentOptions } from '../data/mockData';
+import { mockTreatmentEvidenceById } from '../data/mockData';
 /**
- * Placeholder AI service for future ML/backend integration.
- * Currently returns static mock evidence synthesis.
+ * Lightweight evidence service that prefers an API endpoint when available,
+ * but falls back to treatment-specific mock evidence for buildable demos.
  */
-export async function fetchEvidenceSynthesis(_patientId, assessment) {
+export async function fetchEvidenceSynthesis(patientId, assessment) {
     await delay(300);
-    const selectedOption = mockTreatmentOptions.find((t) => t.id === assessment.selectedTreatment);
+    const treatmentId = assessment.selectedTreatment || 'osimertinib';
+    const evidence = await getEvidenceForTreatment(treatmentId, patientId);
     return {
-        ...mockAiEvidence,
+        ...evidence,
         evidenceFor: [
-            ...mockAiEvidence.evidenceFor,
-            ...(selectedOption
-                ? [{ text: `Your assessment (${selectedOption.name}) aligns with molecular profile evidence`, source: 'Assessment alignment' }]
+            ...evidence.evidenceFor,
+            ...(assessment.selectedTreatment
+                ? [{ text: `Assessment selected ${assessment.selectedTreatment} as the lead treatment pathway.`, source: 'Assessment alignment' }]
                 : []),
         ],
+    };
+}
+export async function getEvidenceForTreatment(treatmentId, patientId) {
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+    if (apiBaseUrl) {
+        try {
+            const response = await fetch(`${apiBaseUrl}/evidence?treatmentId=${encodeURIComponent(treatmentId)}&patientId=${encodeURIComponent(patientId)}`);
+            if (response.ok) {
+                const payload = await response.json();
+                return normalizeEvidence(payload, treatmentId);
+            }
+        }
+        catch {
+            // Fall back to the hardcoded treatment profile below.
+        }
+    }
+    return normalizeEvidence(mockTreatmentEvidenceById[treatmentId] ?? mockTreatmentEvidenceById.osimertinib, treatmentId);
+}
+function normalizeEvidence(payload, treatmentId) {
+    const fallback = mockTreatmentEvidenceById[treatmentId] ?? mockTreatmentEvidenceById.osimertinib;
+    return {
+        ...fallback,
+        ...payload,
+        uncertaintyLevel: payload?.uncertaintyLevel ?? fallback.uncertaintyLevel,
+        uncertaintySummary: payload?.uncertaintySummary ?? fallback.uncertaintySummary,
+        uncertaintyDescription: payload?.uncertaintyDescription ?? fallback.uncertaintyDescription,
+        evidenceFor: payload?.evidenceFor ?? fallback.evidenceFor,
+        evidenceAgainst: payload?.evidenceAgainst ?? fallback.evidenceAgainst,
+        missingData: payload?.missingData ?? fallback.missingData,
+        riskFlags: payload?.riskFlags ?? fallback.riskFlags,
+        publishedCohorts: payload?.publishedCohorts ?? fallback.publishedCohorts,
+        sources: payload?.sources ?? fallback.sources,
+        keyReasoningFactors: payload?.keyReasoningFactors ?? fallback.keyReasoningFactors,
     };
 }
 export async function fetchReflectiveAnswer(promptId, _context) {
