@@ -1,13 +1,6 @@
 import type { StudyCase } from '../types';
 import { STUDY_NAMES, mrnFromId } from '../config/studyCases';
 
-/**
- * Builds a patient view for the Overview from a study case (ML prediction).
- * Values that really exist in the data (model features) are taken over as-is;
- * everything else is filled with plausible, deterministic placeholders
- * (breast-cancer context).
- */
-
 export interface Biomarker {
   label: string;
   value: string;
@@ -83,7 +76,6 @@ function yesNo(v: string | undefined): boolean {
   return (v ?? '').toLowerCase() === 'yes';
 }
 
-/** Deterministischer Hash aus einem String (stabil über Reloads). */
 function hashInt(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
@@ -96,8 +88,6 @@ export function buildPatientView(c: StudyCase): PatientView {
   const age = Number.isFinite(ageNum) ? String(ageNum) : '—';
   const birthYear = Number.isFinite(ageNum) ? 2026 - ageNum : 1970;
   const stage = f.STAGE_HIGHEST_RECORDED ?? 'unknown';
-  // Distant metastasis in any site => treat as metastatic (the recorded stage
-  // string may still read "Stage 1-3" in the raw data).
   const hasDistantMets = METASTASIS_SITES.some(([key]) => yesNo(f[key]));
   const isMetastatic = stage.includes('4') || hasDistantMets;
   const her2 = yesNo(f.HER2);
@@ -128,7 +118,6 @@ export function buildPatientView(c: StudyCase): PatientView {
     { label: 'Smoking status', value: isSmoker ? 'Former/current smoker' : 'Never smoked', real: true },
   ];
 
-  // Imaging: generated from the real metastasis sites (plausible).
   const imaging = [
     {
       type: 'CT chest/abdomen',
@@ -145,14 +134,11 @@ export function buildPatientView(c: StudyCase): PatientView {
     },
   ];
 
-  // --- From here on: placeholders, but derived deterministically from the
-  //     real features so each of the 4 patients differs. ---
 
   const ageForLogic = Number.isFinite(ageNum) ? ageNum : 55;
   const nodePos = yesNo(f.LYMPH_NODES);
   const h = hashInt(c.patient_id);
 
-  // Molecular subtype from real HER2/HR — drives histology label.
   const subtype = her2 ? 'HER2-enriched' : hr ? 'luminal (HR+/HER2−)' : 'triple-negative';
 
   const locations = [
