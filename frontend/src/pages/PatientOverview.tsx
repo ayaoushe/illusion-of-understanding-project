@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { mockPatient } from '../data/mockData';
+import { useEffect, useState } from 'react';
+import { useWorkflow } from '../context/WorkflowContext';
+import { fetchCase } from '../services/caseService';
+import { buildPatientView, type PatientView } from '../services/patientView';
 import { PageHeader } from '../components/layout/PageHeader';
 import { StepFooter } from '../components/layout/StepFooter';
 import { TabBar } from '../components/layout/TabBar';
@@ -8,13 +10,25 @@ import { PreferenceCard } from '../components/cards/PreferenceCard';
 import { CompactMissingDataCard } from '../components/cards/CompactMissingDataCard';
 
 export function PatientOverview() {
-  const { molecular, labs } = mockPatient;
-  const hemoglobin = labs.hemoglobin as { value: number; unit: string; status: string; normal: string };
-  const ldh = labs.ldh as { value: number; unit: string; status: string; normal: string };
-  const crp = (labs.inflammation as { crp: { value: number; unit: string } }).crp;
-  const egfr = labs.egfr as { value: number; unit: string; stage: string };
-
+  const { selectedPatientId } = useWorkflow();
+  const [patient, setPatient] = useState<PatientView | null>(null);
   const [activeTab, setActiveTab] = useState('summary');
+
+  useEffect(() => {
+    if (!selectedPatientId) return;
+    fetchCase(selectedPatientId).then((c) => {
+      if (c) setPatient(buildPatientView(c));
+    });
+  }, [selectedPatientId]);
+
+  if (!patient) {
+    return (
+      <div className="page">
+        <PageHeader title="Patient Overview" badge="Step 1" />
+        <p className="muted">Loading patient data…</p>
+      </div>
+    );
+  }
 
   const tabs = [
     { id: 'summary', label: 'Summary' },
@@ -31,13 +45,13 @@ export function PatientOverview() {
       <div className="card patient-summary-card">
         <div className="patient-header">
           <div>
-            <h3>{mockPatient.name}</h3>
+            <h3>{patient.name}</h3>
             <p className="muted">
-              MRN: {mockPatient.mrn} · DOB: {mockPatient.dateOfBirth} ({mockPatient.age} yrs) · {mockPatient.gender}
+              MRN: {patient.mrn} · DOB: {patient.dateOfBirth} ({patient.age} yrs) · {patient.gender}
             </p>
           </div>
-          <span className={`priority-badge priority-${mockPatient.priority.toLowerCase()}`}>
-            {mockPatient.priority} PRIORITY
+          <span className={`priority-badge priority-${patient.priority.toLowerCase()}`}>
+            {patient.priority} PRIORITY
           </span>
         </div>
       </div>
@@ -47,62 +61,66 @@ export function PatientOverview() {
       {activeTab === 'summary' && (
         <div className="overview-grid">
           <ClinicalInfoCard title="Diagnosis">
-            <p className="value">{mockPatient.diagnosis.primaryDiagnosis}</p>
-            <p className="muted">ICD-10: {mockPatient.diagnosis.icd10} — Stage {mockPatient.diagnosis.stage}</p>
-            <p className="muted">{mockPatient.diagnosis.histology} · {mockPatient.diagnosis.location}</p>
-            <p className="muted">Diagnosed: {mockPatient.diagnosis.diagnosisDate}</p>
+            <p className="value">{patient.diagnosis.primaryDiagnosis}</p>
+            <p className="muted">ICD-10: {patient.diagnosis.icd10} — {patient.diagnosis.stage}</p>
+            <p className="muted">{patient.diagnosis.histology} · {patient.diagnosis.location}</p>
+            <p className="muted">Diagnosed: {patient.diagnosis.diagnosisDate}</p>
           </ClinicalInfoCard>
 
           <ClinicalInfoCard title="Performance Status">
-            <p className="value">ECOG {mockPatient.performance.ecog}</p>
-            <p className="muted">{mockPatient.performance.ecogDescription}</p>
-            <p className="muted">Last assessed: {mockPatient.performance.lastAssessed}</p>
+            <p className="value">ECOG {patient.performance.ecog}</p>
+            <p className="muted">{patient.performance.ecogDescription}</p>
+            <p className="muted">Last assessed: {patient.performance.lastAssessed}</p>
           </ClinicalInfoCard>
 
-          <ClinicalInfoCard title="Key Lab Values" variant="warning">
-            <div className="lab-items">
-              <div className="lab-item status-low">
-                <span>Hemoglobin</span>
-                <span className="value">{hemoglobin.value} {hemoglobin.unit}</span>
-                <span className="status">LOW</span>
-              </div>
-              <div className="lab-item status-elevated">
-                <span>LDH</span>
-                <span className="value">{ldh.value} {ldh.unit}</span>
-                <span className="status">ELEVATED</span>
-              </div>
-              <div className="lab-item status-elevated">
-                <span>CRP</span>
-                <span className="value">{crp.value} {crp.unit}</span>
-                <span className="status">ELEVATED</span>
-              </div>
-              <div className="lab-item">
-                <span>eGFR</span>
-                <span className="value">{egfr.value} {egfr.unit}</span>
-                <span className="status">G2</span>
-              </div>
-            </div>
+          <ClinicalInfoCard title="Biomarkers (model features)" variant="highlight">
+            <table className="data-table">
+              <tbody>
+                {patient.biomarkers.map((b) => (
+                  <tr key={b.label}>
+                    <td>{b.label}</td>
+                    <td><span className="highlight">{b.value}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </ClinicalInfoCard>
         </div>
       )}
 
       {activeTab === 'diagnostics' && (
         <div className="overview-grid">
-          <ClinicalInfoCard title="Pathology & Molecular">
+          <ClinicalInfoCard title="Metastasis status">
             <table className="data-table">
               <tbody>
-                <tr><td>Histology</td><td>{mockPatient.diagnosis.histology}</td></tr>
-                <tr><td>EGFR</td><td>{molecular.egfr.mutation} — <span className="highlight">{molecular.egfr.status}</span></td></tr>
-                <tr><td>ALK</td><td>{molecular.alk.status}</td></tr>
-                <tr><td>PD-L1 TPS</td><td>{molecular.pdl1.tps} ({molecular.pdl1.level})</td></tr>
-                <tr><td>TMB</td><td>{molecular.tmb.value} {molecular.tmb.unit} ({molecular.tmb.level})</td></tr>
-                <tr><td>KRAS</td><td>{molecular.kras.status}</td></tr>
+                {patient.metastases.map((m) => (
+                  <tr key={m.site}>
+                    <td>{m.site}</td>
+                    <td>
+                      <span className={m.present ? 'status-elevated' : ''}>
+                        {m.present ? 'Detected' : 'Not detected'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </ClinicalInfoCard>
 
+          <ClinicalInfoCard title="Key Lab Values" variant="warning">
+            <div className="lab-items">
+              {patient.labs.map((l) => (
+                <div key={l.label} className={`lab-item status-${l.status.toLowerCase()}`}>
+                  <span>{l.label}</span>
+                  <span className="value">{l.value} {l.unit}</span>
+                  <span className="status">{l.status}</span>
+                </div>
+              ))}
+            </div>
+          </ClinicalInfoCard>
+
           <ClinicalInfoCard title="Imaging Summary">
-            {mockPatient.imaging.map((img) => (
+            {patient.imaging.map((img) => (
               <div key={img.type} className="imaging-item">
                 <div className="imaging-header">
                   <strong>{img.type}</strong>
@@ -119,7 +137,7 @@ export function PatientOverview() {
         <div className="overview-grid">
           <ClinicalInfoCard title="Comorbidities" variant="highlight">
             <ul className="comorbidity-list">
-              {mockPatient.comorbidities.map((c) => (
+              {patient.comorbidities.map((c) => (
                 <li key={c.name}>
                   <strong>{c.name}</strong>
                   <span className="detail">{c.status}</span>
@@ -131,7 +149,7 @@ export function PatientOverview() {
 
           <ClinicalInfoCard title="Current Medications" variant="info">
             <ul className="medication-list">
-              {mockPatient.medications.map((m) => (
+              {patient.medications.map((m) => (
                 <li key={m.name}>
                   <strong>{m.name} {m.dose}</strong> — {m.frequency}
                   <p className="muted">{m.relevance}</p>
@@ -140,27 +158,27 @@ export function PatientOverview() {
             </ul>
           </ClinicalInfoCard>
 
-          <ClinicalInfoCard title="Contraindications" variant="warning">
-            <ul className="contraindication-list">
-              {mockPatient.contraindications.map((c) => (
-                <li key={c.factor} className={`contra-${c.severity}`}>
-                  <strong>{c.factor}</strong>
-                  <span className={`severity-badge severity-${c.severity}`}>{c.severity}</span>
-                  <p>{c.detail}</p>
-                </li>
-              ))}
-            </ul>
-          </ClinicalInfoCard>
+          {patient.contraindications.length > 0 && (
+            <ClinicalInfoCard title="Contraindications" variant="warning">
+              <ul className="contraindication-list">
+                {patient.contraindications.map((c) => (
+                  <li key={c.factor} className={`contra-${c.severity}`}>
+                    <strong>{c.factor}</strong>
+                    <span className={`severity-badge severity-${c.severity}`}>{c.severity}</span>
+                    <p>{c.detail}</p>
+                  </li>
+                ))}
+              </ul>
+            </ClinicalInfoCard>
+          )}
         </div>
       )}
 
       {activeTab === 'qol' && (
-        <PreferenceCard concerns={mockPatient.qolConcerns} preferences={mockPatient.patientPreferences} />
+        <PreferenceCard concerns={patient.qolConcerns} preferences={patient.patientPreferences} />
       )}
 
-      {activeTab === 'missing' && (
-        <CompactMissingDataCard items={mockPatient.missingData} />
-      )}
+      {activeTab === 'missing' && <CompactMissingDataCard items={patient.missingData} />}
 
       <StepFooter nextLabel="Begin Assessment" />
     </div>

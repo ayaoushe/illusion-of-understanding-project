@@ -83,9 +83,9 @@ export function CaseSelection() {
     <div className="case-selection">
       <div className="case-selection-inner">
         <header className="case-selection-header">
-          <h1>Patient auswählen</h1>
+          <h1>Select Patient</h1>
           <p className="muted">
-            Bitte wählen Sie einen Fall aus, um mit der Bearbeitung zu beginnen.
+            Please choose a patient to begin.
           </p>
         </header>
 
@@ -97,7 +97,7 @@ export function CaseSelection() {
             <input
               type="text"
               className="case-combobox-input"
-              placeholder="Patient suchen"
+              placeholder="Search Patient"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);

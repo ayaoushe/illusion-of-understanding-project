@@ -1,9 +1,12 @@
 import { mockPatient } from '../../data/mockData';
 import { useWorkflow } from '../../context/WorkflowContext';
+import { STUDY_NAMES } from '../../config/studyCases';
 import { StepNavigation } from './StepNavigation';
 
 export function Sidebar() {
-  const { steps, currentStep, canAccessStep, goToStep, clearPatient } = useWorkflow();
+  const { steps, currentStep, canAccessStep, goToStep, clearPatient, selectedPatientId } = useWorkflow();
+
+  const patientName = selectedPatientId ? STUDY_NAMES[selectedPatientId] ?? selectedPatientId : mockPatient.name;
 
   return (
     <aside className="sidebar">
@@ -14,8 +17,8 @@ export function Sidebar() {
 
       <div className="sidebar-patient">
         <span className="sidebar-patient-label">Current Patient</span>
-        <strong>{mockPatient.name}</strong>
-        <span className="sidebar-patient-mrn">MRN: {mockPatient.mrn}</span>
+        <strong>{patientName}</strong>
+        <span className="sidebar-patient-mrn">ID: {selectedPatientId ?? mockPatient.mrn}</span>
       </div>
 
       <StepNavigation
