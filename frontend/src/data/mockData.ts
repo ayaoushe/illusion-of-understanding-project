@@ -21,14 +21,16 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
 export const TREATMENT_OPTION_IDS = ['osimertinib', 'chemoradiation', 'neoadjuvant'] as const;
 
 /** Treatment options for the human assessment dropdown */
+// 5 breast-cancer regimes selectable in the assessment. Covers the top-1 model
+// prediction of all 4 study cases (AC, Leuprolide, Capecitabine) plus one
+// endocrine and one HER2-targeted option. ids are exact model regime strings so
+// the clinician's choice is directly comparable to the model prediction.
 export const assessmentTreatmentOptions = [
-  { id: 'osimertinib', label: 'Osimertinib (Tagrisso)', category: '1st-line EGFR TKI' },
-  { id: 'erlotinib', label: 'Erlotinib (Tarceva)', category: '1st-line EGFR TKI' },
-  { id: 'gefitinib', label: 'Gefitinib (Iressa)', category: '1st-line EGFR TKI' },
-  { id: 'afatinib', label: 'Afatinib (Gilotrif)', category: '2nd-line EGFR TKI' },
-  { id: 'carboplatin-pemetrexed', label: 'Carboplatin + Pemetrexed', category: 'Chemotherapy' },
-  { id: 'pembrolizumab', label: 'Pembrolizumab (Keytruda)', category: 'Immunotherapy' },
-  { id: 'palliative', label: 'Palliative Care / Best Supportive Care', category: 'Palliative' },
+  { id: 'LETROZOLE', label: 'Letrozole', category: 'Endocrine (AI)' },
+  { id: 'LEUPROLIDE', label: 'Leuprolide', category: 'Ovarian suppression (GnRH)' },
+  { id: 'CAPECITABINE', label: 'Capecitabine', category: 'Chemotherapy' },
+  { id: 'CYCLOPHOSPHAMIDE + DOXORUBICIN', label: 'Cyclophosphamide + Doxorubicin (AC)', category: 'Chemotherapy' },
+  { id: 'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB', label: 'Paclitaxel + Pertuzumab + Trastuzumab (THP)', category: 'Chemo + HER2-targeted' },
 ] as const;
 
 export function getAssessmentTreatmentLabel(id: string): string {

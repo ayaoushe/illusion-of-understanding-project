@@ -1,6 +1,6 @@
 import { mockPatient } from '../../data/mockData';
 import { useWorkflow } from '../../context/WorkflowContext';
-import { STUDY_NAMES } from '../../config/studyCases';
+import { STUDY_NAMES, mrnFromId } from '../../config/studyCases';
 import { StepNavigation } from './StepNavigation';
 
 export function Sidebar() {
@@ -18,7 +18,7 @@ export function Sidebar() {
       <div className="sidebar-patient">
         <span className="sidebar-patient-label">Current Patient</span>
         <strong>{patientName}</strong>
-        <span className="sidebar-patient-mrn">ID: {selectedPatientId ?? mockPatient.mrn}</span>
+        <span className="sidebar-patient-mrn">MRN: {selectedPatientId ? mrnFromId(selectedPatientId) : mockPatient.mrn}</span>
       </div>
 
       <StepNavigation

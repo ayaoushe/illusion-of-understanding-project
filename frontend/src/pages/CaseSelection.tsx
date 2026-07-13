@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWorkflow } from '../context/WorkflowContext';
 import { fetchCases } from '../services/caseService';
-import { STUDY_CASES, STUDY_LABELS, STUDY_NAMES } from '../config/studyCases';
+import { STUDY_CASES, STUDY_LABELS, STUDY_NAMES, mrnFromId } from '../config/studyCases';
 import type { StudyCase } from '../types';
 
 export function CaseSelection() {
@@ -38,8 +38,10 @@ export function CaseSelection() {
     return ordered.filter((c) => {
       const label = (STUDY_LABELS[c.patient_id] ?? '').toLowerCase();
       const name = (STUDY_NAMES[c.patient_id] ?? '').toLowerCase();
+      const mrn = mrnFromId(c.patient_id).toLowerCase();
       return (
         name.includes(q) ||
+        mrn.includes(q) ||
         c.patient_id.toLowerCase().includes(q) ||
         label === q ||
         `fall ${label}`.includes(q)
@@ -131,7 +133,7 @@ export function CaseSelection() {
                       }}
                     >
                       <span className="case-option-name">{name}</span>
-                      <span className="case-option-id">{c.patient_id}</span>
+                      <span className="case-option-id">MRN {mrnFromId(c.patient_id)}</span>
                     </li>
                   );
                 })}

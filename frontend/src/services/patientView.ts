@@ -1,5 +1,5 @@
 import type { StudyCase } from '../types';
-import { STUDY_NAMES } from '../config/studyCases';
+import { STUDY_NAMES, mrnFromId } from '../config/studyCases';
 
 /**
  * Builds a patient view for the Overview from a study case (ML prediction).
@@ -83,21 +83,29 @@ function yesNo(v: string | undefined): boolean {
   return (v ?? '').toLowerCase() === 'yes';
 }
 
+/** Deterministischer Hash aus einem String (stabil über Reloads). */
+function hashInt(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+
 export function buildPatientView(c: StudyCase): PatientView {
   const f = featureMap(c);
   const ageNum = parseInt(f.CURRENT_AGE_DEID ?? '', 10);
   const age = Number.isFinite(ageNum) ? String(ageNum) : '—';
   const birthYear = Number.isFinite(ageNum) ? 2026 - ageNum : 1970;
-  const stage = f.STAGE_HIGHEST_RECORDED ?? 'unbekannt';
-  const isMetastatic = stage.includes('4');
+  const stage = f.STAGE_HIGHEST_RECORDED ?? 'unknown';
+  // Distant metastasis in any site => treat as metastatic (the recorded stage
+  // string may still read "Stage 1-3" in the raw data).
+  const hasDistantMets = METASTASIS_SITES.some(([key]) => yesNo(f[key]));
+  const isMetastatic = stage.includes('4') || hasDistantMets;
   const her2 = yesNo(f.HER2);
   const hr = yesNo(f.HR);
   const smokerRaw = f.SMOKING_PREDICTIONS_3_CLASSES ?? '';
   const isSmoker = smokerRaw.toLowerCase().includes('smoker');
 
-  // MRN plausibel aus der ID ableiten (deterministisch).
-  const digits = c.patient_id.replace(/\D/g, '');
-  const mrn = `${digits.slice(0, 4)}-${digits.slice(4)}`;
+  const mrn = mrnFromId(c.patient_id);
 
   const metastases: MetastasisSite[] = METASTASIS_SITES.map(([key, label]) => ({
     site: label,
@@ -137,34 +145,74 @@ export function buildPatientView(c: StudyCase): PatientView {
     },
   ];
 
-  // --- From here on: plausible placeholders (not present in the raw data) ---
+  // --- From here on: placeholders, but derived deterministically from the
+  //     real features so each of the 4 patients differs. ---
 
+  const ageForLogic = Number.isFinite(ageNum) ? ageNum : 55;
+  const nodePos = yesNo(f.LYMPH_NODES);
+  const h = hashInt(c.patient_id);
+
+  // Molecular subtype from real HER2/HR — drives histology label.
+  const subtype = her2 ? 'HER2-enriched' : hr ? 'luminal (HR+/HER2−)' : 'triple-negative';
+
+  const locations = [
+    'Left breast, upper outer quadrant',
+    'Right breast, upper outer quadrant',
+    'Left breast, lower inner quadrant',
+    'Right breast, central / retroareolar',
+  ];
+  const location = locations[h % locations.length];
+  const dxMonth = String((h % 12) + 1).padStart(2, '0');
+  const dxDay = String((h % 27) + 1).padStart(2, '0');
+  const dobDay = String(((h >> 3) % 27) + 1).padStart(2, '0');
+
+  const anemic = ageForLogic >= 70 || isMetastatic;
+  const renalReduced = ageForLogic >= 70;
   const labs: LabValue[] = [
-    { label: 'Hemoglobin', value: '12.6', unit: 'g/dL', status: 'NORMAL', normal: '12.0–16.0' },
+    { label: 'Hemoglobin', value: anemic ? '11.4' : '13.1', unit: 'g/dL', status: anemic ? 'LOW' : 'NORMAL', normal: '12.0–16.0' },
     { label: 'Leukocytes', value: '6.4', unit: 'K/µL', status: 'NORMAL', normal: '4.5–11.0' },
     { label: 'LDH', value: isMetastatic ? '312' : '198', unit: 'U/L', status: isMetastatic ? 'ELEVATED' : 'NORMAL', normal: '140–280' },
-    { label: 'eGFR', value: '88', unit: 'mL/min', status: 'NORMAL', normal: '>90' },
+    { label: 'eGFR', value: renalReduced ? '74' : '92', unit: 'mL/min', status: renalReduced ? 'LOW' : 'NORMAL', normal: '>90' },
   ];
 
-  const comorbidities = [
-    {
-      name: isSmoker ? 'Tobacco use' : 'No tobacco use',
-      status: isSmoker ? 'Former/current' : 'Never',
-      implications: isSmoker
-        ? 'Consider increased cardiovascular and pulmonary risk.'
-        : 'No smoking-related additional risk.',
-    },
-    {
+  const comorbidities: PatientView['comorbidities'] = [];
+  if (isSmoker) {
+    comorbidities.push({
+      name: 'Tobacco use',
+      status: 'Former/current',
+      implications: 'Consider increased cardiovascular and pulmonary risk.',
+    });
+  }
+  if (ageForLogic >= 60) {
+    comorbidities.push({
       name: 'Arterial hypertension',
       status: 'Controlled',
       implications: 'Monitor blood pressure during systemic therapy.',
-    },
-  ];
+    });
+  }
+  if (ageForLogic >= 68) {
+    comorbidities.push({
+      name: 'Type 2 diabetes mellitus',
+      status: 'Controlled',
+      implications: 'Monitor glucose, especially under corticosteroid premedication.',
+    });
+  }
+  if (comorbidities.length === 0) {
+    comorbidities.push({
+      name: 'No relevant comorbidities',
+      status: '—',
+      implications: 'No additional risk-modifying conditions documented.',
+    });
+  }
 
-  const medications = [
-    { name: 'Ramipril', dose: '5 mg', frequency: 'Daily', relevance: 'Blood pressure control' },
-    { name: 'Pantoprazole', dose: '20 mg', frequency: 'Daily', relevance: 'Gastric protection' },
-  ];
+  const medications: PatientView['medications'] = [];
+  if (ageForLogic >= 60) {
+    medications.push({ name: 'Ramipril', dose: '5 mg', frequency: 'Daily', relevance: 'Blood pressure control' });
+  }
+  if (ageForLogic >= 68) {
+    medications.push({ name: 'Metformin', dose: '500 mg', frequency: 'Twice daily', relevance: 'Monitor renal function with nephrotoxic agents' });
+  }
+  medications.push({ name: 'Pantoprazole', dose: '20 mg', frequency: 'Daily', relevance: 'Gastric protection' });
 
   const contraindications: PatientView['contraindications'] = [];
   if (her2) {
@@ -181,22 +229,61 @@ export function buildPatientView(c: StudyCase): PatientView {
       detail: 'Metastatic stage — systemic treatment approach takes priority.',
     });
   }
+  if (!her2 && !hr) {
+    contraindications.push({
+      factor: 'Endocrine / HER2-targeted therapy',
+      severity: 'low',
+      detail: 'Triple-negative subtype — hormonal and anti-HER2 agents not applicable.',
+    });
+  }
+  if (renalReduced) {
+    contraindications.push({
+      factor: 'Nephrotoxic agents',
+      severity: 'moderate',
+      detail: 'Reduced eGFR — dose adjustment for renally cleared drugs may apply.',
+    });
+  }
+
+  const qolConcerns: string[] = ['Maintaining daily functioning'];
+  qolConcerns.push(ageForLogic >= 65 ? 'Preserving independence at home' : 'Continuing to work during treatment');
+  if (her2 || !hr) qolConcerns.push('Concern about hair loss and neuropathy from chemotherapy');
+  if (hr) qolConcerns.push('Menopausal symptoms from endocrine therapy');
+  if (isMetastatic) qolConcerns.push('Managing fatigue and overall symptom burden');
+  if (isSmoker) qolConcerns.push('Support to stop smoking');
+
+  const patientPreferences = {
+    priorityQoL: isMetastatic
+      ? 'Prioritizes quality of life and symptom control'
+      : 'Willing to tolerate side effects for curative benefit',
+    hospitalPreference: ageForLogic >= 70 || isMetastatic
+      ? 'Prefers outpatient / minimal hospital stays'
+      : 'Flexible; accepts inpatient care if needed',
+    familyInvolvement: ageForLogic >= 65 ? 'Adult children involved in decisions' : 'Partner involved in decisions',
+  };
+
+  const missingData: string[] = [];
+  if (her2) missingData.push('LVEF (baseline cardiac function) not yet documented');
+  missingData.push('Ki-67 proliferation index pending');
+  if (hr && !isMetastatic) missingData.push('Genomic recurrence score (Oncotype/MammaPrint) outstanding');
+  if (isMetastatic) missingData.push('Biopsy re-confirmation of receptor status at metastatic site pending');
+  if (nodePos) missingData.push('Axillary staging (sentinel vs. dissection) to be finalized');
+  if (isSmoker) missingData.push('Pulmonary function assessment pending');
 
   return {
     patientId: c.patient_id,
     name: STUDY_NAMES[c.patient_id] ?? c.patient_id,
     mrn,
-    dateOfBirth: `${birthYear}-05-14`,
+    dateOfBirth: `${birthYear}-${dxMonth}-${dobDay}`,
     age,
     gender: 'Female',
     priority: isMetastatic ? 'HIGH' : 'MODERATE',
     diagnosis: {
       primaryDiagnosis: 'Breast cancer',
       stage,
-      histology: 'Invasive ductal carcinoma (NST)',
-      location: 'Left breast, upper outer quadrant',
+      histology: `Invasive ductal carcinoma, ${subtype}`,
+      location,
       icd10: 'C50.9',
-      diagnosisDate: '2024-10-28',
+      diagnosisDate: `2024-${dxMonth}-${dxDay}`,
     },
     performance: {
       ecog: isMetastatic ? 1 : 0,
@@ -210,20 +297,8 @@ export function buildPatientView(c: StudyCase): PatientView {
     comorbidities,
     medications,
     contraindications,
-    qolConcerns: [
-      'Maintaining daily functioning',
-      'Concern about hair loss and neuropathy',
-      'Family support important',
-    ],
-    patientPreferences: {
-      priorityQoL: 'Balance of efficacy and quality of life',
-      hospitalPreference: 'Prefers outpatient treatment where possible',
-      familyInvolvement: 'Partner involved in decisions',
-    },
-    missingData: [
-      'LVEF (baseline cardiac function) not yet documented',
-      'Ki-67 proliferation index pending',
-      'Genomic recurrence score (if indicated) outstanding',
-    ],
+    qolConcerns,
+    patientPreferences,
+    missingData,
   };
 }

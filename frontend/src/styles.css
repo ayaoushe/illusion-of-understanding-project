@@ -452,9 +452,9 @@ body {
 }
 
 .priority-badge {
-  padding: 0.3rem 0.6rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.65rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -463,6 +463,11 @@ body {
 .priority-high {
   background: rgba(220, 38, 38, 0.1);
   color: var(--danger);
+}
+
+.priority-moderate {
+  background: rgba(217, 119, 6, 0.1);
+  color: var(--warning);
 }
 
 /* ===== TABS ===== */

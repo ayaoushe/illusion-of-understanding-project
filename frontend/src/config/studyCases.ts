@@ -19,7 +19,13 @@ export const STUDY_LABELS: Record<string, StudyLabel> = {
 // Beispiel-Namen (fiktiv) für die Anzeige – die Rohdaten sind anonymisiert.
 export const STUDY_NAMES: Record<string, string> = {
   'P-0001568': 'Anna Seeler',
-  'P-0000081': 'Bela Stefen',
-  'P-0002566': 'Christian Campista',
-  'P-0001862': 'David Ernst',
+  'P-0000081': 'Bianca Stefen',
+  'P-0002566': 'Clara Campista',
+  'P-0001862': 'Diana Ernst',
 };
+
+// Medical Record Number (Krankenakten-Nr.) – deterministisch aus der ID abgeleitet.
+export function mrnFromId(patientId: string): string {
+  const digits = patientId.replace(/\D/g, '');
+  return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+}
