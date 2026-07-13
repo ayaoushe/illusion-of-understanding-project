@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment files
+.env
+*.env
+!*.env.example
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Data: raw cBioPortal export + derived ML artifacts (incl. large rf_model.joblib).
+# Regenerate locally via `python ml/pipeline.py`. The UI copy of predictions lives in
+# frontend/public/predictions.json and IS tracked.
+/data/
