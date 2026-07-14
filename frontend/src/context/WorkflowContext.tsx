@@ -10,7 +10,6 @@ import type {
 import { WORKFLOW_STEPS, getPatientProfile } from '../data/mockData';
 import { initialTelemetry, detectBiasWarnings, trackInteraction } from '../services/interactionService';
 import { fetchEvidenceSynthesis } from '../services/aiService';
-import { STUDY_CASES } from '../config/studyCases';
 
 interface WorkflowContextValue {
   currentStep: WorkflowStepId;
@@ -47,17 +46,21 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
   const [evidenceLoading, setEvidenceLoading] = useState(false);
   const [reflection, setReflection] = useState<FinalReflection | null>(null);
   const [telemetry, setTelemetry] = useState<InteractionTelemetry>(initialTelemetry);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(STUDY_CASES[0]);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
   const assessmentComplete = assessment !== null;
-  const selectedPatient = useMemo(() => getPatientProfile(selectedPatientId), [selectedPatientId]);
+  const selectedPatient = useMemo(
+    () => (selectedPatientId ? getPatientProfile(selectedPatientId) : null),
+    [selectedPatientId],
+  );
 
   const canAccessStep = useCallback(
     (stepId: WorkflowStepId) => {
+      if (!selectedPatientId) return false;
       if (!GATED_STEPS.includes(stepId)) return true;
       return assessmentComplete;
     },
-    [assessmentComplete],
+    [assessmentComplete, selectedPatientId],
   );
 
   const currentIndex = WORKFLOW_STEPS.findIndex((s) => s.id === currentStep);

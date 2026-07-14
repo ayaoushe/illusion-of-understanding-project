@@ -6,10 +6,20 @@ import { fetchCases } from '../../services/caseService';
 import { STUDY_CASES, STUDY_LABELS, STUDY_NAMES, mrnFromId } from '../../config/studyCases';
 import type { StudyCase } from '../../types';
 
-function ConfirmModal({ title, message, onConfirm, onCancel }: { title: string; message: string; onConfirm: () => void; onCancel: () => void }) {
+function ConfirmModal({
+  title,
+  message,
+  onConfirm,
+  onCancel,
+}: {
+  title: string;
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
   return (
     <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal-dialog change-patient-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-dialog change-patient-modal" onClick={(event) => event.stopPropagation()}>
         <div className="change-patient-modal-icon" aria-hidden="true">ID</div>
         <h3>{title}</h3>
         <p>{message}</p>
@@ -37,7 +47,9 @@ export function Sidebar() {
     changePatient,
     assessmentComplete,
   } = useWorkflow();
-  const patient = selectedPatient ?? mockPatient;
+
+  const patient = selectedPatient;
+  const footerPatient = selectedPatient ?? mockPatient;
   const [showConfirm, setShowConfirm] = useState(false);
   const [isCaseMenuOpen, setIsCaseMenuOpen] = useState(false);
   const [pendingPatientId, setPendingPatientId] = useState<string | null>(null);
@@ -90,7 +102,7 @@ export function Sidebar() {
   };
 
   const selectedCaseLabel = selectedPatientId ? STUDY_LABELS[selectedPatientId] ?? '?' : '?';
-  const selectedCaseTitle = `Case ${selectedCaseLabel} · ${patient.name}`;
+  const selectedCaseTitle = patient ? `Case ${selectedCaseLabel} \u00b7 ${patient.name}` : 'Select case';
 
   return (
     <aside className="sidebar">
@@ -129,7 +141,7 @@ export function Sidebar() {
                       aria-selected={isSelected}
                     >
                       <span className="sidebar-case-option-main">
-                        Case {label} · {STUDY_NAMES[c.patient_id] ?? optionPatient.name}
+                        Case {label} {'\u00b7'} {STUDY_NAMES[c.patient_id] ?? optionPatient.name}
                       </span>
                       <span className="sidebar-case-option-meta">MRN {mrnFromId(c.patient_id)}</span>
                     </button>
@@ -138,10 +150,14 @@ export function Sidebar() {
               </div>
             )}
           </div>
-          <span className="sidebar-patient-mrn">MRN {patient.mrn}</span>
-          <span className="sidebar-patient-diagnosis">
-            {patient.diagnosis.primaryDiagnosis} · Stage {patient.diagnosis.stage}
-          </span>
+          {patient && (
+            <>
+              <span className="sidebar-patient-mrn">MRN {patient.mrn}</span>
+              <span className="sidebar-patient-diagnosis">
+                {patient.diagnosis.primaryDiagnosis} {'\u00b7'} Stage {patient.diagnosis.stage}
+              </span>
+            </>
+          )}
         </div>
       </div>
 
@@ -166,8 +182,8 @@ export function Sidebar() {
 
       <div className="sidebar-footer">
         <div className="sidebar-clinician">
-          <span>{patient.session.clinician}</span>
-          <span>{patient.session.date}</span>
+          <span>{footerPatient.session.clinician}</span>
+          <span>{footerPatient.session.date}</span>
         </div>
         <p className="sidebar-research-note">
           Research prototype exploring how explanations influence clinical decision-making.

@@ -24,9 +24,9 @@ export function StepNavigation({ steps, currentStep, canAccessStep, onStepClick 
             disabled={isLocked}
             aria-current={isActive ? 'step' : undefined}
           >
-            <span className="step-number">{isComplete && !isActive ? '✓' : step.number}</span>
+            <span className="step-number">{isComplete && !isActive ? '\u2713' : step.number}</span>
             <span className="step-label">{step.shortLabel}</span>
-            {isLocked && <span className="step-lock">🔒</span>}
+            {isLocked && <span className="step-lock">{'\u{1F512}'}</span>}
           </button>
         );
       })}
