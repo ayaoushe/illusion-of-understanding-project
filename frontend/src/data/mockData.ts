@@ -1,12 +1,15 @@
 import type {
   Patient,
   AiEvidenceSynthesis,
+  PublishedCohort,
   TreatmentOption,
   SimilarCase,
   DecisionChangeFactor,
   DecisionFactor,
   WorkflowStep,
+  RiskFlag,
 } from '../types';
+import { mrnFromId } from '../config/studyCases';
 
 export const WORKFLOW_STEPS: WorkflowStep[] = [
   { id: 'overview', label: 'Patient Overview', shortLabel: 'Overview', number: 1 },
@@ -14,23 +17,20 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
   { id: 'evidence', label: 'AI Evidence Synthesis', shortLabel: 'Evidence', number: 3 },
   { id: 'treatment', label: 'Treatment Comparison', shortLabel: 'Treatment', number: 4 },
   { id: 'similar', label: 'Similar Cases', shortLabel: 'Cases', number: 5 },
-  { id: 'decision', label: 'Decision Factors', shortLabel: 'Factors', number: 6 },
-  { id: 'reflection', label: 'Final Reflection', shortLabel: 'Reflection', number: 7 },
+  { id: 'reflection', label: 'Final Reflection', shortLabel: 'Reflection', number: 6 },
 ];
 
 export const TREATMENT_OPTION_IDS = ['osimertinib', 'chemoradiation', 'neoadjuvant'] as const;
 
 /** Treatment options for the human assessment dropdown */
-// 5 breast-cancer regimes selectable in the assessment. Covers the top-1 model
-// prediction of all 4 study cases (AC, Leuprolide, Capecitabine) plus one
-// endocrine and one HER2-targeted option. ids are exact model regime strings so
-// the clinician's choice is directly comparable to the model prediction.
 export const assessmentTreatmentOptions = [
-  { id: 'LETROZOLE', label: 'Letrozole', category: 'Endocrine (AI)' },
-  { id: 'LEUPROLIDE', label: 'Leuprolide', category: 'Ovarian suppression (GnRH)' },
-  { id: 'CAPECITABINE', label: 'Capecitabine', category: 'Chemotherapy' },
-  { id: 'CYCLOPHOSPHAMIDE + DOXORUBICIN', label: 'Cyclophosphamide + Doxorubicin (AC)', category: 'Chemotherapy' },
-  { id: 'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB', label: 'Paclitaxel + Pertuzumab + Trastuzumab (THP)', category: 'Chemo + HER2-targeted' },
+  { id: 'osimertinib', label: 'Osimertinib (Tagrisso)', category: '1st-line EGFR TKI' },
+  { id: 'erlotinib', label: 'Erlotinib (Tarceva)', category: '1st-line EGFR TKI' },
+  { id: 'gefitinib', label: 'Gefitinib (Iressa)', category: '1st-line EGFR TKI' },
+  { id: 'afatinib', label: 'Afatinib (Gilotrif)', category: '2nd-line EGFR TKI' },
+  { id: 'carboplatin-pemetrexed', label: 'Carboplatin + Pemetrexed', category: 'Chemotherapy' },
+  { id: 'pembrolizumab', label: 'Pembrolizumab (Keytruda)', category: 'Immunotherapy' },
+  { id: 'palliative', label: 'Palliative Care / Best Supportive Care', category: 'Palliative' },
 ] as const;
 
 export function getAssessmentTreatmentLabel(id: string): string {
@@ -167,6 +167,63 @@ export const mockPatient: Patient = {
   },
 };
 
+const patientProfileOverrides: Record<string, Partial<Patient>> = {
+  'P-0001568': {
+    name: 'Anna Seeler',
+    mrn: mrnFromId('P-0001568'),
+    age: 63,
+    gender: 'Female',
+    diagnosis: { primaryDiagnosis: 'Metastatic Breast Cancer', stage: 'IIA', histology: 'Ductal carcinoma', location: 'Right breast', icd10: 'C50.911', diagnosisDate: '2024-01-22' },
+    performance: { ecog: 1, ecogDescription: 'Restricted activity, in bed <50% of day', lastAssessed: '2025-03-08' },
+  },
+  'P-0000081': {
+    name: 'Bianca Stefen',
+    mrn: mrnFromId('P-0000081'),
+    age: 58,
+    gender: 'Female',
+    diagnosis: { primaryDiagnosis: 'Hormone-Receptor Positive Breast Cancer', stage: 'IIB', histology: 'Lobular carcinoma', location: 'Left breast', icd10: 'C50.812', diagnosisDate: '2023-11-10' },
+    performance: { ecog: 0, ecogDescription: 'Fully active', lastAssessed: '2025-04-01' },
+  },
+  'P-0002566': {
+    name: 'Clara Campista',
+    mrn: mrnFromId('P-0002566'),
+    age: 71,
+    gender: 'Female',
+    diagnosis: { primaryDiagnosis: 'Advanced Lung Adenocarcinoma', stage: 'IIIB', histology: 'Adenocarcinoma', location: 'Left upper lobe', icd10: 'C34.12', diagnosisDate: '2024-03-18' },
+    performance: { ecog: 2, ecogDescription: 'Ambulatory and capable of self-care, but unable to work', lastAssessed: '2025-05-05' },
+  },
+  'P-0001862': {
+    name: 'Diana Ernst',
+    mrn: mrnFromId('P-0001862'),
+    age: 67,
+    gender: 'Female',
+    diagnosis: { primaryDiagnosis: 'Oligometastatic NSCLC', stage: 'IVA', histology: 'Adenocarcinoma', location: 'Right lower lobe', icd10: 'C34.31', diagnosisDate: '2024-06-09' },
+    performance: { ecog: 1, ecogDescription: 'Restricted activity, in bed <50% of day', lastAssessed: '2025-04-20' },
+  },
+};
+
+export function getPatientProfile(patientId: string | null | undefined): Patient {
+  if (!patientId) return mockPatient;
+  const overrides = patientProfileOverrides[patientId];
+  if (!overrides) return mockPatient;
+
+  return {
+    ...mockPatient,
+    ...overrides,
+    diagnosis: { ...mockPatient.diagnosis, ...(overrides.diagnosis ?? {}) },
+    performance: { ...mockPatient.performance, ...(overrides.performance ?? {}) },
+    molecular: {
+      ...mockPatient.molecular,
+      ...(overrides.molecular ?? {}),
+      egfr: { ...mockPatient.molecular.egfr, ...((overrides.molecular?.egfr) ?? {}) },
+      alk: { ...mockPatient.molecular.alk, ...((overrides.molecular?.alk) ?? {}) },
+      pdl1: { ...mockPatient.molecular.pdl1, ...((overrides.molecular?.pdl1) ?? {}) },
+      tmb: { ...mockPatient.molecular.tmb, ...((overrides.molecular?.tmb) ?? {}) },
+      kras: { ...mockPatient.molecular.kras, ...((overrides.molecular?.kras) ?? {}) },
+    },
+  };
+}
+
 export const mockRiskFlags = [
   {
     id: 'renal',
@@ -210,28 +267,39 @@ export const mockAiEvidence: AiEvidenceSynthesis = {
   disclaimer:
     'Evidence-based synthesis of guidelines and literature. This is decision support — not a final recommendation. All outputs require clinician verification.',
   uncertaintyLevel: 'moderate',
+  uncertaintySummary: 'Strong molecular evidence supports TKI therapy, but surgical candidacy and cardiac function remain undetermined.',
   uncertaintyDescription:
     'Strong molecular evidence supports TKI therapy, but surgical candidacy and cardiac function remain undetermined. Patient similarity to published cohorts is moderate.',
 
   evidenceFor: [
-    { text: 'EGFR Exon 19 deletion is a strong TKI-sensitizing mutation (ORR >70%)', source: 'FLAURA Trial' },
-    { text: 'Osimertinib crosses CNS barrier — relevant given stage IIIB disease', source: 'NCCN Guidelines' },
+    { text: 'EGFR Exon 19 deletion is a strong TKI-sensitizing mutation supported by first-line osimertinib trial data.', source: 'FLAURA_OSIMERTINIB_NEJM' },
+    { text: 'First-line osimertinib improved progression-free survival versus gefitinib or erlotinib in EGFR-mutated advanced NSCLC.', source: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM' },
     { text: 'Outpatient TKI aligns with patient preference for minimal hospitalization', source: 'Patient context' },
-    { text: 'Renal-sparing profile avoids nephrotoxic platinum agents', source: 'Renal dosing review' },
-    { text: 'Lower myelotoxicity vs chemotherapy given baseline anemia', source: 'Lab analysis' },
+    { text: 'Oral targeted therapy avoids nephrotoxic platinum agents given mild renal impairment', source: 'Clinical data' },
+    { text: 'Lower myelotoxicity vs chemotherapy given baseline anemia', source: 'Lab values' },
   ],
 
   evidenceAgainst: [
-    { text: 'Stage IIIB may benefit from concurrent chemoradiation per some guidelines', source: 'PACIFIC Trial' },
-    { text: 'Elevated LDH (425) suggests higher tumor burden — may need aggressive approach', source: 'Prognostic markers' },
-    { text: 'Surgical candidacy not yet assessed — multimodal approach may be viable', source: 'Pending workup' },
-    { text: 'Elevated CRP may predict poorer immunotherapy outcomes if considered later', source: 'Inflammation markers' },
+    { text: 'Stage IIIB may benefit from concurrent chemoradiation with consolidation immunotherapy in unresectable disease', source: 'PACIFIC_DURVALUMAB_PMC' },
+    { text: 'Surgical candidacy not yet assessed — multimodal approach may be viable', source: 'Missing data' },
     { text: 'LVEF unknown — limits assessment of cardiotoxic regimens', source: 'Missing data' },
   ],
 
   missingData: mockPatient.missingData,
 
   riskFlags: mockRiskFlags,
+  publishedCohorts: [
+    {
+      cohortName: 'FLAURA: Osimertinib overall survival in EGFR+ advanced NSCLC',
+      population: 'Untreated EGFR-mutated advanced NSCLC receiving first-line osimertinib',
+      similarityLevel: 'Moderate',
+      matchingFactors: ['EGFR mutation', 'First-line TKI setting', 'Outpatient preference'],
+      limitationFactors: ['Trial population metastatic/advanced, not locally advanced IIIB', 'Trial population younger than this case'],
+      implication: 'Supports targeted therapy with close monitoring.',
+      sourceLabel: 'FLAURA_OSIMERTINIB_NEJM',
+      sourceUrl: '',
+    },
+  ],
 
   keyReasoningFactors: [
     { factor: 'EGFR mutation status', weight: 'high', direction: 'supports' },
@@ -242,12 +310,204 @@ export const mockAiEvidence: AiEvidenceSynthesis = {
     { factor: 'Incomplete cardiac workup', weight: 'medium', direction: 'cautions' },
   ],
 
-  sources: [
-    { title: 'NCCN Guidelines for NSCLC', year: 2025, type: 'Guideline', url: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
-    { title: 'FLAURA Trial: Osimertinib in EGFR+ NSCLC', year: 2023, type: 'RCT', url: 'https://pubmed.ncbi.nlm.nih.gov/36841857' },
-    { title: 'PACIFIC Trial: Durvalumab after CRT', year: 2018, type: 'RCT', url: 'https://pubmed.ncbi.nlm.nih.gov/28102484' },
-    { title: 'Renal Impairment and Anticancer Drug Selection', year: 2024, type: 'Review', url: 'https://pubmed.ncbi.nlm.nih.gov/38456789' },
-  ],
+  sources: [],
+};
+
+function createTreatmentEvidenceProfile(params: {
+  uncertaintyLevel: AiEvidenceSynthesis['uncertaintyLevel'];
+  uncertaintySummary: string;
+  uncertaintyDescription: string;
+  evidenceFor: Array<{ text: string; source: string }>;
+  evidenceAgainst: Array<{ text: string; source: string }>;
+  riskFlags: RiskFlag[];
+  publishedCohorts: PublishedCohort[];
+  sources: Array<{ title: string; year: number; type: string; url: string }>;
+  reasoningFactors: Array<{ factor: string; weight: 'high' | 'medium' | 'low'; direction: 'supports' | 'cautions' | 'neutral' }>;
+}): AiEvidenceSynthesis {
+  return {
+    title: 'AI Evidence Synthesis',
+    disclaimer: 'Evidence-based synthesis of guidelines and literature. This is decision support — not a final recommendation. All outputs require clinician verification.',
+    uncertaintyLevel: params.uncertaintyLevel,
+    uncertaintySummary: params.uncertaintySummary,
+    uncertaintyDescription: params.uncertaintyDescription,
+    evidenceFor: params.evidenceFor,
+    evidenceAgainst: params.evidenceAgainst,
+    missingData: mockPatient.missingData,
+    riskFlags: params.riskFlags,
+    publishedCohorts: params.publishedCohorts,
+    sources: params.sources,
+    keyReasoningFactors: params.reasoningFactors,
+  };
+}
+
+export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
+  osimertinib: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Strong targeted-therapy evidence remains the best fit for this patient, but missing cardiac and surgical data keep confidence moderate.',
+    uncertaintyDescription: 'The EGFR-targeted pathway is well supported, yet unresolved surgical candidacy and cardiac workup still affect certainty.',
+    evidenceFor: [
+      { text: 'EGFR Exon 19 deletion aligns with first-line osimertinib evidence in EGFR-mutated advanced NSCLC.', source: 'FLAURA_OSIMERTINIB_NEJM' },
+      { text: 'First-line osimertinib demonstrated improved progression-free survival versus gefitinib or erlotinib.', source: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM' },
+      { text: 'Osimertinib offers outpatient delivery that suits the patient\'s preference for minimal hospitalization.', source: 'Patient context' },
+      { text: 'Oral targeted therapy is preferred given mild renal impairment and baseline diabetes.', source: 'Clinical data' },
+    ],
+    evidenceAgainst: [
+      { text: 'Stage IIIB disease may still justify chemoradiation with consolidation durvalumab in unresectable locally advanced disease.', source: 'PACIFIC_DURVALUMAB_PMC' },
+      { text: 'Missing cardiac evaluation limits confidence in any highly intensive regimen.', source: 'Missing data' },
+      { text: 'Surgical candidacy not yet assessed — multimodal approach may remain viable.', source: 'Missing data' },
+    ],
+    riskFlags: [mockRiskFlags[0], mockRiskFlags[2], mockRiskFlags[3]],
+    publishedCohorts: [
+      { cohortName: 'FLAURA: Osimertinib overall survival in EGFR+ advanced NSCLC', population: 'Untreated EGFR-mutated advanced NSCLC, first-line osimertinib', similarityLevel: 'Moderate', matchingFactors: ['EGFR mutation', 'First-line TKI setting', 'Outpatient preference'], limitationFactors: ['Trial population metastatic/advanced, not locally advanced IIIB', 'Limited surgical data'], implication: 'Strong support for targeted therapy with close monitoring.', sourceLabel: 'FLAURA_OSIMERTINIB_NEJM', sourceUrl: '' },
+      { cohortName: 'FLAURA: Osimertinib vs gefitinib/erlotinib', population: 'First-line EGFR-mutated advanced NSCLC randomized to osimertinib or first-generation TKI', similarityLevel: 'Moderate', matchingFactors: ['EGFR mutation', 'First-line targeted therapy'], limitationFactors: ['Advanced/metastatic trial population', 'Not stage IIIB-specific'], implication: 'Supports osimertinib over older EGFR TKIs when available.', sourceLabel: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'EGFR mutation status', weight: 'high', direction: 'supports' },
+      { factor: 'Renal function', weight: 'medium', direction: 'supports' },
+      { factor: 'Cardiac workup', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+  erlotinib: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Erlotinib remains a reasonable EGFR-directed option, although it is less favored than osimertinib for this case.',
+    uncertaintyDescription: 'The evidence is clinically reasonable, but lower efficacy versus osimertinib makes the choice less compelling than newer agents.',
+    evidenceFor: [
+      { text: 'Erlotinib improved progression-free survival versus chemotherapy as first-line treatment in EGFR mutation-positive advanced NSCLC.', source: 'EURTAC_ERLOTINIB_LANCET' },
+      { text: 'It may be acceptable when oral therapy and tolerability are prioritized.', source: 'Patient context' },
+      { text: 'The outpatient regimen aligns with quality-of-life goals and reduced hospital exposure.', source: 'Patient context' },
+    ],
+    evidenceAgainst: [
+      { text: 'First-line osimertinib demonstrated superior progression-free survival versus gefitinib or erlotinib in EGFR-mutated NSCLC.', source: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM' },
+      { text: 'Without complete cardiac workup, escalation to intensive disease-directed regimens remains uncertain.', source: 'Missing data' },
+    ],
+    riskFlags: [mockRiskFlags[0], mockRiskFlags[2]],
+    publishedCohorts: [
+      { cohortName: 'EURTAC: Erlotinib in EGFR+ advanced NSCLC', population: 'European patients with EGFR mutation-positive advanced NSCLC, first-line erlotinib', similarityLevel: 'Moderate', matchingFactors: ['EGFR mutation', 'Oral therapy preference', 'First-line TKI setting'], limitationFactors: ['Older generation TKI', 'Advanced/metastatic trial population'], implication: 'Reasonable fallback if newer agents are not available or tolerated.', sourceLabel: 'EURTAC_ERLOTINIB_LANCET', sourceUrl: '' },
+      { cohortName: 'FLAURA comparator: osimertinib vs first-generation TKI', population: 'First-line EGFR-mutated advanced NSCLC randomized to osimertinib or gefitinib/erlotinib', similarityLevel: 'Partial', matchingFactors: ['EGFR mutation', 'First-line targeted strategy'], limitationFactors: ['Shows superiority of osimertinib over erlotinib', 'Not locally advanced IIIB-specific'], implication: 'Cautions against erlotinib when osimertinib is available.', sourceLabel: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'First-line EGFR targeting', weight: 'high', direction: 'supports' },
+      { factor: 'Treatment convenience', weight: 'medium', direction: 'supports' },
+      { factor: 'Relative efficacy gap', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+  gefitinib: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Gefitinib is a plausible EGFR-directed alternative, but it is less favored than newer genotypically optimized agents.',
+    uncertaintyDescription: 'This option has targeted-therapy rationale, though the evidence base is less contemporary than osimertinib.',
+    evidenceFor: [
+      { text: 'Gefitinib improved outcomes versus chemotherapy in EGFR mutation-positive pulmonary adenocarcinoma.', source: 'IPASS_GEFITINIB_NEJM' },
+      { text: 'Gefitinib demonstrated benefit over chemotherapy in EGFR-mutated NSCLC in a dedicated randomized trial.', source: 'GEFITINIB_EGFR_MUTATION_NEJM' },
+      { text: 'Oral administration supports a lower-burden treatment experience.', source: 'Patient context' },
+    ],
+    evidenceAgainst: [
+      { text: 'First-line osimertinib demonstrated superior progression-free survival versus gefitinib in EGFR-mutated advanced NSCLC.', source: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM' },
+      { text: 'Therapy selection should be revisited if symptoms or disease burden worsen.', source: 'Missing data' },
+    ],
+    riskFlags: [mockRiskFlags[0], mockRiskFlags[3]],
+    publishedCohorts: [
+      { cohortName: 'IPASS: Gefitinib in EGFR-selected pulmonary adenocarcinoma', population: 'Patients with EGFR mutation-positive pulmonary adenocarcinoma', similarityLevel: 'Partial', matchingFactors: ['EGFR mutation', 'Oral targeted therapy'], limitationFactors: ['Older evidence base', 'Not stage IIIB-specific'], implication: 'May be suitable if a less intensive treatment pathway is preferred.', sourceLabel: 'IPASS_GEFITINIB_NEJM', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'Targeted therapy rationale', weight: 'medium', direction: 'supports' },
+      { factor: 'Need for newer-generation option', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+  afatinib: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Afatinib remains a viable EGFR-directed option, but toxicity and resistance concerns make it more uncertain than newer agents.',
+    uncertaintyDescription: 'This path has meaningful targeted-therapy support but should be weighed against side-effect burden and treatment convenience.',
+    evidenceFor: [
+      { text: 'Afatinib is an established irreversible EGFR inhibitor for EGFR mutation-positive NSCLC, including del19 mutations.', source: 'AFATINIB_LUX_LUNG_REVIEW_PMC' },
+      { text: 'LUX-Lung 7 evaluated afatinib versus gefitinib in EGFR mutation-positive NSCLC.', source: 'AFATINIB_LUX_LUNG_7_PMC' },
+      { text: 'It can be considered when a non-osimertinib EGFR TKI is preferred.', source: 'Patient context' },
+    ],
+    evidenceAgainst: [
+      { text: 'Higher toxicity burden may be less acceptable in a patient with QoL concerns and baseline anemia.', source: 'Patient context' },
+      { text: 'First-line osimertinib demonstrated superior progression-free survival versus gefitinib, a relevant comparator for afatinib selection.', source: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM' },
+    ],
+    riskFlags: [mockRiskFlags[2], mockRiskFlags[3]],
+    publishedCohorts: [
+      { cohortName: 'LUX-Lung review: Afatinib in EGFR+ NSCLC', population: 'EGFR-mutant NSCLC patients receiving afatinib across LUX-Lung trials', similarityLevel: 'Partial', matchingFactors: ['EGFR del19 mutation', 'Mutation-driven strategy'], limitationFactors: ['Higher toxicity burden', 'Less contemporary than osimertinib'], implication: 'Useful if a more conservative targeted approach is needed.', sourceLabel: 'AFATINIB_LUX_LUNG_REVIEW_PMC', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'Targeted strategy', weight: 'medium', direction: 'supports' },
+      { factor: 'Tolerability', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+  'carboplatin-pemetrexed': createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'high',
+    uncertaintySummary: 'Platinum-based chemotherapy remains a plausible option, but renal and anemia concerns make it less suitable than targeted therapy.',
+    uncertaintyDescription: 'The evidence base is broad, yet features of the patient profile create meaningful concern around tolerability and toxicity.',
+    evidenceFor: [
+      { text: 'Pemetrexed is an established agent for advanced nonsquamous NSCLC, often combined with platinum chemotherapy.', source: 'PEMETREXED_NSCLC_REVIEW_PMC' },
+      { text: 'Carboplatin plus pemetrexed is a standard protocol for locally advanced or metastatic nonsquamous NSCLC.', source: 'CARBOPLATIN_PEMETREXED_EVIQ' },
+    ],
+    evidenceAgainst: [
+      { text: 'Renal function and anemia increase the risk of toxicity and treatment delays.', source: 'Clinical data' },
+      { text: 'Patient preference for minimal hospitalization and outpatient care argues against a highly intensive regimen.', source: 'Patient context' },
+      { text: 'Incomplete cardiac workup limits confidence in an aggressive plan.', source: 'Missing data' },
+    ],
+    riskFlags: [mockRiskFlags[0], mockRiskFlags[2], mockRiskFlags[4]],
+    publishedCohorts: [
+      { cohortName: 'Pemetrexed in advanced nonsquamous NSCLC', population: 'Patients with advanced nonsquamous NSCLC receiving pemetrexed-based chemotherapy', similarityLevel: 'Moderate', matchingFactors: ['Nonsquamous histology', 'Systemic therapy context'], limitationFactors: ['Higher toxicity risk', 'Renal impairment in this patient'], implication: 'Reasonable if clinical fitness and treatment goals favor intensity.', sourceLabel: 'PEMETREXED_NSCLC_REVIEW_PMC', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'Disease burden', weight: 'medium', direction: 'supports' },
+      { factor: 'Renal function', weight: 'high', direction: 'cautions' },
+      { factor: 'QoL preference', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+  pembrolizumab: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'high',
+    uncertaintySummary: 'Immunotherapy is plausible in selected PD-L1-positive disease, but the patient\'s case lacks confirming context and raises concern for toxicity.',
+    uncertaintyDescription: 'The evidence is variable and the patient\'s incomplete workup makes immune-based therapy a less certain fit.',
+    evidenceFor: [
+      { text: 'Pembrolizumab plus pemetrexed and platinum improved outcomes in metastatic nonsquamous NSCLC in KEYNOTE-189.', source: 'KEYNOTE_189_PEMBROLIZUMAB_PMC' },
+      { text: 'Five-year outcomes from KEYNOTE-189 support pembrolizumab combination therapy in metastatic nonsquamous NSCLC.', source: 'KEYNOTE_189_PDF' },
+    ],
+    evidenceAgainst: [
+      { text: 'This pathway may be less attractive if quality-of-life and tolerance are primary goals.', source: 'Patient context' },
+      { text: 'Incomplete cardiac workup and inflammatory markers limit confidence in benefit.', source: 'Missing data' },
+    ],
+    riskFlags: [mockRiskFlags[1], mockRiskFlags[2], mockRiskFlags[3]],
+    publishedCohorts: [
+      { cohortName: 'KEYNOTE-189: Pembrolizumab plus pemetrexed and platinum', population: 'Previously untreated metastatic nonsquamous NSCLC', similarityLevel: 'Partial', matchingFactors: ['Nonsquamous histology', 'Systemic therapy context'], limitationFactors: ['Metastatic trial population', 'EGFR+ patient not typical ICI-first population'], implication: 'Could be revisited if biomarker and tolerance data improve.', sourceLabel: 'KEYNOTE_189_PEMBROLIZUMAB_PMC', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'Immune-biology fit', weight: 'medium', direction: 'supports' },
+      { factor: 'Toxicity tolerance', weight: 'high', direction: 'cautions' },
+    ],
+  }),
+  palliative: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'low',
+    uncertaintySummary: 'Best supportive care has clear rationale when symptom control and quality of life are the primary goals.',
+    uncertaintyDescription: 'The evidence is less disease-directed, but the patient preference and symptom burden make this a reasonable path when goals are comfort and function.',
+    evidenceFor: [
+      { text: 'Early palliative care improved quality of life and mood in metastatic NSCLC without compromising survival.', source: 'EARLY_PALLIATIVE_CARE_NSCLC_PDF' },
+      { text: 'ASCO guidelines support early integration of palliative care for patients with cancer.', source: 'ASCO_PALLIATIVE_CARE_JCO' },
+      { text: 'The patient\'s outpatient preference and QoL concerns support a less intensive approach.', source: 'Patient context' },
+    ],
+    evidenceAgainst: [
+      { text: 'If curative or disease-control intent is still desired, this approach may under-treat the cancer.', source: 'Clinical data' },
+      { text: 'Incomplete disease and workup data limit confidence in ruling out more active treatment.', source: 'Missing data' },
+    ],
+    riskFlags: [mockRiskFlags[3], mockRiskFlags[4]],
+    publishedCohorts: [
+      { cohortName: 'Early palliative care in metastatic NSCLC', population: 'Patients with newly diagnosed metastatic NSCLC receiving early palliative care', similarityLevel: 'Moderate', matchingFactors: ['QoL-centered goals', 'Symptom-focused management'], limitationFactors: ['Metastatic trial population', 'Less disease-directed benefit'], implication: 'Good fit when symptom relief is the dominant objective.', sourceLabel: 'EARLY_PALLIATIVE_CARE_NSCLC_PDF', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'QoL goals', weight: 'high', direction: 'supports' },
+      { factor: 'Disease-control intent', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
 };
 
 export const mockTreatmentOptions: TreatmentOption[] = [

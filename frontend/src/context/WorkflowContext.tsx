@@ -5,17 +5,13 @@ import type {
   FinalReflection,
   InteractionTelemetry,
   AiEvidenceSynthesis,
+  Patient,
 } from '../types';
-import { WORKFLOW_STEPS } from '../data/mockData';
+import { WORKFLOW_STEPS, getPatientProfile } from '../data/mockData';
 import { initialTelemetry, detectBiasWarnings, trackInteraction } from '../services/interactionService';
 import { fetchEvidenceSynthesis } from '../services/aiService';
 
-const SELECTED_PATIENT_KEY = 'selectedPatientId';
-
 interface WorkflowContextValue {
-  selectedPatientId: string | null;
-  selectPatient: (patientId: string) => void;
-  clearPatient: () => void;
   currentStep: WorkflowStepId;
   steps: typeof WORKFLOW_STEPS;
   assessment: HumanAssessment | null;
@@ -24,6 +20,8 @@ interface WorkflowContextValue {
   evidenceLoading: boolean;
   reflection: FinalReflection | null;
   telemetry: InteractionTelemetry;
+  selectedPatientId: string | null;
+  selectedPatient: Patient | null;
   biasWarnings: ReturnType<typeof detectBiasWarnings>;
   canAccessStep: (stepId: WorkflowStepId) => boolean;
   goToStep: (stepId: WorkflowStepId) => void;
@@ -33,31 +31,36 @@ interface WorkflowContextValue {
   submitReflection: (data: FinalReflection) => void;
   recordInteraction: (event: { type: string; payload?: string }) => void;
   startAssessment: () => void;
+  selectPatient: (patientId: string) => void;
+  changePatient: (newPatientId: string, confirmFn?: () => boolean) => void;
 }
 
 const WorkflowContext = createContext<WorkflowContextValue | null>(null);
 
-const GATED_STEPS: WorkflowStepId[] = ['evidence', 'treatment', 'similar', 'decision', 'reflection'];
+const GATED_STEPS: WorkflowStepId[] = ['evidence', 'treatment', 'similar', 'reflection'];
 
 export function WorkflowProvider({ children }: { children: ReactNode }) {
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    () => localStorage.getItem(SELECTED_PATIENT_KEY),
-  );
   const [currentStep, setCurrentStep] = useState<WorkflowStepId>('overview');
   const [assessment, setAssessment] = useState<HumanAssessment | null>(null);
   const [evidence, setEvidence] = useState<AiEvidenceSynthesis | null>(null);
   const [evidenceLoading, setEvidenceLoading] = useState(false);
   const [reflection, setReflection] = useState<FinalReflection | null>(null);
   const [telemetry, setTelemetry] = useState<InteractionTelemetry>(initialTelemetry);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
   const assessmentComplete = assessment !== null;
+  const selectedPatient = useMemo(
+    () => (selectedPatientId ? getPatientProfile(selectedPatientId) : null),
+    [selectedPatientId],
+  );
 
   const canAccessStep = useCallback(
     (stepId: WorkflowStepId) => {
+      if (!selectedPatientId) return false;
       if (!GATED_STEPS.includes(stepId)) return true;
       return assessmentComplete;
     },
-    [assessmentComplete],
+    [assessmentComplete, selectedPatientId],
   );
 
   const currentIndex = WORKFLOW_STEPS.findIndex((s) => s.id === currentStep);
@@ -79,35 +82,24 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     if (prev) setCurrentStep(prev.id);
   }, [currentIndex]);
 
-  const selectPatient = useCallback((patientId: string) => {
-    localStorage.setItem(SELECTED_PATIENT_KEY, patientId);
-    setSelectedPatientId(patientId);
-    setCurrentStep('overview');
-  }, []);
-
-  const clearPatient = useCallback(() => {
-    localStorage.removeItem(SELECTED_PATIENT_KEY);
-    setSelectedPatientId(null);
-    setCurrentStep('overview');
-  }, []);
-
   const startAssessment = useCallback(() => {
     setTelemetry((t) => ({ ...t, assessmentStartTime: Date.now() }));
   }, []);
 
   const submitAssessment = useCallback(async (data: HumanAssessment) => {
     const completed: HumanAssessment = { ...data, completedAt: new Date().toISOString() };
+    const patientId = selectedPatientId ?? '4821-7734';
     setAssessment(completed);
     setTelemetry((t) => ({ ...t, assessmentSubmitTime: Date.now() }));
     setEvidenceLoading(true);
     try {
-      const synthesis = await fetchEvidenceSynthesis('4821-7734', completed);
+      const synthesis = await fetchEvidenceSynthesis(patientId, completed);
       setEvidence(synthesis);
     } finally {
       setEvidenceLoading(false);
     }
     setCurrentStep('evidence');
-  }, []);
+  }, [selectedPatientId]);
 
   const submitReflection = useCallback((data: FinalReflection) => {
     setReflection(data);
@@ -117,12 +109,27 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     setTelemetry((t) => trackInteraction(t, event));
   }, []);
 
+  const selectPatient = useCallback((patientId: string) => {
+    setSelectedPatientId(patientId);
+    setCurrentStep('overview');
+    setTelemetry((t) => ({ ...t, evidenceInteractions: [...t.evidenceInteractions, `selected:${patientId}`] }));
+  }, []);
+
+  const changePatient = useCallback((newPatientId: string, confirmFn?: () => boolean) => {
+    const shouldProceed = confirmFn ? confirmFn() : true;
+    if (shouldProceed) {
+      setSelectedPatientId(newPatientId);
+      setAssessment(null);
+      setEvidence(null);
+      setReflection(null);
+      setTelemetry(initialTelemetry);
+      setCurrentStep('overview');
+    }
+  }, []);
+
   const biasWarnings = useMemo(() => detectBiasWarnings(telemetry), [telemetry]);
 
   const value: WorkflowContextValue = {
-    selectedPatientId,
-    selectPatient,
-    clearPatient,
     currentStep,
     steps: WORKFLOW_STEPS,
     assessment,
@@ -131,6 +138,8 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     evidenceLoading,
     reflection,
     telemetry,
+    selectedPatientId,
+    selectedPatient,
     biasWarnings,
     canAccessStep,
     goToStep,
@@ -140,6 +149,8 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     submitReflection,
     recordInteraction,
     startAssessment,
+    selectPatient,
+    changePatient,
   };
 
   return <WorkflowContext.Provider value={value}>{children}</WorkflowContext.Provider>;
