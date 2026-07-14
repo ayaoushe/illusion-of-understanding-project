@@ -1,98 +1,164 @@
-import { useState } from 'react';
-import { mockTreatmentOptions, getAssessmentTreatmentLabel } from '../data/mockData';
-import { useWorkflow } from '../context/WorkflowContext';
-import { PageHeader } from '../components/layout/PageHeader';
-import { StepFooter } from '../components/layout/StepFooter';
+import { PageHeader } from "../components/layout/PageHeader";
+import { StepFooter } from "../components/layout/StepFooter";
+
+import { useEffect, useState } from "react";
+
+import { useWorkflow } from "../context/WorkflowContext";
+
+import { fetchCase } from "../services/caseService";
+
+import {
+  fetchTreatmentRecommendations,
+  type TreatmentPrediction,
+} from "../services/predictionService";
+
+function ProbabilityBar({ value }: { value: number }) {
+  return (
+    <div>
+      <div className="probability-row">
+        <div className="probability-track">
+          <div
+            className="probability-fill"
+            style={{
+              width: `${value}%`,
+            }}
+          />
+        </div>
+        <span>{value}%</span>
+      </div>
+      <small className="muted">
+        Estimated likelihood that this option is preferred by the model.
+      </small>
+    </div>
+  );
+}
+
+function ShapChart({
+  shap,
+}: {
+  shap: {
+    feature: string;
+    value: number;
+  }[];
+}) {
+  const visibleShap = shap.filter((feature) => Number(feature.value.toFixed(2)) !== 0);
+  if (visibleShap.length === 0) {
+    return <p className="muted">No meaningful model factors to display.</p>;
+  }
+
+  const max = Math.max(...visibleShap.map((f) => Math.abs(f.value)));
+
+  return (
+    <div className="shap-chart">
+      {visibleShap.map((feature) => (
+        <div className="shap-row" key={feature.feature}>
+          <div className="shap-label">{feature.feature}</div>
+
+          <div className="shap-track">
+            <div
+              className={feature.value >= 0 ? "shap-positive" : "shap-negative"}
+              style={{
+                width: `${(Math.abs(feature.value) / max) * 100}%`,
+              }}
+            />
+          </div>
+
+          <span>
+            {feature.value > 0 ? "+" : ""}
+            {feature.value.toFixed(2)}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function TreatmentComparison() {
-  const { assessment, recordInteraction } = useWorkflow();
-  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+  const { selectedPatientId } = useWorkflow();
+  const [prediction, setPrediction] = useState<TreatmentPrediction | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const toggleExpand = (id: string) => {
-    setExpandedCards((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+  useEffect(() => {
+    let active = true;
+
+    async function loadPrediction() {
+      setLoading(true);
+      setError(null);
+
+      if (!selectedPatientId) {
+        setPrediction(null);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const patient = await fetchCase(selectedPatientId);
+        if (!patient || !active) return;
+
+        const result = await fetchTreatmentRecommendations(patient);
+        if (active) {
+          setPrediction(result);
+        }
+      } catch (err) {
+        if (active) {
+          const message = err instanceof Error ? err.message : "Failed to load treatment recommendations.";
+          setError(message);
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadPrediction();
+
+    return () => {
+      active = false;
+    };
+  }, [selectedPatientId]);
+
+  if (loading) {
+    return (
+      <div className="page">
+        <PageHeader title="AI Treatment Recommendations" badge="Step 4" />
+        <p className="muted">Loading recommendations...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="page">
-      <PageHeader title="Treatment Options Comparison" badge="Step 4" />
+      <PageHeader title="AI Treatment Recommendations" badge="Step 4" />
 
-      {assessment && (
-        <div className="card card-sm" style={{ marginBottom: '0.75rem' }}>
-          <p style={{ margin: 0, fontSize: '0.85rem' }}>
-            Your initial selection: <strong>{getAssessmentTreatmentLabel(assessment.selectedTreatment)}</strong>
-          </p>
-        </div>
-      )}
-
-      <div className="treatment-comparison-grid">
-        {mockTreatmentOptions.map((opt) => (
-          <div
-            key={opt.id}
-            className={`card treatment-option-card ${assessment?.selectedTreatment === opt.id ? 'selected' : ''}`}
-            onClick={() => recordInteraction({ type: 'treatment_view', payload: opt.id })}
-          >
-            <div className="treatment-header">
-              <h4>{opt.name}</h4>
-              <div className="treatment-badges">
-                <span className="strength-badge">{opt.strength}</span>
-                <span className={`uncertainty-badge uncertainty-${opt.uncertainty}`}>
-                  {opt.uncertainty.toUpperCase()}
-                </span>
-              </div>
-            </div>
-
-            <p className="evidence-strength-label">Evidence: {opt.evidenceStrength}</p>
-
-            <div className="treatment-cols">
-              <div className="treatment-section">
-                <h5>Benefits</h5>
-                <ul>
-                  {opt.benefits.map((b, i) => <li key={i}>{b}</li>)}
-                </ul>
-              </div>
-              <div className="treatment-section">
-                <h5>Risks</h5>
-                <ul>
-                  {opt.risks.map((r, i) => <li key={i}>{r}</li>)}
-                </ul>
-              </div>
-            </div>
-
-            <div className="treatment-meta">
-              <div>
-                <p className="meta-text"><strong>QoL:</strong> {opt.qolImpact}</p>
-              </div>
-              <div>
-                <p className="meta-text"><strong>Monitoring:</strong> {opt.monitoring}</p>
-              </div>
-            </div>
-
-            {opt.missingData.length > 0 && (
-              <div className="treatment-missing">
-                <strong style={{ fontSize: '0.75rem' }}>Missing data:</strong>{' '}
-                {opt.missingData.join('; ')}
-              </div>
-            )}
-
-            <details
-              className="treatment-section"
-              style={{ cursor: 'pointer' }}
-              open={expandedCards[opt.id]}
-              onToggle={() => toggleExpand(opt.id)}
-            >
-              <summary style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                {expandedCards[opt.id] ? 'Hide details' : 'Show details'}
-              </summary>
-              <div style={{ marginTop: '0.5rem' }}>
-                <h5>Comorbidity Considerations</h5>
-                <ul>
-                  {opt.comorbidityConsiderations.map((c, i) => <li key={i}>{c}</li>)}
-                </ul>
-              </div>
-            </details>
-          </div>
-        ))}
+      <div className="recommendation-notice">
+        <strong>Decision Support Only</strong>
+        <p>
+          These recommendations are generated by the machine learning model and should be interpreted alongside clinical judgement.
+        </p>
       </div>
+
+      {error ? <p className="muted">{error}</p> : null}
+
+      {!error && prediction ? (
+        <div className="recommendations-grid">
+          {prediction.recommendations.map((treatment, index) => (
+            <div key={treatment.id} className="recommendation-card">
+              <div className="recommendation-header">
+                <strong>
+                  {index + 1}. {treatment.name}
+                </strong>
+              </div>
+
+              <ProbabilityBar value={treatment.probability} />
+
+              <h3>Model Explanation</h3>
+              <ShapChart shap={treatment.shap} />
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       <StepFooter />
     </div>
