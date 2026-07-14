@@ -1,22 +1,15 @@
 import type { ReactNode } from 'react';
 import { WorkflowProvider, useWorkflow } from './context/WorkflowContext';
 import { Sidebar } from './components/layout/Sidebar';
-import { CaseSelection } from './pages/CaseSelection';
 import { PatientOverview } from './pages/PatientOverview';
 import { HumanAssessment } from './pages/HumanAssessment';
 import { EvidenceReview } from './pages/EvidenceReview';
 import { TreatmentComparison } from './pages/TreatmentComparison';
 import { SimilarCases } from './pages/SimilarCases';
-import { DecisionFactors } from './pages/DecisionFactors';
 import { FinalReflection } from './pages/FinalReflection';
 
 function WorkflowContent() {
-  const { currentStep, selectedPatientId } = useWorkflow();
-
-  // Startseite: erst muss ein Patient ausgewählt werden.
-  if (!selectedPatientId) {
-    return <CaseSelection />;
-  }
+  const { currentStep } = useWorkflow();
 
   const pages: Record<string, ReactNode> = {
     overview: <PatientOverview />,
@@ -24,7 +17,6 @@ function WorkflowContent() {
     evidence: <EvidenceReview />,
     treatment: <TreatmentComparison />,
     similar: <SimilarCases />,
-    decision: <DecisionFactors />,
     reflection: <FinalReflection />,
   };
 
