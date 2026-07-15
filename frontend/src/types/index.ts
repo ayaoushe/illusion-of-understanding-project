@@ -172,16 +172,29 @@ export interface TreatmentOption {
   sources: Array<{ title: string; url: string }>;
 }
 
+export type PatientId = 'P-0001568' | 'P-0000081' | 'P-0002566' | 'P-0001862';
+
+export interface SimilarCaseDifference {
+  feature: string;
+  currentPatient: string;
+  comparisonCase: string;
+}
+
 export interface SimilarCase {
   caseId: string;
-  isRare?: boolean;
+  caseType: 'supporting' | 'counterfactual' | 'rare';
+  matchScore: number;
   matchCriteria: Array<{ label: string; matched: boolean }>;
   presentation: string;
   treatmentUsed: string;
   outcome: string;
   source: string;
-  matchScore: number;
+  similarities: string[];
+  differences: SimilarCaseDifference[];
+  takeaway: string;
 }
+
+export type SimilarCasesByPatient = Record<PatientId, SimilarCase[]>;
 
 export interface StudyCase {
   patient_id: string;

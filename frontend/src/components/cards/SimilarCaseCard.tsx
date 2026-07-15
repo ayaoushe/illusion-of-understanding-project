@@ -5,8 +5,8 @@ interface SimilarCaseCardProps {
 }
 
 const getCaseType = (caseData: SimilarCase): 'supporting' | 'counterfactual' | 'neutral' => {
-  if (caseData.isRare) return 'counterfactual';
-  if (caseData.matchScore >= 85) return 'supporting';
+  if (caseData.caseType === 'rare') return 'counterfactual';
+  if (caseData.caseType === 'supporting') return 'supporting';
   return 'neutral';
 };
 
@@ -51,7 +51,7 @@ export function SimilarCaseCard({ caseData }: SimilarCaseCardProps) {
             }}>
               {caseType === 'supporting' ? 'Supporting' : caseType === 'counterfactual' ? 'Counterfactual' : 'Similar'}
             </span>
-            {caseData.isRare && (
+            {caseData.caseType === 'rare' && (
               <span style={{
                 padding: '0.15rem 0.4rem',
                 background: 'rgba(6, 182, 212, 0.12)',
@@ -138,7 +138,7 @@ export function SimilarCaseCard({ caseData }: SimilarCaseCardProps) {
         </p>
       </div>
 
-      {caseData.isRare && (
+      {caseData.caseType === 'rare' && (
         <p style={{
           fontSize: '0.75rem',
           color: '#d97706',
