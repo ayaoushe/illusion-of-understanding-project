@@ -45,67 +45,99 @@ export function SimilarCases() {
                 className={`card similar-case-card ${isRare ? 'rare-case' : c.caseType === 'supporting' ? 'supporting' : 'counterfactual'}`}
               >
                 <div className="case-header">
-                  <div>
-                    <strong style={{ fontSize: '0.9rem' }}>{c.caseId}</strong>
-                    {isRare && <span className="rare-badge">RARE</span>}
-                  </div>
-                  <div className="case-meta">
-                    <span className="match-score">{c.matchScore}% match</span>
-                    <span className="badge" style={badgeStyle}>
+                  <div className="case-header-main">
+                    <div className="case-id-row">
+                      <strong className="case-id">{c.caseId}</strong>
+                      {isRare && <span className="rare-badge">Rare</span>}
+                    </div>
+                    <span className="case-badge" style={badgeStyle}>
                       {badgeLabel}
                     </span>
                   </div>
+                  <div className="case-meta">
+                    <span className="match-score">{c.matchScore}% match</span>
+                  </div>
                 </div>
 
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0 0 0.5rem' }}>{c.presentation}</p>
-
-                <div className="match-criteria">
-                  {c.matchCriteria.slice(0, 4).map((crit) => (
-                    <span key={crit.label} className={`criteria-chip ${crit.matched ? 'matched' : 'unmatched'}`}>
-                      {crit.label}
-                    </span>
-                  ))}
-                  {c.matchCriteria.length > 4 && (
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', padding: '0.2rem 0.4rem' }}>
-                      +{c.matchCriteria.length - 4} more
-                    </span>
-                  )}
+                <div className="case-section similarities">
+                  <div className="case-section-title">Similarities</div>
+                  <div className="similarity-list">
+                    {c.similarities.slice(0, 3).map((item) => (
+                      <span key={item} className="similarity-pill">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
-                <div style={{ fontSize: '0.85rem', marginBottom: '0.35rem' }}>
+                <div className="case-section differences">
+                  <div className="case-section-title">Key differences</div>
+                  <div className="difference-list">
+                    {c.differences.slice(0, 2).map((difference) => (
+                      <div key={`${difference.feature}-${difference.currentPatient}`} className="difference-row">
+                        <div className="difference-cell difference-feature">{difference.feature}</div>
+                        <div className="difference-cell">
+                          <span className="difference-label">Current patient</span>
+                          <span>{difference.currentPatient}</span>
+                        </div>
+                        <div className="difference-cell">
+                          <span className="difference-label">Similar case</span>
+                          <span>{difference.comparisonCase}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="case-takeaway">{c.takeaway}</p>
+                <div className="case-meta-line">
                   <strong>Treatment:</strong> {c.treatmentUsed}
                 </div>
-                <div style={{ fontSize: '0.85rem', marginBottom: '0.35rem' }}>
+                <div className="case-meta-line">
                   <strong>Outcome:</strong> <span className="outcome-text">{c.outcome}</span>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  Source: {c.source}
-                </div>
 
-                {c.matchCriteria.length > 4 && (
-                  <details
-                    style={{ cursor: 'pointer', marginTop: '0.35rem' }}
-                    open={isExpanded}
-                    onToggle={() => setExpandedCase(isExpanded ? null : c.caseId)}
-                  >
-                    <summary style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                      {isExpanded ? 'Hide details' : 'Show details'}
-                    </summary>
-                    <div className="match-criteria" style={{ marginTop: '0.35rem' }}>
-                      {c.matchCriteria.slice(4).map((crit) => (
-                        <span key={crit.label} className={`criteria-chip ${crit.matched ? 'matched' : 'unmatched'}`}>
-                          {crit.label}
-                        </span>
-                      ))}
+                <details
+                  className="case-details"
+                  open={isExpanded}
+                  onToggle={() => setExpandedCase(isExpanded ? null : c.caseId)}
+                >
+                  <summary className="details-toggle">{isExpanded ? 'Hide details' : 'Show details'}</summary>
+                  <div className="detail-panel">
+                    <div className="detail-group">
+                      <div className="detail-label">Presentation</div>
+                      <div className="detail-text">{c.presentation}</div>
                     </div>
-                  </details>
-                )}
 
-                {isRare && (
-                  <div className="rare-note">
-                    Rare presentation — consider with caution. Limited comparative data.
+                    {c.matchCriteria.length > 0 && (
+                      <div className="detail-group">
+                        <div className="detail-label">Match criteria</div>
+                        <div className="detail-list">
+                          {c.matchCriteria.map((crit) => (
+                            <span key={crit.label} className={`criteria-chip ${crit.matched ? 'matched' : 'unmatched'}`}>
+                              {crit.label}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="detail-group">
+                      <div className="detail-label">Treatment</div>
+                      <div className="detail-text">{c.treatmentUsed}</div>
+                    </div>
+
+                    <div className="detail-group">
+                      <div className="detail-label">Outcome</div>
+                      <div className="detail-text">{c.outcome}</div>
+                    </div>
+
+                    <div className="detail-group">
+                      <div className="detail-label">Source</div>
+                      <div className="detail-text">{c.source}</div>
+                    </div>
                   </div>
-                )}
+                </details>
               </div>
             );
           })
