@@ -28,3 +28,17 @@ export async function fetchCase(patientId: string): Promise<StudyCase | undefine
   const cases = await fetchCases();
   return cases.find((c) => c.patient_id === patientId);
 }
+
+/**
+ * Alle Regime eines Falls, absteigend nach Modell-Wahrscheinlichkeit.
+ *
+ * Die Pipeline schreibt `probabilities` bereits sortiert (ml/pipeline.py),
+ * wir sortieren hier trotzdem explizit — die Key-Reihenfolge eines JSON-
+ * Objekts ist nichts, worauf man sich verlassen sollte.
+ */
+export function rankedRegimes(c: StudyCase): Array<{ id: string; probability: number }> {
+  if (!c.probabilities) return [];
+  return Object.entries(c.probabilities)
+    .map(([id, probability]) => ({ id, probability }))
+    .sort((a, b) => b.probability - a.probability);
+}

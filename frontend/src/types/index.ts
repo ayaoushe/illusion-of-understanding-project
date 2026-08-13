@@ -185,8 +185,17 @@ export interface SimilarCase {
 
 export interface StudyCase {
   patient_id: string;
+  study_label?: string;
+  /** Top-1-Regime des Modells */
+  prediction?: string;
+  confidence_percent?: number;
+  /** Alle Regime-Klassen mit Wahrscheinlichkeit (aus predictions.json) */
+  probabilities?: Record<string, number>;
   options: Array<{
-    features: Array<{ name: string; value: string }>;
+    regime?: string;
+    rank?: number;
+    probability?: number;
+    features: Array<{ name: string; value: string; weight?: number; explanation?: string }>;
   }>;
 }
 

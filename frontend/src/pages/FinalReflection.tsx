@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { assessmentTreatmentOptions } from '../data/mockData';
+import { useTreatmentOptions } from '../hooks/useTreatmentOptions';
 import { useWorkflow } from '../context/WorkflowContext';
 import type { FinalReflection } from '../types';
 import { PageHeader } from '../components/layout/PageHeader';
@@ -17,6 +17,7 @@ const emptyReflection: FinalReflection = {
 
 export function FinalReflection() {
   const { assessment, evidence, reflection, submitReflection } = useWorkflow();
+  const treatmentOptions = useTreatmentOptions();
   const [form, setForm] = useState<FinalReflection>(
     reflection ?? { ...emptyReflection, finalTreatment: assessment?.selectedTreatment ?? '' },
   );
@@ -81,7 +82,7 @@ export function FinalReflection() {
               onChange={(e) => update('finalTreatment', e.target.value)}
             >
               <option value="">Select a treatment option...</option>
-              {assessmentTreatmentOptions.map((opt) => (
+              {treatmentOptions.map((opt) => (
                 <option key={opt.id} value={opt.id}>
                   {opt.label} [{opt.category}]
                 </option>

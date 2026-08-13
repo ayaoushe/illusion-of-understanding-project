@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { assessmentTreatmentOptions } from '../data/mockData';
+import { useTreatmentOptions } from '../hooks/useTreatmentOptions';
 import { useWorkflow } from '../context/WorkflowContext';
 import type { HumanAssessment } from '../types';
 import { PageHeader } from '../components/layout/PageHeader';
@@ -16,6 +16,7 @@ const emptyForm: HumanAssessment = {
 
 export function HumanAssessment() {
   const { submitAssessment, startAssessment, assessmentComplete } = useWorkflow();
+  const treatmentOptions = useTreatmentOptions();
   const [form, setForm] = useState<HumanAssessment>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
 
@@ -64,7 +65,7 @@ export function HumanAssessment() {
             onChange={(e) => update('selectedTreatment', e.target.value)}
           >
             <option value="">Select a treatment option...</option>
-            {assessmentTreatmentOptions.map((opt) => (
+            {treatmentOptions.map((opt) => (
               <option key={opt.id} value={opt.id}>
                 {opt.label} [{opt.category}]
               </option>
