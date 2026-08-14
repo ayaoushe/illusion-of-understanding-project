@@ -135,6 +135,7 @@ export interface PublishedCohort {
 export interface AiEvidenceSynthesis {
   title: string;
   disclaimer: string;
+  /** Aus der Modellwahrscheinlichkeit für die gewählte Therapie abgeleitet. */
   uncertaintyLevel: 'low' | 'moderate' | 'high';
   uncertaintySummary: string;
   uncertaintyDescription: string;

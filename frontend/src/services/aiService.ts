@@ -1,5 +1,7 @@
 import type { HumanAssessment, AiEvidenceSynthesis } from '../types';
 import { mockTreatmentEvidenceById } from '../data/mockData';
+import { fetchCase } from './caseService';
+import { buildTreatmentEvidence } from './treatmentEvidence';
 
 /**
  * Lightweight evidence service that prefers an API endpoint when available,
@@ -12,6 +14,14 @@ export async function fetchEvidenceSynthesis(
   await delay(300);
 
   const treatmentId = assessment.selectedTreatment || 'osimertinib';
+
+  // Evidenz zur Wahl des Arztes, erzeugt aus den echten Falldaten.
+  // Der alte Mock-Katalog greift nur noch, wenn kein Studienfall geladen ist.
+  const studyCase = await fetchCase(patientId).catch(() => undefined);
+  if (studyCase && assessment.selectedTreatment) {
+    return buildTreatmentEvidence(studyCase, assessment.selectedTreatment);
+  }
+
   const evidence = await getEvidenceForTreatment(treatmentId, patientId);
 
   return {
