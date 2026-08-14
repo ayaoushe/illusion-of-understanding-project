@@ -219,10 +219,23 @@ export interface ClinicalContext {
   outcome?: { os_months?: number | null; os_status?: string | null };
 }
 
+/** Ähnlichster Trainingsfall laut Random-Forest-Proximity. */
+export interface SimilarNeighbor {
+  rank: number;
+  patient_id: string;
+  match_percent: number;
+  regime: string;
+  features: Record<string, string | number | null>;
+  matched_fields: string[];
+  os_months: number | null;
+  os_status: string;
+}
+
 export interface StudyCase {
   patient_id: string;
   study_label?: string;
   clinical?: ClinicalContext;
+  similar_cases?: SimilarNeighbor[];
   /** Top-1-Regime des Modells */
   prediction?: string;
   confidence_percent?: number;

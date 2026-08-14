@@ -323,6 +323,68 @@ def build_clinical_context(all_ids, labels, pat, samp) -> dict[str, dict]:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Ähnliche Fälle über die Random-Forest-Proximity: Anteil der 300 Bäume, in
+# denen zwei Patientinnen im selben Blatt landen. Das ist Ähnlichkeit aus Sicht
+# des Modells und passt damit zu den SHAP-Erklärungen — keine frei gewählte
+# Distanzfunktion.
+#
+# Die Nachbarn stammen aus dem Trainingsset: genau die Fälle, aus denen das
+# Modell gelernt hat, mit abgeschlossenem Verlauf. Ihr Outcome ist echtes
+# Registerwissen und darf gezeigt werden; das Outcome des Indexfalls selbst
+# nicht (es liegt zeitlich nach der Entscheidung).
+# ---------------------------------------------------------------------------
+SIMILAR_FIELDS = [
+    "CURRENT_AGE_DEID", "HR", "HER2", "STAGE_HIGHEST_RECORDED", "LYMPH_NODES",
+    "LIVER", "BONE", "LUNG", "SMOKING_PREDICTIONS_3_CLASSES", "MSI_TYPE",
+    "TMB_NONSYNONYMOUS", "TUMOR_PURITY",
+]
+N_SIMILAR = 3
+
+
+def build_similar_cases(all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat):
+    rf = pipe.named_steps["rf"]
+    pre = pipe.named_steps["pre"]
+    leaves_train = rf.apply(pre.transform(X_train))
+    leaves_test = rf.apply(pre.transform(X_test))
+
+    raw_by_pid = raw.set_index(df["PATIENT_ID"])
+    pat_idx = pat.drop_duplicates("PATIENT_ID").set_index("PATIENT_ID")
+
+    def row_of(pid):
+        r = raw_by_pid.loc[pid]
+        return r.iloc[0] if isinstance(r, pd.DataFrame) else r
+
+    def value(v):
+        if pd.isna(v):
+            return None
+        return float(v) if isinstance(v, (int, float, np.number)) else str(v)
+
+    out = {}
+    for pid in all_ids:
+        pos = int(np.where(pid_test.values == pid)[0][0])
+        prox = (leaves_train == leaves_test[pos]).mean(axis=1)
+        target = row_of(pid)
+
+        neighbors = []
+        for rank, i in enumerate(np.argsort(-prox)[:N_SIMILAR], start=1):
+            npid = pid_train.iloc[i]
+            r = row_of(npid)
+            os_months = pat_idx.loc[npid, "OS_MONTHS"]
+            neighbors.append({
+                "rank": rank,
+                "patient_id": npid,
+                "match_percent": round(float(prox[i]) * 100),
+                "regime": str(y_train.iloc[i]),
+                "features": {f: value(r[f]) for f in SIMILAR_FIELDS},
+                "matched_fields": [f for f in SIMILAR_FIELDS if str(r[f]) == str(target[f])],
+                "os_months": round(float(os_months), 1) if pd.notna(os_months) else None,
+                "os_status": str(pat_idx.loc[npid, "OS_STATUS"]),
+            })
+        out[pid] = neighbors
+    return out
+
+
 # Baut für diese 12 Fälle die Ausgabestruktur mit den Top-3-Regimen,
 # deren Wahrscheinlichkeiten und je 18 nach Einfluss sortierten Feature-Erklärungen in Textform.
 def build_predictions(all_ids, pid_test, proba, classes, raw, X_test, X_test_imp, get_sv, y_test):
@@ -389,7 +451,7 @@ def main():
     feature_names = list(X.columns)
 
     # single stratified split (X, y and patient ids together) — deterministic with random_state
-    X_train, X_test, y_train, y_test, _, pid_test = train_test_split(
+    X_train, X_test, y_train, y_test, pid_train, pid_test = train_test_split(
         X, y, df["PATIENT_ID"], test_size=0.2, stratify=y, random_state=RANDOM_STATE
     )
     pipe = fit_model(X_train, y_train)
@@ -421,8 +483,12 @@ def main():
 
     # echte klinische Felder aus MSK CHORD anhängen (siehe build_clinical_context)
     clinical = build_clinical_context(all_ids, labels, pat, samp)
+    similar = build_similar_cases(
+        all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat
+    )
     for entry in predictions:
         entry["clinical"] = clinical.get(entry["patient_id"], {})
+        entry["similar_cases"] = similar.get(entry["patient_id"], [])
 
     with open(OUT_DIR + "predictions.json", "w", encoding="utf-8") as f:
         json.dump(predictions, f, indent=2, ensure_ascii=False)
