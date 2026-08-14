@@ -45,20 +45,9 @@ export function FinalDecisionSummary({ assessment, evidence, reflection }: Final
       <div className="summary-column col-decision">
         <h4>Final Decision</h4>
         {reflection ? (
-          <>
-            <p className="summary-treatment">
-              {getAssessmentTreatmentLabel(reflection.finalTreatment)}
-            </p>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Changed mind: <strong>{reflection.changedMind}</strong>
-              </span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Preferences honored: <strong>{reflection.patientPreferenceHonored ? 'Yes' : 'No'}</strong>
-              </span>
-            </div>
-            <p className="summary-reasoning" style={{ fontSize: '0.8rem' }}>{reflection.finalReasoning}</p>
-          </>
+          <p className="summary-treatment">
+            {getAssessmentTreatmentLabel(reflection.finalTreatment)}
+          </p>
         ) : (
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
             Complete the form below to record your final decision.

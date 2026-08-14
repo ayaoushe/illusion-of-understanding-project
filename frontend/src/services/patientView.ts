@@ -36,7 +36,7 @@ export interface PatientView {
     icd10: string;
     diagnosisDate: string;
   };
-  performance: { ecog: number; ecogDescription: string; lastAssessed: string };
+  performance: { ecog: number | null; ecogDescription: string; lastAssessed: string };
   biomarkers: Biomarker[];
   metastases: MetastasisSite[];
   labs: LabValue[];
@@ -82,14 +82,57 @@ function hashInt(s: string): number {
   return h;
 }
 
+/**
+ * Bezugsdatum der Fallansicht: der Tag, an dem über die Erstlinie entschieden
+ * wird. Die Rohdaten liefern nur Tagesabstände dazu, daraus werden hier
+ * darstellbare Datumsangaben.
+ */
+const DECISION_DATE = '2026-06-18';
+
+function dateBefore(days: number): string {
+  const d = new Date(`${DECISION_DATE}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - days);
+  return d.toISOString().slice(0, 10);
+}
+
+const ECOG_TEXT: Record<number, string> = {
+  0: 'Fully active, no restriction',
+  1: 'Restricted in strenuous activity, ambulatory',
+  2: 'Ambulatory, up more than 50% of waking hours',
+  3: 'Limited self-care, confined to bed or chair over 50% of waking hours',
+  4: 'Completely disabled, no self-care',
+};
+
+/** "… (M8500/3 | C508)" -> "C50.8" */
+function icdFromIcdO(description: string | null | undefined): string | null {
+  const match = description?.match(/C(\d{2})(\d)/);
+  return match ? `C${match[1]}.${match[2]}` : null;
+}
+
+/** "INFILTRATING DUCT CARCINOMA | BREAST, UIQ (M8500/3 | C502)" -> "Breast, UIQ" */
+function locationFromIcdO(description: string | null | undefined): string | null {
+  if (!description) return null;
+  const site = description.split('|')[1]?.split('(')[0]?.trim();
+  if (!site) return null;
+  return site
+    .toLowerCase()
+    .replace(/\bnos\b/, 'not otherwise specified')
+    .replace(/\buiq\b/, 'upper outer quadrant')
+    .replace(/^\w/, (m) => m.toUpperCase());
+}
+
 export function buildPatientView(c: StudyCase): PatientView {
   const f = featureMap(c);
+  const clinical = c.clinical ?? {};
   const ageNum = parseInt(f.CURRENT_AGE_DEID ?? '', 10);
   const age = Number.isFinite(ageNum) ? String(ageNum) : '—';
   const birthYear = Number.isFinite(ageNum) ? 2026 - ageNum : 1970;
-  const stage = f.STAGE_HIGHEST_RECORDED ?? 'unknown';
-  const hasDistantMets = METASTASIS_SITES.some(([key]) => yesNo(f[key]));
-  const isMetastatic = stage.includes('4') || hasDistantMets;
+  // Registerangabe ist genauer als das grobe "Stage 1-3" des Modell-Merkmals.
+  const preciseGroup = clinical.stage?.pathological_group ?? clinical.stage?.registry_path_group ?? null;
+  const stage = preciseGroup ? `Stage ${preciseGroup}` : (f.STAGE_HIGHEST_RECORDED ?? 'unknown');
+  // Die Organ-Flags in MSK CHORD bedeuten "jemals dokumentierte Beteiligung",
+  // nicht "aktuell metastasiert". Nur das Stadium entscheidet über M1.
+  const isMetastatic = stage.includes('4');
   const her2 = yesNo(f.HER2);
   const hr = yesNo(f.HR);
   const smokerRaw = f.SMOKING_PREDICTIONS_3_CLASSES ?? '';
@@ -97,10 +140,13 @@ export function buildPatientView(c: StudyCase): PatientView {
 
   const mrn = mrnFromId(c.patient_id);
 
-  const metastases: MetastasisSite[] = METASTASIS_SITES.map(([key, label]) => ({
-    site: label,
-    present: yesNo(f[key]),
-  }));
+  // Bevorzugt die datierten Befunde aus dem Register; die Organ-Flags des
+  // Modells sind nur der Rückfall, wenn kein Kontext geladen ist.
+  const hasContext = Boolean(c.clinical);
+  const documentedSites = clinical.tumor_sites ?? [];
+  const metastases: MetastasisSite[] = hasContext
+    ? documentedSites.map((t) => ({ site: t.site, present: true }))
+    : METASTASIS_SITES.map(([key, label]) => ({ site: label, present: yesNo(f[key]) }));
   const activeMets = metastases.filter((m) => m.present).map((m) => m.site);
 
   const biomarkers: Biomarker[] = [
@@ -113,33 +159,45 @@ export function buildPatientView(c: StudyCase): PatientView {
       value: f.TMB_NONSYNONYMOUS ? `${Number(f.TMB_NONSYNONYMOUS).toFixed(1)} mut/Mb` : '—',
       real: true,
     },
-    { label: 'MSI status', value: f.MSI_TYPE ?? '—', real: true },
+    {
+      label: 'MSI status',
+      value: clinical.assay?.msi_score != null
+        ? `${f.MSI_TYPE ?? '—'} (score ${clinical.assay.msi_score})`
+        : (f.MSI_TYPE ?? '—'),
+      real: true,
+    },
     { label: 'Tumor purity', value: f.TUMOR_PURITY ? `${f.TUMOR_PURITY} %` : '—', real: true },
     { label: 'Smoking status', value: isSmoker ? 'Former/current smoker' : 'Never smoked', real: true },
   ];
 
-  const imaging = [
-    {
-      type: 'CT chest/abdomen',
-      date: '2025-03-18',
-      findings:
-        activeMets.length > 0
-          ? `Metastases detected: ${activeMets.join(', ')}.`
-          : 'No distant metastases detected.',
-    },
-    {
-      type: 'Mammography / ultrasound',
-      date: '2024-11-02',
-      findings: `Primary breast tumor${yesNo(f.LYMPH_NODES) ? ' with axillary lymph node involvement' : ''}.`,
-    },
-  ];
+  // Aus den datierten Registerbefunden; ohne Kontext bleibt der alte Platzhalter.
+  const imaging = documentedSites.length
+    ? documentedSites.map((t) => ({
+        type: t.modality ? `${t.modality} — ${t.site}` : `Imaging — ${t.site}`,
+        date: dateBefore(t.days_before_first_line),
+        findings: `Tumor involvement documented at ${t.site.toLowerCase()}${t.source ? ` (${t.source})` : ''}.`,
+      }))
+    : [
+        {
+          type: 'Imaging',
+          date: '—',
+          findings: 'No tumor sites documented before treatment decision.',
+        },
+      ];
 
 
   const ageForLogic = Number.isFinite(ageNum) ? ageNum : 55;
   const nodePos = yesNo(f.LYMPH_NODES);
   const h = hashInt(c.patient_id);
 
-  const subtype = her2 ? 'HER2-enriched' : hr ? 'luminal (HR+/HER2−)' : 'triple-negative';
+  // HER2-enriched setzt HR-negativ voraus; HR+/HER2+ ist luminal B.
+  const subtype = her2
+    ? hr
+      ? 'luminal B (HR+/HER2+)'
+      : 'HER2-enriched (HR−/HER2+)'
+    : hr
+      ? 'luminal (HR+/HER2−)'
+      : 'triple-negative';
 
   const locations = [
     'Left breast, upper outer quadrant',
@@ -148,8 +206,12 @@ export function buildPatientView(c: StudyCase): PatientView {
     'Right breast, central / retroareolar',
   ];
   const location = locations[h % locations.length];
+  // Der Registertext trägt Topografie und ICD-O-Code: "… | BREAST, UIQ (M8500/3 | C502)"
+  const registryText = clinical.diagnosis?.description ?? null;
+  const icdCode = icdFromIcdO(registryText);
   const dxMonth = String((h % 12) + 1).padStart(2, '0');
   const dxDay = String((h % 27) + 1).padStart(2, '0');
+  const dobMonth = String(((h >> 5) % 12) + 1).padStart(2, '0');
   const dobDay = String(((h >> 3) % 27) + 1).padStart(2, '0');
 
   const anemic = ageForLogic >= 70 || isMetastatic;
@@ -259,22 +321,28 @@ export function buildPatientView(c: StudyCase): PatientView {
     patientId: c.patient_id,
     name: STUDY_NAMES[c.patient_id] ?? c.patient_id,
     mrn,
-    dateOfBirth: `${birthYear}-${dxMonth}-${dobDay}`,
+    dateOfBirth: `${birthYear}-${dobMonth}-${dobDay}`,
     age,
-    gender: 'Female',
+    gender: clinical.sex ?? 'Female',
     priority: isMetastatic ? 'HIGH' : 'MODERATE',
     diagnosis: {
-      primaryDiagnosis: 'Breast cancer',
+      primaryDiagnosis: clinical.histology?.cancer_type_detailed ?? 'Breast cancer',
       stage,
-      histology: `Invasive ductal carcinoma, ${subtype}`,
-      location,
-      icd10: 'C50.9',
-      diagnosisDate: `2024-${dxMonth}-${dxDay}`,
+      histology: `${clinical.histology?.icd_o_description ?? 'Invasive ductal carcinoma'}, ${subtype}`,
+      location: locationFromIcdO(registryText) ?? location,
+      icd10: icdCode ?? 'C50.9',
+      diagnosisDate: clinical.diagnosis
+        ? dateBefore(clinical.diagnosis.days_before_first_line)
+        : `2024-${dxMonth}-${dxDay}`,
     },
     performance: {
-      ecog: isMetastatic ? 1 : 0,
-      ecogDescription: isMetastatic ? 'Restricted activity' : 'Fully active, no restriction',
-      lastAssessed: '2025-03-20',
+      // Vor dem Entscheidungszeitpunkt liegt in MSK CHORD kein ECOG vor;
+      // dann bleibt das Feld leer, statt eine Zahl zu erfinden.
+      ecog: clinical.ecog?.value ?? null,
+      ecogDescription: clinical.ecog
+        ? ECOG_TEXT[clinical.ecog.value] ?? '—'
+        : 'Not documented before treatment decision',
+      lastAssessed: clinical.ecog ? dateBefore(clinical.ecog.days_before_first_line) : '—',
     },
     biomarkers,
     metastases,

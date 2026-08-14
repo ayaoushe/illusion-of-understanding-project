@@ -1,23 +1,45 @@
 import { useEffect, useState } from 'react';
 import { mockSimilarCases } from '../data/mockData';
+import { fetchCase } from '../services/caseService';
+import { buildSimilarCases } from '../services/similarCaseView';
 import { useWorkflow } from '../context/WorkflowContext';
+import type { SimilarCase } from '../types';
 import { PageHeader } from '../components/layout/PageHeader';
 import { StepFooter } from '../components/layout/StepFooter';
 
 export function SimilarCases() {
-  const { recordInteraction } = useWorkflow();
+  const { recordInteraction, selectedPatientId } = useWorkflow();
   const [expandedCase, setExpandedCase] = useState<string | null>(null);
+  const [cases, setCases] = useState<SimilarCase[]>(mockSimilarCases);
 
   useEffect(() => {
     recordInteraction({ type: 'similar_cases_view' });
   }, [recordInteraction]);
+
+  // Echte Nachbarfälle des gewählten Patienten; ohne sie bleibt der Platzhalter.
+  useEffect(() => {
+    if (!selectedPatientId) return;
+    let cancelled = false;
+    fetchCase(selectedPatientId)
+      .then((c) => {
+        if (cancelled || !c) return;
+        const real = buildSimilarCases(c);
+        if (real.length) setCases(real);
+      })
+      .catch(() => {
+        /* Platzhalter bleibt stehen */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedPatientId]);
 
   return (
     <div className="page">
       <PageHeader title="Similar & Rare Cases" badge="Step 5" />
 
       <div className="similar-cases-grid">
-        {mockSimilarCases.map((c) => {
+        {cases.map((c) => {
           const isExpanded = expandedCase === c.caseId;
           return (
             <div

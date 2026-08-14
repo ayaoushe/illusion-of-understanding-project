@@ -89,13 +89,13 @@ export function PatientOverview() {
         <div className="overview-grid">
           <ClinicalInfoCard title="Diagnosis">
             <p className="value">{view.diagnosis.primaryDiagnosis}</p>
-            <p className="muted">ICD-10: {view.diagnosis.icd10} — Stage {view.diagnosis.stage}</p>
+            <p className="muted">ICD-10: {view.diagnosis.icd10} — {view.diagnosis.stage}</p>
             <p className="muted">{view.diagnosis.histology}</p>
             <p className="muted">{view.diagnosis.location}</p>
           </ClinicalInfoCard>
 
           <ClinicalInfoCard title="Performance Status">
-            <p className="value">ECOG {view.performance.ecog}</p>
+            <p className="value">{view.performance.ecog !== null ? `ECOG ${view.performance.ecog}` : 'ECOG —'}</p>
             <p className="muted">{view.performance.ecogDescription}</p>
           </ClinicalInfoCard>
 

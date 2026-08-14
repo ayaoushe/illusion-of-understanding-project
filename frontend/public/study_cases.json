@@ -362,6 +362,145 @@
           }
         ]
       }
+    ],
+    "clinical": {
+      "sex": "Female",
+      "histology": {
+        "cancer_type_detailed": "Breast Invasive Ductal Carcinoma",
+        "oncotree_code": "IDC",
+        "icd_o_description": "Infiltrating Duct Carcinoma",
+        "primary_site": "Breast",
+        "sample_type": "Primary",
+        "metastatic_site": "Not Applicable"
+      },
+      "stage": {
+        "coarse": "Stage 1-3",
+        "clinical_group": null,
+        "pathological_group": "2A",
+        "registry_path_group": "2A"
+      },
+      "diagnosis": {
+        "days_before_first_line": 84,
+        "description": "INFILTRATING DUCT CARCINOMA | BREAST, OVERLAPPING LESION OF BREAST (M8500/3 | C508)",
+        "source": "Tumor Registry"
+      },
+      "ecog": null,
+      "tumor_markers": {},
+      "tumor_sites": [],
+      "events_before_first_line": {
+        "surgeries_before": 2,
+        "radiation_before": 0,
+        "progressions_before": 0
+      },
+      "assay": {
+        "msi_score": 0.55,
+        "gene_panel": "IMPACT341"
+      },
+      "outcome": {
+        "os_months": 62.30130159,
+        "os_status": "1:DECEASED"
+      }
+    },
+    "similar_cases": [
+      {
+        "rank": 1,
+        "patient_id": "P-0002775",
+        "match_percent": 66,
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "features": {
+          "CURRENT_AGE_DEID": 68.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 9.982397705,
+          "TUMOR_PURITY": 50.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "os_months": 101.0,
+        "os_status": "0:LIVING"
+      },
+      {
+        "rank": 2,
+        "patient_id": "P-0002514",
+        "match_percent": 54,
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "features": {
+          "CURRENT_AGE_DEID": 61.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.327465902,
+          "TUMOR_PURITY": null
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "os_months": 105.6,
+        "os_status": "0:LIVING"
+      },
+      {
+        "rank": 3,
+        "patient_id": "P-0015138",
+        "match_percent": 42,
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "features": {
+          "CURRENT_AGE_DEID": 64.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 6.052886665,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "os_months": 41.3,
+        "os_status": "0:LIVING"
+      }
     ]
   },
   {
@@ -726,6 +865,150 @@
             "explanation": "PLEURA = No verschiebt Richtung LETROZOLE."
           }
         ]
+      }
+    ],
+    "clinical": {
+      "sex": "Female",
+      "histology": {
+        "cancer_type_detailed": "Breast Invasive Ductal Carcinoma",
+        "oncotree_code": "IDC",
+        "icd_o_description": "Infiltrating Duct Carcinoma",
+        "primary_site": "Breast",
+        "sample_type": "Metastasis",
+        "metastatic_site": "Bone"
+      },
+      "stage": {
+        "coarse": "Stage 1-3",
+        "clinical_group": "3A",
+        "pathological_group": "3A",
+        "registry_path_group": "3A"
+      },
+      "diagnosis": {
+        "days_before_first_line": 2797,
+        "description": "INFILTRATING DUCT CARCINOMA | BREAST, CENTRAL PORTION (M8500/3 | C501)",
+        "source": "Tumor Registry"
+      },
+      "ecog": null,
+      "tumor_markers": {},
+      "tumor_sites": [
+        {
+          "site": "Bone",
+          "days_before_first_line": 230,
+          "modality": "MR",
+          "source": "Radiology Reports (NLP)"
+        }
+      ],
+      "events_before_first_line": {
+        "surgeries_before": 0,
+        "radiation_before": 0,
+        "progressions_before": 1
+      },
+      "assay": {
+        "msi_score": 18.54,
+        "gene_panel": "IMPACT341"
+      },
+      "outcome": {
+        "os_months": 34.91503023,
+        "os_status": "1:DECEASED"
+      }
+    },
+    "similar_cases": [
+      {
+        "rank": 1,
+        "patient_id": "P-0060549",
+        "match_percent": 26,
+        "regime": "LETROZOLE",
+        "features": {
+          "CURRENT_AGE_DEID": 59.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 4.922083419,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "TUMOR_PURITY"
+        ],
+        "os_months": 33.7,
+        "os_status": "0:LIVING"
+      },
+      {
+        "rank": 2,
+        "patient_id": "P-0000125",
+        "match_percent": 15,
+        "regime": "LEUPROLIDE",
+        "features": {
+          "CURRENT_AGE_DEID": 46.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Unknown",
+          "MSI_TYPE": "Instable",
+          "TMB_NONSYNONYMOUS": 4.436621202,
+          "TUMOR_PURITY": 90.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "MSI_TYPE"
+        ],
+        "os_months": 15.9,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "rank": 3,
+        "patient_id": "P-0002696",
+        "match_percent": 14,
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "features": {
+          "CURRENT_AGE_DEID": 76.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 5.545776503,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "TUMOR_PURITY"
+        ],
+        "os_months": 105.4,
+        "os_status": "0:LIVING"
       }
     ]
   },
@@ -1092,6 +1375,164 @@
           }
         ]
       }
+    ],
+    "clinical": {
+      "sex": "Female",
+      "histology": {
+        "cancer_type_detailed": "Breast Invasive Ductal Carcinoma",
+        "oncotree_code": "IDC",
+        "icd_o_description": "Infiltrating Duct Carcinoma",
+        "primary_site": "Breast",
+        "sample_type": "Primary",
+        "metastatic_site": "Not Applicable"
+      },
+      "stage": {
+        "coarse": "Stage 1-3",
+        "clinical_group": "1",
+        "pathological_group": "3C",
+        "registry_path_group": "3C"
+      },
+      "diagnosis": {
+        "days_before_first_line": 99,
+        "description": "INFILTRATING DUCT CARCINOMA | BREAST, UIQ (M8500/3 | C502)",
+        "source": "Tumor Registry"
+      },
+      "ecog": null,
+      "tumor_markers": {
+        "CA 15-3": {
+          "unit": "Units/ml",
+          "points": [
+            {
+              "days_before_first_line": 18,
+              "value": 19.0
+            }
+          ]
+        },
+        "CEA": {
+          "unit": "ng/ml",
+          "points": [
+            {
+              "days_before_first_line": 18,
+              "value": 1.1
+            }
+          ]
+        }
+      },
+      "tumor_sites": [],
+      "events_before_first_line": {
+        "surgeries_before": 2,
+        "radiation_before": 0,
+        "progressions_before": 0
+      },
+      "assay": {
+        "msi_score": 0.47,
+        "gene_panel": "IMPACT341"
+      },
+      "outcome": {
+        "os_months": 45.43556665,
+        "os_status": "1:DECEASED"
+      }
+    },
+    "similar_cases": [
+      {
+        "rank": 1,
+        "patient_id": "P-0040287",
+        "match_percent": 37,
+        "regime": "CAPECITABINE",
+        "features": {
+          "CURRENT_AGE_DEID": 80.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.45879238,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "os_months": 1.8,
+        "os_status": "0:LIVING"
+      },
+      {
+        "rank": 2,
+        "patient_id": "P-0010464",
+        "match_percent": 34,
+        "regime": "CAPECITABINE",
+        "features": {
+          "CURRENT_AGE_DEID": 72.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 8.808477279,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "os_months": 20.0,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "rank": 3,
+        "patient_id": "P-0037760",
+        "match_percent": 15,
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "features": {
+          "CURRENT_AGE_DEID": 57.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.45879238,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "os_months": 56.6,
+        "os_status": "0:LIVING"
+      }
     ]
   },
   {
@@ -1456,6 +1897,176 @@
             "explanation": "TUMOR_PURITY = 40 verschiebt weg von LEUPROLIDE."
           }
         ]
+      }
+    ],
+    "clinical": {
+      "sex": "Female",
+      "histology": {
+        "cancer_type_detailed": "Breast Invasive Ductal Carcinoma",
+        "oncotree_code": "IDC",
+        "icd_o_description": "Infiltrating Duct Carcinoma",
+        "primary_site": "Breast",
+        "sample_type": "Metastasis",
+        "metastatic_site": "Soft Tissue"
+      },
+      "stage": {
+        "coarse": "Stage 1-3",
+        "clinical_group": "3A",
+        "pathological_group": "3A",
+        "registry_path_group": "3A"
+      },
+      "diagnosis": {
+        "days_before_first_line": 41,
+        "description": "INFILTRATING DUCT CARCINOMA | BREAST, NOS (M8500/3 | C509)",
+        "source": "Tumor Registry"
+      },
+      "ecog": null,
+      "tumor_markers": {
+        "CA 15-3": {
+          "unit": "Units/ml",
+          "points": [
+            {
+              "days_before_first_line": 6,
+              "value": 32.0
+            }
+          ]
+        },
+        "CEA": {
+          "unit": "ng/ml",
+          "points": [
+            {
+              "days_before_first_line": 6,
+              "value": 7.7
+            }
+          ]
+        }
+      },
+      "tumor_sites": [
+        {
+          "site": "Lymph Nodes",
+          "days_before_first_line": 36,
+          "modality": "MR",
+          "source": "Radiology Reports (NLP)"
+        },
+        {
+          "site": "Other",
+          "days_before_first_line": 36,
+          "modality": "MR",
+          "source": "Radiology Reports (NLP)"
+        }
+      ],
+      "events_before_first_line": {
+        "surgeries_before": 1,
+        "radiation_before": 0,
+        "progressions_before": 0
+      },
+      "assay": {
+        "msi_score": 1.97,
+        "gene_panel": "IMPACT341"
+      },
+      "outcome": {
+        "os_months": 69.96156717,
+        "os_status": "1:DECEASED"
+      }
+    },
+    "similar_cases": [
+      {
+        "rank": 1,
+        "patient_id": "P-0032003",
+        "match_percent": 31,
+        "regime": "ANASTROZOLE",
+        "features": {
+          "CURRENT_AGE_DEID": 37.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.72939619,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "os_months": 48.1,
+        "os_status": "0:LIVING"
+      },
+      {
+        "rank": 2,
+        "patient_id": "P-0007340",
+        "match_percent": 31,
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "features": {
+          "CURRENT_AGE_DEID": 45.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.957439395,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "os_months": 10.8,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "rank": 3,
+        "patient_id": "P-0014149",
+        "match_percent": 30,
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "features": {
+          "CURRENT_AGE_DEID": 52.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Do not report",
+          "TMB_NONSYNONYMOUS": 2.936159093,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES"
+        ],
+        "os_months": 85.2,
+        "os_status": "0:LIVING"
       }
     ]
   }

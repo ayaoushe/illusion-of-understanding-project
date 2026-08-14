@@ -49,11 +49,13 @@ export function FinalReflection() {
     <div className="page">
       <PageHeader title="Final Reflection" badge="Step 7" />
 
-      {submitted ? (
-        <FinalDecisionSummary assessment={assessment} evidence={evidence} reflection={form} />
-      ) : (
-        <FinalDecisionSummary assessment={assessment} evidence={evidence} reflection={null} />
-      )}
+      {/* Sobald eine Therapie gewählt ist, steht sie live im Kasten — nicht erst nach dem Absenden. */}
+      <FinalDecisionSummary
+        assessment={assessment}
+        evidence={evidence}
+        reflection={submitted || form.finalTreatment ? form : null}
+      />
+
 
       {!submitted && (
         <div className="reflection-form">
