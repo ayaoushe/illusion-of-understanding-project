@@ -501,6 +501,75 @@
         "os_months": 41.3,
         "os_status": "0:LIVING"
       }
+    ],
+    "cohorts": [
+      {
+        "level": "receptor_stage_nodes",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes"
+        },
+        "n_patients": 160,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.6937,
+          "TAMOXIFEN": 0.0688,
+          "LETROZOLE": 0.0625,
+          "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.0563,
+          "LEUPROLIDE": 0.0375,
+          "ANASTROZOLE": 0.0375,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.0312,
+          "CAPECITABINE": 0.0063,
+          "PACLITAXEL": 0.0063
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.6937
+      },
+      {
+        "level": "receptor_stage",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3"
+        },
+        "n_patients": 247,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.6721,
+          "LETROZOLE": 0.0891,
+          "TAMOXIFEN": 0.0648,
+          "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.0526,
+          "ANASTROZOLE": 0.0486,
+          "LEUPROLIDE": 0.0405,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.0202,
+          "PACLITAXEL": 0.0081,
+          "CAPECITABINE": 0.004
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.6721
+      },
+      {
+        "level": "receptor",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "Yes"
+        },
+        "n_patients": 327,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.5168,
+          "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.1804,
+          "LETROZOLE": 0.0979,
+          "TAMOXIFEN": 0.055,
+          "LEUPROLIDE": 0.0459,
+          "ANASTROZOLE": 0.0428,
+          "PACLITAXEL": 0.0275,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.0183,
+          "LETROZOLE + PALBOCICLIB": 0.0122,
+          "CAPECITABINE": 0.0031
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.5168
+      }
     ]
   },
   {
@@ -1009,6 +1078,76 @@
         ],
         "os_months": 105.4,
         "os_status": "0:LIVING"
+      }
+    ],
+    "cohorts": [
+      {
+        "level": "receptor_stage_nodes",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No"
+        },
+        "n_patients": 716,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.264,
+          "TAMOXIFEN": 0.2025,
+          "ANASTROZOLE": 0.1774,
+          "LETROZOLE": 0.1648,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.1299,
+          "CAPECITABINE": 0.0279,
+          "LEUPROLIDE": 0.0196,
+          "LETROZOLE + PALBOCICLIB": 0.0112,
+          "PACLITAXEL": 0.0028
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.264
+      },
+      {
+        "level": "receptor_stage",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3"
+        },
+        "n_patients": 1721,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.3603,
+          "ANASTROZOLE": 0.154,
+          "LETROZOLE": 0.1447,
+          "TAMOXIFEN": 0.1389,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.118,
+          "CAPECITABINE": 0.0302,
+          "LETROZOLE + PALBOCICLIB": 0.0221,
+          "LEUPROLIDE": 0.0192,
+          "PACLITAXEL": 0.0122,
+          "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.0006
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.3603
+      },
+      {
+        "level": "receptor",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "No"
+        },
+        "n_patients": 2032,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.3145,
+          "LETROZOLE": 0.1762,
+          "ANASTROZOLE": 0.1407,
+          "TAMOXIFEN": 0.1304,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.1004,
+          "LETROZOLE + PALBOCICLIB": 0.0517,
+          "LEUPROLIDE": 0.0335,
+          "CAPECITABINE": 0.0305,
+          "PACLITAXEL": 0.0207,
+          "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.0015
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.3145
       }
     ]
   },
@@ -1532,6 +1671,76 @@
         ],
         "os_months": 56.6,
         "os_status": "0:LIVING"
+      }
+    ],
+    "cohorts": [
+      {
+        "level": "receptor_stage_nodes",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No"
+        },
+        "n_patients": 716,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.264,
+          "TAMOXIFEN": 0.2025,
+          "ANASTROZOLE": 0.1774,
+          "LETROZOLE": 0.1648,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.1299,
+          "CAPECITABINE": 0.0279,
+          "LEUPROLIDE": 0.0196,
+          "LETROZOLE + PALBOCICLIB": 0.0112,
+          "PACLITAXEL": 0.0028
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.264
+      },
+      {
+        "level": "receptor_stage",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3"
+        },
+        "n_patients": 1721,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.3603,
+          "ANASTROZOLE": 0.154,
+          "LETROZOLE": 0.1447,
+          "TAMOXIFEN": 0.1389,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.118,
+          "CAPECITABINE": 0.0302,
+          "LETROZOLE + PALBOCICLIB": 0.0221,
+          "LEUPROLIDE": 0.0192,
+          "PACLITAXEL": 0.0122,
+          "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.0006
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.3603
+      },
+      {
+        "level": "receptor",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "No"
+        },
+        "n_patients": 2032,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.3145,
+          "LETROZOLE": 0.1762,
+          "ANASTROZOLE": 0.1407,
+          "TAMOXIFEN": 0.1304,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.1004,
+          "LETROZOLE + PALBOCICLIB": 0.0517,
+          "LEUPROLIDE": 0.0335,
+          "CAPECITABINE": 0.0305,
+          "PACLITAXEL": 0.0207,
+          "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.0015
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.3145
       }
     ]
   },
@@ -2067,6 +2276,75 @@
         ],
         "os_months": 85.2,
         "os_status": "0:LIVING"
+      }
+    ],
+    "cohorts": [
+      {
+        "level": "receptor_stage_nodes",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes"
+        },
+        "n_patients": 160,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.6937,
+          "TAMOXIFEN": 0.0688,
+          "LETROZOLE": 0.0625,
+          "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.0563,
+          "LEUPROLIDE": 0.0375,
+          "ANASTROZOLE": 0.0375,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.0312,
+          "CAPECITABINE": 0.0063,
+          "PACLITAXEL": 0.0063
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.6937
+      },
+      {
+        "level": "receptor_stage",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3"
+        },
+        "n_patients": 247,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.6721,
+          "LETROZOLE": 0.0891,
+          "TAMOXIFEN": 0.0648,
+          "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.0526,
+          "ANASTROZOLE": 0.0486,
+          "LEUPROLIDE": 0.0405,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.0202,
+          "PACLITAXEL": 0.0081,
+          "CAPECITABINE": 0.004
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.6721
+      },
+      {
+        "level": "receptor",
+        "criteria": {
+          "HR": "Yes",
+          "HER2": "Yes"
+        },
+        "n_patients": 327,
+        "regime_share": {
+          "CYCLOPHOSPHAMIDE + DOXORUBICIN": 0.5168,
+          "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB": 0.1804,
+          "LETROZOLE": 0.0979,
+          "TAMOXIFEN": 0.055,
+          "LEUPROLIDE": 0.0459,
+          "ANASTROZOLE": 0.0428,
+          "PACLITAXEL": 0.0275,
+          "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE": 0.0183,
+          "LETROZOLE + PALBOCICLIB": 0.0122,
+          "CAPECITABINE": 0.0031
+        },
+        "top_regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "top_share": 0.5168
       }
     ]
   }

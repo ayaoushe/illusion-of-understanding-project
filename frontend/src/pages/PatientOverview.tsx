@@ -147,6 +147,9 @@ export function PatientOverview() {
           </ClinicalInfoCard>
 
           <ClinicalInfoCard title="Imaging Summary">
+            {view.imaging.length === 0 && (
+              <p className="muted" style={{ margin: 0 }}>No imaging documented before the treatment decision.</p>
+            )}
             {view.imaging.map((img) => (
               <div key={img.type} className="imaging-item">
                 <div className="imaging-header">

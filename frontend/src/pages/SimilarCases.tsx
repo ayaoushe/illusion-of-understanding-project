@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { mockSimilarCases } from '../data/mockData';
 import { fetchCase } from '../services/caseService';
 import { buildSimilarCases } from '../services/similarCaseView';
 import { useWorkflow } from '../context/WorkflowContext';
@@ -10,7 +9,7 @@ import { StepFooter } from '../components/layout/StepFooter';
 export function SimilarCases() {
   const { recordInteraction, selectedPatientId } = useWorkflow();
   const [expandedCase, setExpandedCase] = useState<string | null>(null);
-  const [cases, setCases] = useState<SimilarCase[]>(mockSimilarCases);
+  const [cases, setCases] = useState<SimilarCase[]>([]);
 
   useEffect(() => {
     recordInteraction({ type: 'similar_cases_view' });
@@ -23,8 +22,7 @@ export function SimilarCases() {
     fetchCase(selectedPatientId)
       .then((c) => {
         if (cancelled || !c) return;
-        const real = buildSimilarCases(c);
-        if (real.length) setCases(real);
+        setCases(buildSimilarCases(c));
       })
       .catch(() => {
         /* Platzhalter bleibt stehen */
@@ -37,6 +35,12 @@ export function SimilarCases() {
   return (
     <div className="page">
       <PageHeader title="Similar & Rare Cases" badge="Step 5" />
+
+      {cases.length === 0 && (
+        <div className="card" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+          No comparable registry cases available for this patient.
+        </div>
+      )}
 
       <div className="similar-cases-grid">
         {cases.map((c) => {

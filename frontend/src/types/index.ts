@@ -64,13 +64,6 @@ export interface Patient {
     ecogDescription: string;
     lastAssessed: string;
   };
-  molecular: {
-    egfr: { mutation: string; status: string };
-    alk: { status: string };
-    pdl1: { tps: string; level: string };
-    tmb: { value: number; unit: string; level: string };
-    kras: { status: string };
-  };
   imaging: Array<{ type: string; date: string; findings: string }>;
   labs: Record<string, unknown>;
   comorbidities: Array<{
@@ -142,6 +135,8 @@ export interface AiEvidenceSynthesis {
   evidenceFor: EvidenceItem[];
   evidenceAgainst: EvidenceItem[];
   missingData: string[];
+  /** Dieselben Punkte mit Begründung und Auswirkung (Step-3-Tab). */
+  missingDataDetails?: Array<{ item: string; whyMatters: string; impact: string; urgency: 'high' | 'medium' | 'low' }>;
   riskFlags: RiskFlag[];
   publishedCohorts: PublishedCohort[];
   sources: Array<{
@@ -237,6 +232,15 @@ export interface StudyCase {
   study_label?: string;
   clinical?: ClinicalContext;
   similar_cases?: SimilarNeighbor[];
+  /** Registerkohorten: Vergleichsgruppen im Trainingsset (ml/pipeline.py). */
+  cohorts?: Array<{
+    level: string;
+    criteria: Record<string, string>;
+    n_patients: number;
+    regime_share: Record<string, number>;
+    top_regime: string;
+    top_share: number;
+  }>;
   /** Top-1-Regime des Modells */
   prediction?: string;
   confidence_percent?: number;

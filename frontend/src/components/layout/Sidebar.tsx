@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getPatientProfile, mockPatient } from '../../data/mockData';
+import { getPatientProfile } from '../../data/mockData';
 import { useWorkflow } from '../../context/WorkflowContext';
 import { StepNavigation } from './StepNavigation';
 import { fetchCases } from '../../services/caseService';
@@ -49,7 +49,7 @@ export function Sidebar() {
   } = useWorkflow();
 
   const patient = selectedPatient;
-  const footerPatient = selectedPatient ?? mockPatient;
+  const footerPatient = selectedPatient ?? getPatientProfile(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [isCaseMenuOpen, setIsCaseMenuOpen] = useState(false);
   const [pendingPatientId, setPendingPatientId] = useState<string | null>(null);

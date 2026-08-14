@@ -24,26 +24,16 @@ const uncertaintyExplanations: Record<string, string> = {
   high: 'Evidence is weakly matched or important patient-specific information is missing; recommendation should be interpreted cautiously.',
 };
 
-const missingDataDetails = [
+/** Rückfall, falls die Evidenz noch keine Detailliste mitbringt. */
+const fallbackMissingData = [
   {
-    item: 'Surgical candidacy assessment pending thoracic surgery consultation',
-    whyMatters: 'Determines if neoadjuvant or surgical approach is viable',
-    impact: 'May open curative-intent surgical options',
-    urgency: 'high' as const,
-  },
-  {
-    item: 'Cardiac ejection fraction not yet obtained',
-    whyMatters: 'Required for cardiotoxic chemotherapy regimens',
-    impact: 'Limits chemoradiation options',
-    urgency: 'high' as const,
-  },
-  {
-    item: 'Detailed toxicity history from prior treatments (none documented)',
-    whyMatters: 'Baseline tolerance profile for treatment planning',
-    impact: 'Uncertainty in tolerability assessment',
+    item: 'No structured data gaps recorded for this case',
+    whyMatters: 'The record appears complete for the fields the model uses',
+    impact: 'No additional caveat from missing information',
     urgency: 'medium' as const,
   },
 ];
+
 
 export function EvidenceReview() {
   const { assessment, evidence, evidenceLoading } = useWorkflow();
@@ -220,7 +210,7 @@ export function EvidenceReview() {
 
       {activeTab === 'missing' && (
         <div className="missing-detail-grid">
-          {missingDataDetails.map((item, i) => (
+          {(evidence.missingDataDetails ?? fallbackMissingData).map((item, i) => (
             <div key={i} className="missing-detail-card">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.3rem' }}>
                 <h5>{item.item}</h5>
@@ -298,7 +288,7 @@ export function EvidenceReview() {
             </div>
           )}
           {referencedSources.map((s: SourceRegistryEntry, i: number) => {
-            const urlType = s.urlType || null;
+            const urlType = s.urlType && s.urlType !== s.type ? s.urlType : null;
             return (
               <div key={`${s.id}-${i}`} className="card card-sm" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
                 <div style={{ flex: 1 }}>

@@ -21,235 +21,189 @@ export interface SourceRegistryEntry {
 }
 
 export const sourceRegistry: Record<string, SourceRegistryEntry> = {
-  FLAURA_OSIMERTINIB_NEJM: {
-    id: 'FLAURA_OSIMERTINIB_NEJM',
-    title: 'Overall Survival with Osimertinib in Untreated, EGFR-Mutated Advanced NSCLC',
-    type: 'Publisher full text',
+  // --- Klinische Belege für die Mamma-Ca-Regime (geprüft, Stand 08/2026) ---
+  ESMO_EARLY_BREAST_CANCER_2024: {
+    id: 'ESMO_EARLY_BREAST_CANCER_2024',
+    title: 'Loibl S et al. — Early breast cancer: ESMO Clinical Practice Guideline (Ann Oncol 2024;35:159–182)',
+    type: 'Guideline',
+    urlType: 'Guideline / protocol',
+    url: 'https://www.annalsofoncology.org/article/S0923-7534(23)05104-9/fulltext',
+    useFor: [
+      'systemic therapy at this stage',
+      'HER2-directed therapy is usually part of the plan',
+      'endocrine therapy indication',
+      'nodal involvement and treatment intensity',
+    ],
+  },
+  APHINITY_NEJM_2017: {
+    id: 'APHINITY_NEJM_2017',
+    title: 'von Minckwitz G et al. — Adjuvant Pertuzumab and Trastuzumab in Early HER2-Positive Breast Cancer (APHINITY, NEJM 2017;377:122–131)',
+    type: 'Randomised trial',
     urlType: 'Publisher full text',
-    url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa1913662',
+    url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa1703643',
     useFor: [
-      'Osimertinib',
-      'first-line EGFR TKI',
-      'EGFR-mutated advanced NSCLC',
-      'EGFR Exon 19 deletion',
-      'EGFR L858R',
+      'dual HER2 blockade',
+      'HER2-positive node-positive early breast cancer',
+      'pertuzumab plus trastuzumab',
     ],
   },
-
-  FLAURA_FIRSTLINE_OSIMERTINIB_NEJM: {
-    id: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM',
-    title: 'Osimertinib in Untreated EGFR-Mutated Advanced Non–Small-Cell Lung Cancer',
-    type: 'Publisher full text',
+  BIG_1_98_NEJM_2005: {
+    id: 'BIG_1_98_NEJM_2005',
+    title: 'BIG 1-98 Collaborative Group (Thürlimann B et al.) — A Comparison of Letrozole and Tamoxifen in Postmenopausal Women with Early Breast Cancer (NEJM 2005;353:2747–2757)',
+    type: 'Randomised trial',
     urlType: 'Publisher full text',
-    url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa1713137',
+    url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa052258',
     useFor: [
-      'Osimertinib',
-      'first-line EGFR-mutated NSCLC',
-      'progression-free survival',
-      'comparison with gefitinib or erlotinib',
+      'aromatase inhibition',
+      'letrozole versus tamoxifen',
+      'postmenopausal endocrine therapy',
     ],
   },
-
-  EURTAC_ERLOTINIB_LANCET: {
-    id: 'EURTAC_ERLOTINIB_LANCET',
-    title: 'Erlotinib versus standard chemotherapy as first-line treatment for European patients with advanced EGFR mutation-positive NSCLC',
-    type: 'Publisher full text',
+  SOFT_TEXT_NEJM_2014: {
+    id: 'SOFT_TEXT_NEJM_2014',
+    title: 'Pagani O et al. — Adjuvant Exemestane with Ovarian Suppression in Premenopausal Breast Cancer (TEXT/SOFT, NEJM 2014;371:107–118)',
+    type: 'Randomised trial',
     urlType: 'Publisher full text',
-    url: 'https://www.thelancet.com/journals/lanonc/article/PIIS1470-2045(11)70393-X/fulltext',
+    url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa1404037',
     useFor: [
-      'Erlotinib',
-      'first-line EGFR TKI',
-      'EGFR mutation-positive NSCLC',
-      'advanced NSCLC',
+      'ovarian suppression',
+      'premenopausal endocrine therapy',
+      'aromatase inhibitor requires ovarian suppression',
     ],
   },
-
-  IPASS_GEFITINIB_NEJM: {
-    id: 'IPASS_GEFITINIB_NEJM',
-    title: 'Gefitinib or Carboplatin–Paclitaxel in Pulmonary Adenocarcinoma',
-    type: 'Publisher full text',
+  SOFT_NEJM_2015: {
+    id: 'SOFT_NEJM_2015',
+    title: 'Francis PA et al. — Adjuvant Ovarian Suppression in Premenopausal Breast Cancer (SOFT, NEJM 2015;372:436–446)',
+    type: 'Randomised trial',
     urlType: 'Publisher full text',
-    url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa0810699',
+    url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa1412379',
     useFor: [
-      'Gefitinib',
-      'first-line EGFR TKI',
-      'pulmonary adenocarcinoma',
-      'EGFR mutation-positive NSCLC',
-      'older first-generation EGFR TKI evidence',
+      'ovarian suppression added to tamoxifen',
+      'GnRH agonist as sole endocrine therapy',
     ],
   },
-
-  GEFITINIB_EGFR_MUTATION_NEJM: {
-    id: 'GEFITINIB_EGFR_MUTATION_NEJM',
-    title: 'Gefitinib or Chemotherapy for Non–Small-Cell Lung Cancer with Mutated EGFR',
-    type: 'Publisher full text',
+  TAILORX_NEJM_2018: {
+    id: 'TAILORX_NEJM_2018',
+    title: 'Sparano JA et al. — Adjuvant Chemotherapy Guided by a 21-Gene Expression Assay in Breast Cancer (TAILORx, NEJM 2018;379:111–121)',
+    type: 'Randomised trial',
     urlType: 'Publisher full text',
-    url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa0909530',
+    url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa1804710',
     useFor: [
-      'Gefitinib',
-      'EGFR-mutated NSCLC',
-      'first-line targeted therapy',
-      'comparison with chemotherapy',
+      'genomic recurrence score',
+      'chemotherapy benefit in HR-positive disease',
+      'Ki-67 and proliferation',
     ],
   },
-
-  AFATINIB_LUX_LUNG_REVIEW_PMC: {
-    id: 'AFATINIB_LUX_LUNG_REVIEW_PMC',
-    title: 'Afatinib for the treatment of EGFR mutation-positive NSCLC',
-    type: 'PMC full text',
-    urlType: 'PMC full text',
-    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC7448811/',
-    useFor: [
-      'Afatinib',
-      'EGFR mutation-positive NSCLC',
-      'EGFR del19',
-      'LUX-Lung 3',
-      'LUX-Lung 6',
-      'second-line or alternative EGFR TKI context',
-    ],
-  },
-
-  AFATINIB_LUX_LUNG_7_PMC: {
-    id: 'AFATINIB_LUX_LUNG_7_PMC',
-    title: 'Afatinib in lung cancer harboring EGFR mutation in the LUX-Lung trials',
-    type: 'PMC full text',
-    urlType: 'PMC full text',
-    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5009085/',
-    useFor: [
-      'Afatinib',
-      'comparison with gefitinib',
-      'EGFR mutation-positive NSCLC',
-      'LUX-Lung 7',
-    ],
-  },
-
-  PEMETREXED_NSCLC_REVIEW_PMC: {
-    id: 'PEMETREXED_NSCLC_REVIEW_PMC',
-    title: 'Role of pemetrexed in advanced non-small-cell lung cancer',
-    type: 'PMC full text',
-    urlType: 'PMC full text',
-    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC3267597/',
-    useFor: [
-      'Pemetrexed',
-      'advanced nonsquamous NSCLC',
-      'chemotherapy',
-      'carboplatin plus pemetrexed context',
-    ],
-  },
-
-  CARBOPLATIN_PEMETREXED_EVIQ: {
-    id: 'CARBOPLATIN_PEMETREXED_EVIQ',
-    title: 'NSCLC locally advanced or metastatic carboplatin and pemetrexed protocol',
-    type: 'Guideline / protocol',
+  EBCTCG_POLYCHEMOTHERAPY_LANCET_2012: {
+    id: 'EBCTCG_POLYCHEMOTHERAPY_LANCET_2012',
+    title: 'EBCTCG — Comparisons between different polychemotherapy regimens for early breast cancer (Lancet 2012;379:432–444)',
+    type: 'Meta-analysis',
     urlType: 'Publisher full text',
-    url: 'https://www.eviq.org.au/medical-oncology/respiratory/non-small-cell-lung-cancer-advanced-metastatic/1261-nsclc-locally-advanced-or-metastatic-carbopla',
+    url: 'https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(11)61625-5/fulltext',
     useFor: [
-      'Carboplatin + Pemetrexed',
-      'advanced nonsquamous NSCLC',
-      'chemotherapy protocol',
-      'monitoring and toxicity context',
+      'anthracycline-based chemotherapy',
+      'anthracycline-free combination chemotherapy',
+      'CMF versus anthracycline',
+      'taxane chemotherapy',
     ],
   },
-
-  KEYNOTE_189_PEMBROLIZUMAB_PMC: {
-    id: 'KEYNOTE_189_PEMBROLIZUMAB_PMC',
-    title: 'Pembrolizumab Plus Pemetrexed and Platinum in Nonsquamous NSCLC: 5-Year Outcomes From KEYNOTE-189',
-    type: 'PMC full text',
-    urlType: 'PMC full text',
-    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10082311/',
-    useFor: [
-      'Pembrolizumab',
-      'pembrolizumab plus pemetrexed and platinum',
-      'metastatic nonsquamous NSCLC',
-      'immunotherapy',
-    ],
-  },
-
-  KEYNOTE_189_PDF: {
-    id: 'KEYNOTE_189_PDF',
-    title: 'Pembrolizumab Plus Pemetrexed and Platinum in Nonsquamous NSCLC: 5-Year Outcomes PDF',
-    type: 'PDF',
-    urlType: 'PDF',
-    url: 'https://scientiasalut.gencat.cat/bitstream/handle/11351/9808/pembrolizumab_plus_pemetrexed_platinum_nonsquamous_non_small_cell_lung_cancer_5_year_outcomes_phase_3_keynote_189_study_2023.pdf?isAllowed=y&sequence=1',
-    useFor: [
-      'Pembrolizumab',
-      'KEYNOTE-189',
-      'metastatic nonsquamous NSCLC',
-      'PDF source',
-    ],
-  },
-
-  PACIFIC_DURVALUMAB_PMC: {
-    id: 'PACIFIC_DURVALUMAB_PMC',
-    title: 'Five-Year Survival Outcomes From the PACIFIC Trial',
-    type: 'PMC full text',
-    urlType: 'PMC full text',
-    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9015199/',
-    useFor: [
-      'Durvalumab',
-      'chemoradiotherapy',
-      'unresectable stage III NSCLC',
-      'PACIFIC trial',
-      'published cohort',
-    ],
-  },
-
-  OLIGOMETASTATIC_LCT_PMC: {
-    id: 'OLIGOMETASTATIC_LCT_PMC',
-    title: 'Local consolidative therapy in metastatic non-small cell lung cancer',
-    type: 'PMC full text',
-    urlType: 'PMC full text',
-    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6783748/',
-    useFor: [
-      'oligometastatic NSCLC',
-      'local consolidative therapy',
-      'selected stage IV NSCLC',
-      'published cohort',
-    ],
-  },
-
-  CHECKMATE_816_PMC: {
-    id: 'CHECKMATE_816_PMC',
-    title: 'Neoadjuvant Nivolumab plus Chemotherapy in Resectable Lung Cancer',
-    type: 'PMC full text',
-    urlType: 'PMC full text',
-    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9844511/',
-    useFor: [
-      'neoadjuvant chemo-immunotherapy',
-      'resectable NSCLC',
-      'nivolumab plus chemotherapy',
-      'published cohort',
-    ],
-  },
-
-  EARLY_PALLIATIVE_CARE_NSCLC_PDF: {
-    id: 'EARLY_PALLIATIVE_CARE_NSCLC_PDF',
-    title: 'Early Palliative Care for Patients with Metastatic Non–Small-Cell Lung Cancer',
-    type: 'PDF',
-    urlType: 'PDF',
-    url: 'https://www.dgpalliativmedizin.de/images/stories/Temel_Early_Palliative_Care_NSCLC_NEJM2010.pdf',
-    useFor: [
-      'Palliative Care',
-      'Best Supportive Care',
-      'metastatic NSCLC',
-      'quality of life',
-      'early palliative care',
-    ],
-  },
-
-  ASCO_PALLIATIVE_CARE_JCO: {
-    id: 'ASCO_PALLIATIVE_CARE_JCO',
-    title: 'Palliative Care for Patients With Cancer: ASCO Guideline Update',
-    type: 'Publisher full text',
+  PALOMA2_NEJM_2016: {
+    id: 'PALOMA2_NEJM_2016',
+    title: 'Finn RS et al. — Palbociclib and Letrozole in Advanced Breast Cancer (PALOMA-2, NEJM 2016;375:1925–1936)',
+    type: 'Randomised trial',
     urlType: 'Publisher full text',
-    url: 'https://ascopubs.org/doi/10.1200/JCO.24.00542',
+    url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa1607303',
     useFor: [
-      'Palliative Care',
-      'Best Supportive Care',
-      'cancer palliative care guideline',
-      'early integration of palliative care',
+      'CDK4/6 inhibition',
+      'palbociclib plus letrozole',
+      'advanced/metastatic setting',
+      'neutropenia under palbociclib',
     ],
   },
+  ESC_CARDIO_ONCOLOGY_2022: {
+    id: 'ESC_CARDIO_ONCOLOGY_2022',
+    title: '2022 ESC Guidelines on cardio-oncology (Eur Heart J 2022;43:4229–4361)',
+    type: 'Guideline',
+    urlType: 'Guideline / protocol',
+    url: 'https://academic.oup.com/eurheartj/article/43/41/4229/6673995',
+    useFor: [
+      'baseline LVEF before cardiotoxic therapy',
+      'anthracycline cardiotoxicity',
+      'trastuzumab and pertuzumab cardiac monitoring',
+    ],
+  },
+  CREATE_X_NEJM_2017: {
+    id: 'CREATE_X_NEJM_2017',
+    title: 'Masuda N et al. — Adjuvant Capecitabine for Breast Cancer after Preoperative Chemotherapy (CREATE-X, NEJM 2017;376:2147–2159)',
+    type: 'Randomised trial',
+    urlType: 'Publisher full text',
+    url: 'https://www.nejm.org/doi/full/10.1056/NEJMoa1612645',
+    useFor: [
+      'capecitabine in early breast cancer',
+      'capecitabine after residual disease',
+      'oral fluoropyrimidine chemotherapy',
+    ],
+  },
+  CAPECITABINE_HFS_JOPP_2006: {
+    id: 'CAPECITABINE_HFS_JOPP_2006',
+    title: 'Gressett SM et al. — Management of hand-foot syndrome induced by capecitabine (J Oncol Pharm Pract 2006;12:131–141)',
+    type: 'Review',
+    urlType: 'Publisher full text',
+    url: 'https://journals.sagepub.com/doi/10.1177/1078155206069242',
+    useFor: ['hand-foot syndrome', 'capecitabine dose-limiting toxicity'],
+  },
+  XELODA_EMA_SMPC: {
+    id: 'XELODA_EMA_SMPC',
+    title: 'Xeloda (capecitabine) — EMA summary of product characteristics',
+    type: 'Product information',
+    urlType: 'Guideline / protocol',
+    url: 'https://www.ema.europa.eu/en/medicines/human/EPAR/xeloda',
+    useFor: ['renal dose adjustment', 'capecitabine contraindications'],
+  },
+  // --- Grundlagen dieser Anwendung: Datensatz und Verfahren ---
+  MSK_CHORD_2024: {
+    id: 'MSK_CHORD_2024',
+    title: 'MSK-CHORD 2024 — clinico-genomic cohort underlying the model and the comparison groups',
+    type: 'Dataset',
+    urlType: 'Publisher full text',
+    url: 'https://www.cbioportal.org/study/summary?id=msk_chord_2024',
+    useFor: [
+      'Model probabilities for a regimen',
+      'Similar registry cases',
+      'Registry cohorts and first-line practice',
+    ],
+  },
+  RANDOM_FOREST_BREIMAN_2001: {
+    id: 'RANDOM_FOREST_BREIMAN_2001',
+    title: 'Breiman L. — Random Forests (Machine Learning 45:5–32)',
+    type: 'Method',
+    urlType: 'Publisher full text',
+    url: 'https://doi.org/10.1023/A:1010933404324',
+    useFor: ['Class probabilities as tree votes', 'Proximity as a similarity measure'],
+  },
+  SHAP_LUNDBERG_2017: {
+    id: 'SHAP_LUNDBERG_2017',
+    title: 'Lundberg & Lee — A Unified Approach to Interpreting Model Predictions (NeurIPS 2017)',
+    type: 'Method',
+    urlType: 'Publisher full text',
+    url: 'https://arxiv.org/abs/1705.07874',
+    useFor: ['Feature attributions shown per regimen'],
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 };
 
 /** Plain-text labels for patient-specific claims — no citation chips. */
@@ -332,74 +286,3 @@ export function extractSourceIdsFromEvidence(
 }
 
 /** Determine similarity label based on source relevance to a specific clinical context. */
-export function getCohortSimilarityLevel(
-  sourceId: string,
-  treatmentId: string,
-  patientDiagnosis: { stage: string; histology: string; primaryDiagnosis: string },
-  molecular: { egfr: { status: string }; alk: { status: string }; pdl1: { level: string } },
-): 'High' | 'Moderate' | 'Partial' {
-  const entry = sourceRegistry[sourceId];
-  if (!entry) return 'Partial';
-
-  const diagnosis = patientDiagnosis.primaryDiagnosis.toLowerCase();
-  const stage = patientDiagnosis.stage.toUpperCase();
-  const isNSCLC = diagnosis.includes('nsclc') || diagnosis.includes('lung');
-  const isEGFRPositive = molecular.egfr.status === 'Positive';
-  const isAdvancedStage = stage.startsWith('IV') || stage === 'IIIB' || stage === 'IIIA';
-
-  if (!isNSCLC) return 'Partial';
-
-  if (sourceId === 'FLAURA_OSIMERTINIB_NEJM' || sourceId === 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM') {
-    if (isEGFRPositive && treatmentId === 'osimertinib' && isAdvancedStage) return 'Moderate';
-    if (isEGFRPositive && treatmentId === 'osimertinib') return 'Partial';
-    return 'Partial';
-  }
-
-  if (sourceId === 'EURTAC_ERLOTINIB_LANCET') {
-    if (isEGFRPositive && treatmentId === 'erlotinib' && isAdvancedStage) return 'Moderate';
-    return 'Partial';
-  }
-
-  if (sourceId === 'IPASS_GEFITINIB_NEJM' || sourceId === 'GEFITINIB_EGFR_MUTATION_NEJM') {
-    if (isEGFRPositive && treatmentId === 'gefitinib' && isAdvancedStage) return 'Moderate';
-    return 'Partial';
-  }
-
-  if (sourceId === 'AFATINIB_LUX_LUNG_REVIEW_PMC' || sourceId === 'AFATINIB_LUX_LUNG_7_PMC') {
-    if (isEGFRPositive && treatmentId === 'afatinib' && isAdvancedStage) return 'Moderate';
-    return 'Partial';
-  }
-
-  if (sourceId === 'PACIFIC_DURVALUMAB_PMC') {
-    if (stage.startsWith('III') && treatmentId === 'chemoradiation') return 'Moderate';
-    if (stage.startsWith('III')) return 'Partial';
-    return 'Partial';
-  }
-
-  if (sourceId === 'OLIGOMETASTATIC_LCT_PMC') {
-    if (stage.startsWith('IV')) return 'Partial';
-    return 'Partial';
-  }
-
-  if (sourceId === 'CHECKMATE_816_PMC') {
-    if (treatmentId === 'neoadjuvant') return 'Moderate';
-    return 'Partial';
-  }
-
-  if (sourceId === 'KEYNOTE_189_PEMBROLIZUMAB_PMC' || sourceId === 'KEYNOTE_189_PDF') {
-    if (treatmentId === 'pembrolizumab' && isAdvancedStage) return 'Moderate';
-    return 'Partial';
-  }
-
-  if (sourceId === 'PEMETREXED_NSCLC_REVIEW_PMC' || sourceId === 'CARBOPLATIN_PEMETREXED_EVIQ') {
-    if (treatmentId === 'carboplatin-pemetrexed' && isAdvancedStage) return 'Moderate';
-    return 'Partial';
-  }
-
-  if (sourceId === 'EARLY_PALLIATIVE_CARE_NSCLC_PDF' || sourceId === 'ASCO_PALLIATIVE_CARE_JCO') {
-    if (treatmentId === 'palliative') return 'Moderate';
-    return 'Partial';
-  }
-
-  return 'Partial';
-}

@@ -385,6 +385,58 @@ def build_similar_cases(all_ids, pipe, X_train, y_train, pid_train, X_test, pid_
     return out
 
 
+# ---------------------------------------------------------------------------
+# Registerkohorten: Für jeden Fall werden im Trainingsset drei geschachtelte
+# Vergleichsgruppen gebildet — von "gleicher Rezeptorstatus, gleiches Stadium,
+# gleicher Nodalstatus" bis "gleicher Rezeptorstatus". Exportiert wird, wie
+# groß die Gruppe ist und welche Erstlinientherapien sie bekommen hat.
+#
+# Das ersetzt die frühere Studienkachel im UI durch etwas Nachprüfbares: die
+# Zugehörigkeit ist definiert, nicht geschätzt, und es ist dieselbe Population,
+# aus der das Modell gelernt hat.
+# ---------------------------------------------------------------------------
+COHORT_LEVELS = [
+    ("receptor_stage_nodes", ["HR", "HER2", "STAGE_HIGHEST_RECORDED", "LYMPH_NODES"]),
+    ("receptor_stage", ["HR", "HER2", "STAGE_HIGHEST_RECORDED"]),
+    ("receptor", ["HR", "HER2"]),
+]
+MIN_COHORT_SIZE = 10
+
+
+def build_cohorts(all_ids, raw, df, X_train, y_train, pid_train, X_test, pid_test):
+    raw_by_pid = raw.set_index(df["PATIENT_ID"])
+    train = raw.loc[X_train.index].copy()
+    train["__regime"] = y_train.values
+    train["__pid"] = pid_train.values
+
+    def row_of(pid):
+        r = raw_by_pid.loc[pid]
+        return r.iloc[0] if isinstance(r, pd.DataFrame) else r
+
+    out = {}
+    for pid in all_ids:
+        target = row_of(pid)
+        cohorts = []
+        for name, fields in COHORT_LEVELS:
+            mask = pd.Series(True, index=train.index)
+            for f in fields:
+                mask &= train[f].astype(str) == str(target[f])
+            grp = train[mask & (train["__pid"] != pid)]
+            if len(grp) < MIN_COHORT_SIZE:
+                continue
+            dist = grp["__regime"].value_counts(normalize=True)
+            cohorts.append({
+                "level": name,
+                "criteria": {f: str(target[f]) for f in fields},
+                "n_patients": int(len(grp)),
+                "regime_share": {str(k): round(float(v), 4) for k, v in dist.items()},
+                "top_regime": str(dist.index[0]),
+                "top_share": round(float(dist.iloc[0]), 4),
+            })
+        out[pid] = cohorts
+    return out
+
+
 # Baut für diese 12 Fälle die Ausgabestruktur mit den Top-3-Regimen,
 # deren Wahrscheinlichkeiten und je 18 nach Einfluss sortierten Feature-Erklärungen in Textform.
 def build_predictions(all_ids, pid_test, proba, classes, raw, X_test, X_test_imp, get_sv, y_test):
@@ -486,9 +538,11 @@ def main():
     similar = build_similar_cases(
         all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat
     )
+    cohorts = build_cohorts(all_ids, raw, df, X_train, y_train, pid_train, X_test, pid_test)
     for entry in predictions:
         entry["clinical"] = clinical.get(entry["patient_id"], {})
         entry["similar_cases"] = similar.get(entry["patient_id"], [])
+        entry["cohorts"] = cohorts.get(entry["patient_id"], [])
 
     with open(OUT_DIR + "predictions.json", "w", encoding="utf-8") as f:
         json.dump(predictions, f, indent=2, ensure_ascii=False)

@@ -976,7 +976,15 @@ body {
 .imaging-header {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
   margin-bottom: 0.15rem;
+}
+
+/* Das Datum bleibt einzeilig und rechtsbündig, auch wenn der Titel umbricht. */
+.imaging-header > .muted {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 /* ===== EVIDENCE REVIEW ===== */

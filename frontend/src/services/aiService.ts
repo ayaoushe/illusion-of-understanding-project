@@ -1,11 +1,13 @@
 import type { HumanAssessment, AiEvidenceSynthesis } from '../types';
-import { mockTreatmentEvidenceById } from '../data/mockData';
 import { fetchCase } from './caseService';
 import { buildTreatmentEvidence } from './treatmentEvidence';
 
 /**
- * Lightweight evidence service that prefers an API endpoint when available,
- * but falls back to treatment-specific mock evidence for buildable demos.
+ * Evidenz zur Therapiewahl des Arztes.
+ *
+ * Erzeugt aus den echten Falldaten (services/treatmentEvidence.ts). Ein
+ * optionaler API-Endpunkt darf sie überschreiben; die frühere NSCLC-Mock-
+ * Evidenz ist entfernt.
  */
 export async function fetchEvidenceSynthesis(
   patientId: string,
@@ -13,82 +15,56 @@ export async function fetchEvidenceSynthesis(
 ): Promise<AiEvidenceSynthesis> {
   await delay(300);
 
-  const treatmentId = assessment.selectedTreatment || 'osimertinib';
+  const treatmentId = assessment.selectedTreatment;
+  const apiEvidence = await fetchFromApi(treatmentId, patientId);
+  if (apiEvidence) return apiEvidence;
 
-  // Evidenz zur Wahl des Arztes, erzeugt aus den echten Falldaten.
-  // Der alte Mock-Katalog greift nur noch, wenn kein Studienfall geladen ist.
   const studyCase = await fetchCase(patientId).catch(() => undefined);
-  if (studyCase && assessment.selectedTreatment) {
-    return buildTreatmentEvidence(studyCase, assessment.selectedTreatment);
+  if (studyCase && treatmentId) {
+    return buildTreatmentEvidence(studyCase, treatmentId);
   }
 
-  const evidence = await getEvidenceForTreatment(treatmentId, patientId);
-
-  return {
-    ...evidence,
-    evidenceFor: [
-      ...evidence.evidenceFor,
-      ...(assessment.selectedTreatment
-        ? [{ text: `Assessment selected ${assessment.selectedTreatment} as the lead treatment pathway.`, source: 'Patient context' }]
-        : []),
-    ],
-  };
+  return emptyEvidence(treatmentId);
 }
 
-export async function getEvidenceForTreatment(treatmentId: string, patientId: string): Promise<AiEvidenceSynthesis> {
+/** Optionaler Backend-Endpunkt; ohne VITE_API_BASE_URL wird er übersprungen. */
+async function fetchFromApi(treatmentId: string, patientId: string): Promise<AiEvidenceSynthesis | null> {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  if (!apiBaseUrl || !treatmentId) return null;
 
-  if (apiBaseUrl) {
-    try {
-      const response = await fetch(`${apiBaseUrl}/evidence?treatmentId=${encodeURIComponent(treatmentId)}&patientId=${encodeURIComponent(patientId)}`);
-      if (response.ok) {
-        const payload = await response.json();
-        return normalizeEvidence(payload, treatmentId);
-      }
-    } catch {
-      // Fall back to the hardcoded treatment profile below.
-    }
+  try {
+    const response = await fetch(
+      `${apiBaseUrl}/evidence?treatmentId=${encodeURIComponent(treatmentId)}&patientId=${encodeURIComponent(patientId)}`,
+    );
+    if (!response.ok) return null;
+    const payload = (await response.json()) as Partial<AiEvidenceSynthesis>;
+    return { ...emptyEvidence(treatmentId), ...payload };
+  } catch {
+    return null;
   }
-
-  return normalizeEvidence(mockTreatmentEvidenceById[treatmentId] ?? mockTreatmentEvidenceById.osimertinib, treatmentId);
 }
 
-function normalizeEvidence(payload: Partial<AiEvidenceSynthesis> | undefined, treatmentId: string): AiEvidenceSynthesis {
-  const fallback = mockTreatmentEvidenceById[treatmentId] ?? mockTreatmentEvidenceById.osimertinib;
-
+/** Wenn weder Fall noch API vorliegen: leeres Gerüst statt erfundener Inhalte. */
+function emptyEvidence(treatmentId: string): AiEvidenceSynthesis {
   return {
-    ...fallback,
-    ...payload,
-    uncertaintyLevel: payload?.uncertaintyLevel ?? fallback.uncertaintyLevel,
-    uncertaintySummary: payload?.uncertaintySummary ?? fallback.uncertaintySummary,
-    uncertaintyDescription: payload?.uncertaintyDescription ?? fallback.uncertaintyDescription,
-    evidenceFor: payload?.evidenceFor ?? fallback.evidenceFor,
-    evidenceAgainst: payload?.evidenceAgainst ?? fallback.evidenceAgainst,
-    missingData: payload?.missingData ?? fallback.missingData,
-    riskFlags: payload?.riskFlags ?? fallback.riskFlags,
-    publishedCohorts: payload?.publishedCohorts ?? fallback.publishedCohorts,
-    sources: payload?.sources ?? fallback.sources,
-    keyReasoningFactors: payload?.keyReasoningFactors ?? fallback.keyReasoningFactors,
+    title: 'AI Evidence Synthesis',
+    disclaimer:
+      'Decision support only — not a treatment recommendation. All outputs require clinician verification.',
+    uncertaintyLevel: 'high',
+    uncertaintySummary: 'No case data available',
+    uncertaintyDescription: treatmentId
+      ? 'Evidence for this choice could not be assembled because the case data failed to load.'
+      : 'No treatment was selected in the initial assessment.',
+    evidenceFor: [],
+    evidenceAgainst: [],
+    missingData: [],
+    riskFlags: [],
+    publishedCohorts: [],
+    sources: [],
+    keyReasoningFactors: [],
   };
 }
 
-export async function fetchReflectiveAnswer(
-  promptId: string,
-  _context: { assessment: HumanAssessment },
-): Promise<string> {
-  await delay(200);
-
-  const responses: Record<string, string> = {
-    why: 'The EGFR Exon 19 deletion is one of the strongest predictors of TKI response. Combined with controlled comorbidities and patient preference for outpatient care, the evidence cluster supports targeted therapy — but this depends on assumptions about surgical candidacy.',
-    'why-not': 'Stage IIIB historically benefited from concurrent chemoradiation. Elevated LDH and incomplete cardiac workup introduce uncertainty. A more aggressive approach could be justified if the patient prioritizes maximum tumor control over convenience.',
-    uncertainty: 'Missing LVEF, unassessed surgical candidacy, and moderate patient-similarity scores increase uncertainty. The molecular evidence is strong, but the whole-patient picture is incomplete.',
-    contradicts: 'Elevated LDH suggests higher tumor burden, which some clinicians would address with multimodal therapy. The PACIFIC trial data supports chemoradiation + durvalumab for Stage III — creating tension with TKI-first approach.',
-    change: 'If ECOG worsens, BP becomes uncontrolled, or LVEF is reduced, the risk-benefit balance shifts away from intensive regimens. A change in patient preference toward QoL would also alter the decision.',
-  };
-
-  return responses[promptId] ?? 'Consider what clinical factors most influence your confidence in this decision.';
-}
-
-function delay(ms: number): Promise<void> {
+function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

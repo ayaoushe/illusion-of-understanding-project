@@ -12,7 +12,7 @@ const getSourceTypeFromLabel = (label: string): 'guideline' | 'pubmed' | 'doi' |
   if (lower.includes('guideline') || lower.includes('nccn')) return 'guideline';
   if (lower.includes('pubmed')) return 'pubmed';
   if (lower.includes('doi')) return 'doi';
-  if (lower.includes('trial') || lower.includes('rct') || lower.includes('flaura') || lower.includes('pacific')) return 'rct';
+  if (lower.includes('trial') || lower.includes('rct')) return 'rct';
   return 'review';
 };
 

@@ -1,5 +1,8 @@
 import type { StudyCase } from '../types';
 import { STUDY_NAMES, mrnFromId } from '../config/studyCases';
+import { buildMissingData } from './missingData';
+import { sessionContext } from '../data/mockData';
+import { SIMULATED_WORKUP } from '../data/simulatedWorkup';
 
 export interface Biomarker {
   label: string;
@@ -10,6 +13,13 @@ export interface Biomarker {
 export interface MetastasisSite {
   site: string;
   present: boolean;
+  /**
+   * true = kein Registerbefund, sondern simulierte Staging-Diagnostik.
+   * Bewusst NICHT im UI dargestellt: ein sichtbarer "simulated"-Hinweis nur bei
+   * einem der Fälle wäre ein Störfaktor für die Vertrauensmessung. Die
+   * Herkunft steht in data/simulatedWorkup.ts und im Provenienz-Artefakt.
+   */
+  simulated?: boolean;
 }
 
 export interface LabValue {
@@ -40,7 +50,7 @@ export interface PatientView {
   biomarkers: Biomarker[];
   metastases: MetastasisSite[];
   labs: LabValue[];
-  imaging: Array<{ type: string; date: string; findings: string }>;
+  imaging: Array<{ type: string; date: string; findings: string; simulated?: boolean }>;
   comorbidities: Array<{ name: string; status: string; implications: string }>;
   medications: Array<{ name: string; dose: string; frequency: string; relevance: string }>;
   contraindications: Array<{ factor: string; severity: 'high' | 'moderate' | 'low'; detail: string }>;
@@ -87,7 +97,7 @@ function hashInt(s: string): number {
  * wird. Die Rohdaten liefern nur Tagesabstände dazu, daraus werden hier
  * darstellbare Datumsangaben.
  */
-const DECISION_DATE = '2026-06-18';
+const DECISION_DATE = sessionContext.date;
 
 function dateBefore(days: number): string {
   const d = new Date(`${DECISION_DATE}T00:00:00Z`);
@@ -144,8 +154,13 @@ export function buildPatientView(c: StudyCase): PatientView {
   // Modells sind nur der Rückfall, wenn kein Kontext geladen ist.
   const hasContext = Boolean(c.clinical);
   const documentedSites = clinical.tumor_sites ?? [];
+  // Nur wenn das Register vor Therapiestart nichts hergibt: simulierte
+  // Staging-Diagnostik, sofern für diesen Fall hinterlegt (s. simulatedWorkup.ts).
+  const workup = documentedSites.length ? undefined : SIMULATED_WORKUP[c.patient_id];
   const metastases: MetastasisSite[] = hasContext
-    ? documentedSites.map((t) => ({ site: t.site, present: true }))
+    ? documentedSites.length
+      ? documentedSites.map((t) => ({ site: t.site, present: true }))
+      : (workup?.sites ?? []).map((site) => ({ site, present: true, simulated: true }))
     : METASTASIS_SITES.map(([key, label]) => ({ site: label, present: yesNo(f[key]) }));
   const activeMets = metastases.filter((m) => m.present).map((m) => m.site);
 
@@ -177,13 +192,12 @@ export function buildPatientView(c: StudyCase): PatientView {
         date: dateBefore(t.days_before_first_line),
         findings: `Tumor involvement documented at ${t.site.toLowerCase()}${t.source ? ` (${t.source})` : ''}.`,
       }))
-    : [
-        {
-          type: 'Imaging',
-          date: '—',
-          findings: 'No tumor sites documented before treatment decision.',
-        },
-      ];
+    : (workup?.imaging ?? []).map((e) => ({
+        type: e.type,
+        date: dateBefore(e.daysBefore),
+        findings: e.findings,
+        simulated: true,
+      }));
 
 
   const ageForLogic = Number.isFinite(ageNum) ? ageNum : 55;
@@ -309,13 +323,13 @@ export function buildPatientView(c: StudyCase): PatientView {
     familyInvolvement: ageForLogic >= 65 ? 'Adult children involved in decisions' : 'Partner involved in decisions',
   };
 
-  const missingData: string[] = [];
-  if (her2) missingData.push('LVEF (baseline cardiac function) not yet documented');
-  missingData.push('Ki-67 proliferation index pending');
-  if (hr && !isMetastatic) missingData.push('Genomic recurrence score (Oncotype/MammaPrint) outstanding');
-  if (isMetastatic) missingData.push('Biopsy re-confirmation of receptor status at metastatic site pending');
-  if (nodePos) missingData.push('Axillary staging (sentinel vs. dissection) to be finalized');
-  if (isSmoker) missingData.push('Pulmonary function assessment pending');
+  // Gemeinsame Quelle mit dem Evidenz-Tab in Step 3 (services/missingData.ts).
+  const missingData = buildMissingData({
+    hr,
+    her2,
+    nodes: nodePos,
+    hasEcog: Boolean(clinical.ecog),
+  }).map((m) => m.item);
 
   return {
     patientId: c.patient_id,
