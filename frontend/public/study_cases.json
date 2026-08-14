@@ -362,7 +362,45 @@
           }
         ]
       }
-    ]
+    ],
+    "clinical": {
+      "sex": "Female",
+      "histology": {
+        "cancer_type_detailed": "Breast Invasive Ductal Carcinoma",
+        "oncotree_code": "IDC",
+        "icd_o_description": "Infiltrating Duct Carcinoma",
+        "primary_site": "Breast",
+        "sample_type": "Primary",
+        "metastatic_site": "Not Applicable"
+      },
+      "stage": {
+        "coarse": "Stage 1-3",
+        "clinical_group": null,
+        "pathological_group": "2A",
+        "registry_path_group": "2A"
+      },
+      "diagnosis": {
+        "days_before_first_line": 84,
+        "description": "INFILTRATING DUCT CARCINOMA | BREAST, OVERLAPPING LESION OF BREAST (M8500/3 | C508)",
+        "source": "Tumor Registry"
+      },
+      "ecog": null,
+      "tumor_markers": {},
+      "tumor_sites": [],
+      "events_before_first_line": {
+        "surgeries_before": 2,
+        "radiation_before": 0,
+        "progressions_before": 0
+      },
+      "assay": {
+        "msi_score": 0.55,
+        "gene_panel": "IMPACT341"
+      },
+      "outcome": {
+        "os_months": 62.30130159,
+        "os_status": "1:DECEASED"
+      }
+    }
   },
   {
     "study_label": "B",
@@ -727,7 +765,52 @@
           }
         ]
       }
-    ]
+    ],
+    "clinical": {
+      "sex": "Female",
+      "histology": {
+        "cancer_type_detailed": "Breast Invasive Ductal Carcinoma",
+        "oncotree_code": "IDC",
+        "icd_o_description": "Infiltrating Duct Carcinoma",
+        "primary_site": "Breast",
+        "sample_type": "Metastasis",
+        "metastatic_site": "Bone"
+      },
+      "stage": {
+        "coarse": "Stage 1-3",
+        "clinical_group": "3A",
+        "pathological_group": "3A",
+        "registry_path_group": "3A"
+      },
+      "diagnosis": {
+        "days_before_first_line": 2797,
+        "description": "INFILTRATING DUCT CARCINOMA | BREAST, CENTRAL PORTION (M8500/3 | C501)",
+        "source": "Tumor Registry"
+      },
+      "ecog": null,
+      "tumor_markers": {},
+      "tumor_sites": [
+        {
+          "site": "Bone",
+          "days_before_first_line": 230,
+          "modality": "MR",
+          "source": "Radiology Reports (NLP)"
+        }
+      ],
+      "events_before_first_line": {
+        "surgeries_before": 0,
+        "radiation_before": 0,
+        "progressions_before": 1
+      },
+      "assay": {
+        "msi_score": 18.54,
+        "gene_panel": "IMPACT341"
+      },
+      "outcome": {
+        "os_months": 34.91503023,
+        "os_status": "1:DECEASED"
+      }
+    }
   },
   {
     "study_label": "C",
@@ -1092,7 +1175,64 @@
           }
         ]
       }
-    ]
+    ],
+    "clinical": {
+      "sex": "Female",
+      "histology": {
+        "cancer_type_detailed": "Breast Invasive Ductal Carcinoma",
+        "oncotree_code": "IDC",
+        "icd_o_description": "Infiltrating Duct Carcinoma",
+        "primary_site": "Breast",
+        "sample_type": "Primary",
+        "metastatic_site": "Not Applicable"
+      },
+      "stage": {
+        "coarse": "Stage 1-3",
+        "clinical_group": "1",
+        "pathological_group": "3C",
+        "registry_path_group": "3C"
+      },
+      "diagnosis": {
+        "days_before_first_line": 99,
+        "description": "INFILTRATING DUCT CARCINOMA | BREAST, UIQ (M8500/3 | C502)",
+        "source": "Tumor Registry"
+      },
+      "ecog": null,
+      "tumor_markers": {
+        "CA 15-3": {
+          "unit": "Units/ml",
+          "points": [
+            {
+              "days_before_first_line": 18,
+              "value": 19.0
+            }
+          ]
+        },
+        "CEA": {
+          "unit": "ng/ml",
+          "points": [
+            {
+              "days_before_first_line": 18,
+              "value": 1.1
+            }
+          ]
+        }
+      },
+      "tumor_sites": [],
+      "events_before_first_line": {
+        "surgeries_before": 2,
+        "radiation_before": 0,
+        "progressions_before": 0
+      },
+      "assay": {
+        "msi_score": 0.47,
+        "gene_panel": "IMPACT341"
+      },
+      "outcome": {
+        "os_months": 45.43556665,
+        "os_status": "1:DECEASED"
+      }
+    }
   },
   {
     "study_label": "D",
@@ -1457,6 +1597,76 @@
           }
         ]
       }
-    ]
+    ],
+    "clinical": {
+      "sex": "Female",
+      "histology": {
+        "cancer_type_detailed": "Breast Invasive Ductal Carcinoma",
+        "oncotree_code": "IDC",
+        "icd_o_description": "Infiltrating Duct Carcinoma",
+        "primary_site": "Breast",
+        "sample_type": "Metastasis",
+        "metastatic_site": "Soft Tissue"
+      },
+      "stage": {
+        "coarse": "Stage 1-3",
+        "clinical_group": "3A",
+        "pathological_group": "3A",
+        "registry_path_group": "3A"
+      },
+      "diagnosis": {
+        "days_before_first_line": 41,
+        "description": "INFILTRATING DUCT CARCINOMA | BREAST, NOS (M8500/3 | C509)",
+        "source": "Tumor Registry"
+      },
+      "ecog": null,
+      "tumor_markers": {
+        "CA 15-3": {
+          "unit": "Units/ml",
+          "points": [
+            {
+              "days_before_first_line": 6,
+              "value": 32.0
+            }
+          ]
+        },
+        "CEA": {
+          "unit": "ng/ml",
+          "points": [
+            {
+              "days_before_first_line": 6,
+              "value": 7.7
+            }
+          ]
+        }
+      },
+      "tumor_sites": [
+        {
+          "site": "Lymph Nodes",
+          "days_before_first_line": 36,
+          "modality": "MR",
+          "source": "Radiology Reports (NLP)"
+        },
+        {
+          "site": "Other",
+          "days_before_first_line": 36,
+          "modality": "MR",
+          "source": "Radiology Reports (NLP)"
+        }
+      ],
+      "events_before_first_line": {
+        "surgeries_before": 1,
+        "radiation_before": 0,
+        "progressions_before": 0
+      },
+      "assay": {
+        "msi_score": 1.97,
+        "gene_panel": "IMPACT341"
+      },
+      "outcome": {
+        "os_months": 69.96156717,
+        "os_status": "1:DECEASED"
+      }
+    }
   }
 ]

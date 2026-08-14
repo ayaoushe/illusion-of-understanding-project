@@ -163,6 +163,166 @@ def select_cases(pred, pid_test, y_test, ptop, raw, X_test):
     all_ids = sorted(a_ids + b_ids + c_ids + d_ids, key=lambda p: (order_cat[chosen[p]], p))
     return all_ids
 
+# ---------------------------------------------------------------------------
+# Klinischer Kontext: echte Felder aus MSK CHORD, die das Modell selbst nicht
+# benutzt, die die Fallansicht aber bisher erfunden hat (Geschlecht, Histologie,
+# genaues Stadium, Diagnosedatum, ECOG, Tumormarker, Tumorlokalisationen,
+# Ereignisse, MSI-Score).
+#
+# Zeitlicher Bezugspunkt ist immer der Start der Erstlinientherapie (Tag 0).
+# Alles wird strikt darauf gefiltert: was erst danach dokumentiert wurde, darf
+# im Studien-UI nicht erscheinen — die Probanden entscheiden genau an diesem
+# Punkt und dürfen kein Wissen aus der Zukunft sehen.
+# ---------------------------------------------------------------------------
+MARKER_FILES = {"CA 15-3": "data_timeline_ca_15-3_labs.txt", "CEA": "data_timeline_cea_labs.txt"}
+MARKER_WINDOW_DAYS = 730   # nur Messungen aus den 2 Jahren vor Therapiestart
+MAX_MARKER_POINTS = 10     # je Marker die letzten 10 davor
+
+
+def _read_timeline(name: str) -> pd.DataFrame:
+    return pd.read_csv(DATA_DIR + name, sep="\t", low_memory=False)
+
+
+def _before(df: pd.DataFrame, pid: str, t0: float) -> pd.DataFrame:
+    """Zeilen eines Patienten bis einschließlich Therapiestart, zeitlich sortiert."""
+    sub = df[(df["PATIENT_ID"] == pid) & (df["START_DATE"] <= t0)]
+    return sub.sort_values("START_DATE")
+
+
+def _clean(v):
+    """NaN -> None, Strings trimmen (die Rohdaten sind rechts aufgefüllt)."""
+    if v is None or (isinstance(v, float) and pd.isna(v)):
+        return None
+    return v.strip() if isinstance(v, str) else v
+
+
+def build_clinical_context(all_ids, labels, pat, samp) -> dict[str, dict]:
+    ids = set(all_ids)
+    t0_by_pid = labels.set_index("PATIENT_ID")["first_line_start_date"].to_dict()
+    p = pat[pat["PATIENT_ID"].isin(ids)].drop_duplicates("PATIENT_ID").set_index("PATIENT_ID")
+    s = samp[samp["PATIENT_ID"].isin(ids)].drop_duplicates("PATIENT_ID").set_index("PATIENT_ID")
+
+    dx = _read_timeline("data_timeline_diagnosis.txt")
+    ps = _read_timeline("data_timeline_performance_status.txt")
+    ts = _read_timeline("data_timeline_tumor_sites.txt")
+    prog = _read_timeline("data_timeline_progression.txt")
+    surg = _read_timeline("data_timeline_surgery.txt")
+    rad = _read_timeline("data_timeline_radiation.txt")
+    markers = {name: _read_timeline(f) for name, f in MARKER_FILES.items()}
+
+    out: dict[str, dict] = {}
+    for pid in all_ids:
+        t0 = t0_by_pid[pid]
+        prow = p.loc[pid] if pid in p.index else None
+        srow = s.loc[pid] if pid in s.index else None
+
+        # 1 Geschlecht
+        sex = _clean(prow["GENDER"]) if prow is not None else None
+
+        # 2 Histologie / ICD-O
+        histology = {
+            "cancer_type_detailed": _clean(srow["CANCER_TYPE_DETAILED"]) if srow is not None else None,
+            "oncotree_code": _clean(srow["ONCOTREE_CODE"]) if srow is not None else None,
+            "icd_o_description": _clean(srow["ICD_O_HISTOLOGY_DESCRIPTION"]) if srow is not None else None,
+            "primary_site": _clean(srow["PRIMARY_SITE"]) if srow is not None else None,
+            "sample_type": _clean(srow["SAMPLE_TYPE"]) if srow is not None else None,
+            "metastatic_site": _clean(srow["METASTATIC_SITE"]) if srow is not None else None,
+        }
+
+        # 3 genaues Stadium (Registerangabe, feiner als "Stage 1-3")
+        dx_rows = _before(dx, pid, t0)
+        dx_row = dx_rows.iloc[-1] if len(dx_rows) else None
+        stage = {
+            "coarse": _clean(prow["STAGE_HIGHEST_RECORDED"]) if prow is not None else None,
+            "clinical_group": _clean(srow["CLINICAL_GROUP"]) if srow is not None else None,
+            "pathological_group": _clean(srow["PATHOLOGICAL_GROUP"]) if srow is not None else None,
+            "registry_path_group": _clean(dx_row["PATH_GROUP"]) if dx_row is not None else None,
+        }
+
+        # 4 Diagnose (Datum relativ zum Therapiestart + Registertext)
+        diagnosis = None
+        if dx_row is not None:
+            diagnosis = {
+                "days_before_first_line": int(t0 - dx_row["START_DATE"]),
+                "description": _clean(dx_row["DX_DESCRIPTION"]),
+                "source": _clean(dx_row["SOURCE"]),
+            }
+
+        # 5 ECOG: letzter Wert vor Therapiestart + wie viele Messungen es gibt
+        ps_rows = _before(ps, pid, t0).dropna(subset=["ECOG"])
+        ecog = None
+        if len(ps_rows):
+            last = ps_rows.iloc[-1]
+            ecog = {
+                "value": int(last["ECOG"]),
+                "days_before_first_line": int(t0 - last["START_DATE"]),
+                "n_measurements_before": int(len(ps_rows)),
+                "range_before": [int(ps_rows["ECOG"].min()), int(ps_rows["ECOG"].max())],
+            }
+
+        # 6 Tumormarker: die letzten Messungen vor Therapiestart
+        tumor_markers = {}
+        for name, df in markers.items():
+            rows = _before(df, pid, t0)
+            rows = rows[rows["START_DATE"] >= t0 - MARKER_WINDOW_DAYS]
+            rows = rows.tail(MAX_MARKER_POINTS)
+            if not len(rows):
+                continue
+            tumor_markers[name] = {
+                "unit": _clean(rows.iloc[-1]["LR_UNIT_MEASURE"]),
+                "points": [
+                    {"days_before_first_line": int(t0 - r["START_DATE"]), "value": float(r["RESULT"])}
+                    for _, r in rows.iterrows()
+                ],
+            }
+
+        # 7 dokumentierte Tumorlokalisationen mit Datum und Bildgebungsart
+        ts_rows = _before(ts, pid, t0)
+        tumor_sites = []
+        for site, grp in ts_rows.groupby("TUMOR_SITE"):
+            first = grp.iloc[0]
+            tumor_sites.append({
+                "site": _clean(site),
+                "days_before_first_line": int(t0 - first["START_DATE"]),
+                "modality": _clean(first.get("SOURCE_SPECIFIC")),
+                "source": _clean(first.get("SOURCE")),
+            })
+        tumor_sites.sort(key=lambda d: -d["days_before_first_line"])
+
+        # 8 Ereignisse vor Therapiestart (OP, Bestrahlung, Progress)
+        prog_rows = _before(prog, pid, t0)
+        prog_rows = prog_rows[prog_rows["PROGRESSION"] == "Y"]
+        events = {
+            "surgeries_before": int(len(_before(surg, pid, t0))),
+            "radiation_before": int(len(_before(rad, pid, t0))),
+            "progressions_before": int(len(prog_rows)),
+        }
+
+        # 9 zusätzliche Probenwerte
+        assay = {
+            "msi_score": float(srow["MSI_SCORE"]) if srow is not None and pd.notna(srow["MSI_SCORE"]) else None,
+            "gene_panel": _clean(srow["GENE_PANEL"]) if srow is not None else None,
+        }
+
+        out[pid] = {
+            "sex": sex,
+            "histology": histology,
+            "stage": stage,
+            "diagnosis": diagnosis,
+            "ecog": ecog,
+            "tumor_markers": tumor_markers,
+            "tumor_sites": tumor_sites,
+            "events_before_first_line": events,
+            "assay": assay,
+            # NUR für die Auswertung, NICHT im UI vor der Entscheidung anzeigen:
+            "outcome": {
+                "os_months": float(prow["OS_MONTHS"]) if prow is not None and pd.notna(prow["OS_MONTHS"]) else None,
+                "os_status": _clean(prow["OS_STATUS"]) if prow is not None else None,
+            },
+        }
+    return out
+
+
 # Baut für diese 12 Fälle die Ausgabestruktur mit den Top-3-Regimen,
 # deren Wahrscheinlichkeiten und je 18 nach Einfluss sortierten Feature-Erklärungen in Textform.
 def build_predictions(all_ids, pid_test, proba, classes, raw, X_test, X_test_imp, get_sv, y_test):
@@ -258,6 +418,11 @@ def main():
     predictions, truth = build_predictions(
         all_ids, pid_test, proba, classes, raw, X_test, X_test_imp, get_sv, y_test
     )
+
+    # echte klinische Felder aus MSK CHORD anhängen (siehe build_clinical_context)
+    clinical = build_clinical_context(all_ids, labels, pat, samp)
+    for entry in predictions:
+        entry["clinical"] = clinical.get(entry["patient_id"], {})
 
     with open(OUT_DIR + "predictions.json", "w", encoding="utf-8") as f:
         json.dump(predictions, f, indent=2, ensure_ascii=False)
