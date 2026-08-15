@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
 RANDOM_STATE = 42   # heißt das random_state immer dieselben zufälligen Zahlen generiert, damit wir es reproduzieren können für die Fälle die wir später präsentieren wolen
-DATA_DIR = "data/msk_chord_2024/"
+DATA_DIR = "data/msk_chord_2024/" # die AblageOrte'/Pfade, wo die Dateien sich befinden
 OUT_DIR = "data/derived/"
 
 # --- the 18 features (3 numeric + 5 categorical + 10 organ-involvement columns) ---
@@ -28,18 +28,18 @@ ALL_ORIG = NUM + CAT
 ENDOCRINE = {"TAMOXIFEN", "LETROZOLE", "ANASTROZOLE", "LETROZOLE + PALBOCICLIB"}
 
 
-def load_sources():
+def load_sources(): # hier werden die CSV-Datien, die data Ordner hinterlegt sind geladen
     pat = pd.read_csv(DATA_DIR + "data_clinical_patient.txt", sep="\t", comment="#")
     samp = pd.read_csv(DATA_DIR + "data_clinical_sample.txt", sep="\t", comment="#")
     tl = pd.read_csv(DATA_DIR + "data_timeline_treatment.txt", sep="\t")
     return pat, samp, tl
 
 
-def build_labels(samp: pd.DataFrame, tl: pd.DataFrame) -> pd.DataFrame:
+def build_labels(samp: pd.DataFrame, tl: pd.DataFrame) -> pd.DataFrame:  # baut das Label aus den Features, d.h. welche Erstlinien-Therapie ein Patient bekommen hat
     """breast-only cohort, first-line regime label, threshold >=100, 'Other' removed (10 classes)."""
-    breast_pat = set(samp.loc[samp["CANCER_TYPE"] == "Breast Cancer", "PATIENT_ID"])
-    types_per_pat = samp.groupby("PATIENT_ID")["CANCER_TYPE"].apply(lambda s: set(s.dropna()))
-    breast_only = {p for p in breast_pat if types_per_pat[p] == {"Breast Cancer"}}
+    breast_pat = set(samp.loc[samp["CANCER_TYPE"] == "Breast Cancer", "PATIENT_ID"]) # Patienten mit mind. einer Proble CANCER_TYPE == Breast Cancer
+    types_per_pat = samp.groupby("PATIENT_ID")["CANCER_TYPE"].apply(lambda s: set(s.dropna())) # pro Patient die Menge aller vorkommenden Krebstypen
+    breast_only = {p for p in breast_pat if types_per_pat[p] == {"Breast Cancer"}} # nur Fälle mit ausschließlich Brustkrebs
 
     t = tl[tl["PATIENT_ID"].isin(breast_only)].copy()
     fl_start = t.groupby("PATIENT_ID")["START_DATE"].min().rename("first_line_start_date")
@@ -47,10 +47,11 @@ def build_labels(samp: pd.DataFrame, tl: pd.DataFrame) -> pd.DataFrame:
     fl = t[t["START_DATE"] == mn]
     reg = (
         fl.groupby("PATIENT_ID")["AGENT"]
-        .apply(lambda s: " + ".join(sorted(set(s.dropna()))))
+        .apply(lambda s: " + ".join(sorted(set(s.dropna())))) #Wirkstoff ohne Namen wird verworfen
         .rename("regime_label")
     )
 
+    # seltene Regimes mit < 100 Patienten werden rausgefiltert (sonst ist die "Other" Klasse sehr groß)
     vc = reg.value_counts()
     keep_regimes = set(vc[vc >= 100].index)  # 10 klassen und somit >=100 patients
     labels = pd.concat([reg, fl_start], axis=1).reset_index()
@@ -59,7 +60,10 @@ def build_labels(samp: pd.DataFrame, tl: pd.DataFrame) -> pd.DataFrame:
     return labels.reset_index(drop=True)
 
 
-def build_xy(labels: pd.DataFrame, pat: pd.DataFrame, samp: pd.DataFrame):
+# Sammelt für genau diese Patienten die 18 klinischen Merkmale aus Patienten- und Probentabelle ein 
+# und bringt sie ins Modellformat (One-Hot-Encoding), sodass Merkmale und Label zeilengleich zusammenpassen.
+
+def build_xy(labels: pd.DataFrame, pat: pd.DataFrame, samp: pd.DataFrame): 
     pcols = ["PATIENT_ID", "CURRENT_AGE_DEID", "HR", "HER2", "STAGE_HIGHEST_RECORDED",
              "SMOKING_PREDICTIONS_3_CLASSES"] + ORGANS
     scols = ["PATIENT_ID", "TMB_NONSYNONYMOUS", "TUMOR_PURITY", "MSI_TYPE"]
@@ -80,8 +84,8 @@ def build_xy(labels: pd.DataFrame, pat: pd.DataFrame, samp: pd.DataFrame):
     return df, raw, X, y
 
 
-def fit_model(X_train, y_train):
-    pre = ColumnTransformer(
+def fit_model(X_train, y_train): # modell wird trainiert
+    pre = ColumnTransformer(     # wenn alter, tmb und tumor purity fehlen, kriegen die den median
         transformers=[("num_impute", SimpleImputer(strategy="median"), NUM)],
         remainder="passthrough",
     )
@@ -92,7 +96,7 @@ def fit_model(X_train, y_train):
     pipe.fit(X_train, y_train)
     return pipe
 
-
+# mit TreeExplainer werden hier die SHAP-Werte berechnet
 def shap_setup(pipe, X_test):
     imputer = pipe.named_steps["pre"]
     rf = pipe.named_steps["rf"]
@@ -106,7 +110,8 @@ def shap_setup(pipe, X_test):
     sv = explainer.shap_values(X_test_imp.values)
     return rf, X_test_imp, sv
 
-
+# hilfsfunktion, damit die shap-Werte aus ihren untersch. Matrix Formen alle zu einem einheitlichen Vektor umgeformt werden
+# bzw. den Vektor für einen bestimmten Patienten und eine bestimmte Klasse
 def make_get_sv(sv):
     def get_sv(sample_idx, class_idx):
         if isinstance(sv, list):
@@ -117,7 +122,11 @@ def make_get_sv(sv):
         return arr[sample_idx]
     return get_sv
 
-
+# Wählt reproduzierbar 12 Testpatienten aus, 
+# je 3 pro Kategorie: A sicher und richtig,
+# B unsicher bei Hormontherapie,
+# C knapp daneben liegend "wirkt sicher aber ist falsch"
+# D klinisch fragwürdig: HER2-positiv mit Chemo-Vorhersage
 def select_cases(pred, pid_test, y_test, ptop, raw, X_test):
     """Deterministische Auswahl von 12 Fällen über 4 categories A/B/C/D."""
     sel = pd.DataFrame({
@@ -154,7 +163,8 @@ def select_cases(pred, pid_test, y_test, ptop, raw, X_test):
     all_ids = sorted(a_ids + b_ids + c_ids + d_ids, key=lambda p: (order_cat[chosen[p]], p))
     return all_ids
 
-
+# Baut für diese 12 Fälle die Ausgabestruktur mit den Top-3-Regimen,
+# deren Wahrscheinlichkeiten und je 18 nach Einfluss sortierten Feature-Erklärungen in Textform.
 def build_predictions(all_ids, pid_test, proba, classes, raw, X_test, X_test_imp, get_sv, y_test):
     feat_cols = list(X_test_imp.columns)
     orig_to_dummies = {f: [f] for f in NUM}
@@ -201,7 +211,12 @@ def build_predictions(all_ids, pid_test, proba, classes, raw, X_test, X_test_imp
         truth[pid] = str(y_test.iloc[pos])
     return predictions, truth
 
-
+# Führt den gesamten Durchlauf aus:
+# Daten laden, Labels und Features bauen,
+# splitten
+# Modell trainieren und speichern
+# SHAP berechnen
+# Fälle auswählen und alles als CSV/JSON nach data/derived exportieren
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     pat, samp, tl = load_sources()

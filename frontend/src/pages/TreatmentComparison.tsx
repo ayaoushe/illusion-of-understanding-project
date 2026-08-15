@@ -1,3 +1,16 @@
+/*
+ML-Model Predictions for the Case Studies
+- Case Studies A,B,C,D
+- Predicition represents the prediction with the highest confidence percentage
+- Probabilites represents the confidence precentages for all the possible prediciton outcomes
+- Options delivers the top 3 recommendations and the features that contributed to the prediction including their weight
+
+*/
+
+
+
+
+
 import { PageHeader } from "../components/layout/PageHeader";
 import { StepFooter } from "../components/layout/StepFooter";
 

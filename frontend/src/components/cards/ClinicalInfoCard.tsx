@@ -1,3 +1,5 @@
+// Card Design for Patient Overview, to display clinical information such as diagnosis, performance status, and key lab values.
+
 import type { ReactNode } from 'react';
 
 interface ClinicalInfoCardProps {

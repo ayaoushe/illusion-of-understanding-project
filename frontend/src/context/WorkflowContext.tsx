@@ -1,3 +1,5 @@
+// Helper for the Workflow and saving current data
+
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 import type {
   WorkflowStepId,
@@ -37,7 +39,10 @@ interface WorkflowContextValue {
 
 const WorkflowContext = createContext<WorkflowContextValue | null>(null);
 
+//Locked Pages (Not immediatly accessible)
 const GATED_STEPS: WorkflowStepId[] = ['evidence', 'treatment', 'similar', 'reflection'];
+
+
 
 export function WorkflowProvider({ children }: { children: ReactNode }) {
   const [currentStep, setCurrentStep] = useState<WorkflowStepId>('overview');
@@ -47,13 +52,15 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
   const [reflection, setReflection] = useState<FinalReflection | null>(null);
   const [telemetry, setTelemetry] = useState<InteractionTelemetry>(initialTelemetry);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
-
   const assessmentComplete = assessment !== null;
+
+// Get patient from PatientID
   const selectedPatient = useMemo(
     () => (selectedPatientId ? getPatientProfile(selectedPatientId) : null),
     [selectedPatientId],
   );
 
+  // Check if user can access a step 
   const canAccessStep = useCallback(
     (stepId: WorkflowStepId) => {
       if (!selectedPatientId) return false;
@@ -63,8 +70,10 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     [assessmentComplete, selectedPatientId],
   );
 
+  // Find current step
   const currentIndex = WORKFLOW_STEPS.findIndex((s) => s.id === currentStep);
 
+  // Go to a step (if allowed)
   const goToStep = useCallback(
     (stepId: WorkflowStepId) => {
       if (canAccessStep(stepId)) setCurrentStep(stepId);
@@ -72,16 +81,19 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     [canAccessStep],
   );
 
+  // Go to next step (if allowed)
   const goNext = useCallback(() => {
     const next = WORKFLOW_STEPS[currentIndex + 1];
     if (next && canAccessStep(next.id)) setCurrentStep(next.id);
   }, [currentIndex, canAccessStep]);
 
+  // Go to previous step
   const goPrevious = useCallback(() => {
     const prev = WORKFLOW_STEPS[currentIndex - 1];
     if (prev) setCurrentStep(prev.id);
   }, [currentIndex]);
 
+  //
   const startAssessment = useCallback(() => {
     setTelemetry((t) => ({ ...t, assessmentStartTime: Date.now() }));
   }, []);

@@ -1,3 +1,5 @@
+//Design for the Page Header with title and step
+
 import type { ReactNode } from 'react';
 
 interface PageHeaderProps {

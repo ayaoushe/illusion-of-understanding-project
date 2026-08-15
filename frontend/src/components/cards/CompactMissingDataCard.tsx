@@ -1,3 +1,6 @@
+// Card Design for displaying a list of missing data with an option to expand and view more.
+
+
 import { useState } from 'react';
 
 interface CompactMissingDataCardProps {

@@ -1,3 +1,5 @@
+//Card design for final decision
+
 import type { HumanAssessment, FinalReflection, AiEvidenceSynthesis } from '../../types';
 import { getAssessmentTreatmentLabel } from '../../data/mockData';
 

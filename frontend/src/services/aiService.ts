@@ -4,6 +4,11 @@ import { mockTreatmentEvidenceById } from '../data/mockData';
 /**
  * Lightweight evidence service that prefers an API endpoint when available,
  * but falls back to treatment-specific mock evidence for buildable demos.
+ * 
+ * This gets called after the Assessment is completed, and returns the AI Evidence Synthesis for the selected treatment and patient.
+ * 
+ * 
+ * 
  */
 export async function fetchEvidenceSynthesis(
   patientId: string,

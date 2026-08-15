@@ -30,6 +30,16 @@ npm run dev
 
 Open the URL Vite prints (e.g. `http://localhost:5173`). The dev server proxies API routes to `http://127.0.0.1:8010`.
 
+**Start both (Windows)**
+
+From the repository root you can launch both the backend and frontend together using the PowerShell helper:
+
+```powershell
+.\start-dev.ps1
+```
+
+This opens the backend (uvicorn) and the frontend (Vite) in separate windows so you can view logs for each. Close the spawned windows to stop the servers.
+
 ## REST API
 
 | Method | Path | Body (JSON) | Purpose |
