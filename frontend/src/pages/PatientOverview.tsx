@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { mockPatient } from '../data/mockData';
+import { useEffect, useState } from 'react';
 import { useWorkflow } from '../context/WorkflowContext';
+import { fetchCase } from '../services/caseService';
+import { buildPatientView, type PatientView } from '../services/patientView';
 import { PageHeader } from '../components/layout/PageHeader';
 import { StepFooter } from '../components/layout/StepFooter';
 import { TabBar } from '../components/layout/TabBar';
@@ -8,16 +9,38 @@ import { ClinicalInfoCard } from '../components/cards/ClinicalInfoCard';
 import { PreferenceCard } from '../components/cards/PreferenceCard';
 import { CompactMissingDataCard } from '../components/cards/CompactMissingDataCard';
 
-export function PatientOverview() {
-  const { selectedPatient } = useWorkflow();
-  const patient = selectedPatient ?? mockPatient;
-  const { molecular, labs } = patient;
-  const hemoglobin = labs.hemoglobin as { value: number; unit: string; status: string; normal: string };
-  const ldh = labs.ldh as { value: number; unit: string; status: string; normal: string };
-  const crp = (labs.inflammation as { crp: { value: number; unit: string } }).crp;
-  const egfr = labs.egfr as { value: number; unit: string; stage: string };
+const LAB_STATUS_CLASS: Record<string, string> = {
+  LOW: 'status-low',
+  ELEVATED: 'status-elevated',
+  NORMAL: '',
+};
 
+export function PatientOverview() {
+  const { selectedPatientId } = useWorkflow();
+  const [view, setView] = useState<PatientView | null>(null);
   const [activeTab, setActiveTab] = useState('summary');
+
+  // Der Patient wird aus dem echten Studienfall abgeleitet (study_cases.json),
+  // nicht aus statischen Mock-Profilen.
+  useEffect(() => {
+    if (!selectedPatientId) {
+      setView(null);
+      return;
+    }
+
+    let cancelled = false;
+    fetchCase(selectedPatientId)
+      .then((studyCase) => {
+        if (!cancelled) setView(studyCase ? buildPatientView(studyCase) : null);
+      })
+      .catch(() => {
+        if (!cancelled) setView(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedPatientId]);
 
   const tabs = [
     { id: 'summary', label: 'Summary' },
@@ -27,6 +50,21 @@ export function PatientOverview() {
     { id: 'missing', label: 'Missing Data' },
   ];
 
+  if (!view) {
+    return (
+      <div className="page">
+        <PageHeader title="Patient Overview" badge="Step 1" />
+        <div className="card">
+          <p className="muted" style={{ margin: 0 }}>
+            {selectedPatientId ? 'Loading patient data…' : 'Select a case to begin.'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const activeMetastases = view.metastases.filter((m) => m.present);
+
   return (
     <div className="page">
       <PageHeader title="Patient Overview" badge="Step 1" />
@@ -34,13 +72,13 @@ export function PatientOverview() {
       <div className="card patient-summary-card">
         <div className="patient-header">
           <div>
-            <h3>{patient.name}</h3>
+            <h3>{view.name}</h3>
             <p className="muted">
-              MRN: {patient.mrn} · DOB: {patient.dateOfBirth} ({patient.age} yrs) · {patient.gender}
+              MRN: {view.mrn} · {view.age} yrs · {view.gender}
             </p>
           </div>
-          <span className={`priority-badge priority-${patient.priority.toLowerCase()}`}>
-            {patient.priority} PRIORITY
+          <span className={`priority-badge priority-${view.priority.toLowerCase()}`}>
+            {view.priority} PRIORITY
           </span>
         </div>
       </div>
@@ -50,40 +88,26 @@ export function PatientOverview() {
       {activeTab === 'summary' && (
         <div className="overview-grid">
           <ClinicalInfoCard title="Diagnosis">
-            <p className="value">{patient.diagnosis.primaryDiagnosis}</p>
-            <p className="muted">ICD-10: {patient.diagnosis.icd10} — Stage {patient.diagnosis.stage}</p>
-            <p className="muted">{patient.diagnosis.histology} · {patient.diagnosis.location}</p>
-            <p className="muted">Diagnosed: {patient.diagnosis.diagnosisDate}</p>
+            <p className="value">{view.diagnosis.primaryDiagnosis}</p>
+            <p className="muted">ICD-10: {view.diagnosis.icd10} — {view.diagnosis.stage}</p>
+            <p className="muted">{view.diagnosis.histology}</p>
+            <p className="muted">{view.diagnosis.location}</p>
           </ClinicalInfoCard>
 
           <ClinicalInfoCard title="Performance Status">
-            <p className="value">ECOG {patient.performance.ecog}</p>
-            <p className="muted">{patient.performance.ecogDescription}</p>
-            <p className="muted">Last assessed: {patient.performance.lastAssessed}</p>
+            <p className="value">{view.performance.ecog !== null ? `ECOG ${view.performance.ecog}` : 'ECOG —'}</p>
+            <p className="muted">{view.performance.ecogDescription}</p>
           </ClinicalInfoCard>
 
           <ClinicalInfoCard title="Key Lab Values" variant="warning">
             <div className="lab-items">
-              <div className="lab-item status-low">
-                <span>Hemoglobin</span>
-                <span className="value">{hemoglobin.value} {hemoglobin.unit}</span>
-                <span className="status">LOW</span>
-              </div>
-              <div className="lab-item status-elevated">
-                <span>LDH</span>
-                <span className="value">{ldh.value} {ldh.unit}</span>
-                <span className="status">ELEVATED</span>
-              </div>
-              <div className="lab-item status-elevated">
-                <span>CRP</span>
-                <span className="value">{crp.value} {crp.unit}</span>
-                <span className="status">ELEVATED</span>
-              </div>
-              <div className="lab-item">
-                <span>eGFR</span>
-                <span className="value">{egfr.value} {egfr.unit}</span>
-                <span className="status">G2</span>
-              </div>
+              {view.labs.map((lab) => (
+                <div key={lab.label} className={`lab-item ${LAB_STATUS_CLASS[lab.status] ?? ''}`}>
+                  <span>{lab.label}</span>
+                  <span className="value">{lab.value} {lab.unit}</span>
+                  <span className="status">{lab.status}</span>
+                </div>
+              ))}
             </div>
           </ClinicalInfoCard>
         </div>
@@ -91,21 +115,39 @@ export function PatientOverview() {
 
       {activeTab === 'diagnostics' && (
         <div className="overview-grid">
-          <ClinicalInfoCard title="Pathology & Molecular">
+          <ClinicalInfoCard title="Pathology & Biomarkers">
             <table className="data-table">
               <tbody>
-                <tr><td>Histology</td><td>{mockPatient.diagnosis.histology}</td></tr>
-                <tr><td>EGFR</td><td>{molecular.egfr.mutation} — <span className="highlight">{molecular.egfr.status}</span></td></tr>
-                <tr><td>ALK</td><td>{molecular.alk.status}</td></tr>
-                <tr><td>PD-L1 TPS</td><td>{molecular.pdl1.tps} ({molecular.pdl1.level})</td></tr>
-                <tr><td>TMB</td><td>{molecular.tmb.value} {molecular.tmb.unit} ({molecular.tmb.level})</td></tr>
-                <tr><td>KRAS</td><td>{molecular.kras.status}</td></tr>
+                <tr>
+                  <td>Histology</td>
+                  <td>{view.diagnosis.histology}</td>
+                </tr>
+                {view.biomarkers.map((b) => (
+                  <tr key={b.label}>
+                    <td>{b.label}</td>
+                    <td>{b.value}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </ClinicalInfoCard>
 
+          <ClinicalInfoCard title="Documented Tumor Sites">
+            {activeMetastases.length > 0 ? (
+              <ul className="comorbidity-list">
+                {activeMetastases.map((m) => (
+                  <li key={m.site}>
+                    <strong>{m.site}</strong>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="muted" style={{ margin: 0 }}>No distant tumor sites documented.</p>
+            )}
+          </ClinicalInfoCard>
+
           <ClinicalInfoCard title="Imaging Summary">
-            {patient.imaging.map((img) => (
+            {view.imaging.map((img) => (
               <div key={img.type} className="imaging-item">
                 <div className="imaging-header">
                   <strong>{img.type}</strong>
@@ -122,7 +164,7 @@ export function PatientOverview() {
         <div className="overview-grid">
           <ClinicalInfoCard title="Comorbidities" variant="highlight">
             <ul className="comorbidity-list">
-              {patient.comorbidities.map((c) => (
+              {view.comorbidities.map((c) => (
                 <li key={c.name}>
                   <strong>{c.name}</strong>
                   <span className="detail">{c.status}</span>
@@ -134,7 +176,7 @@ export function PatientOverview() {
 
           <ClinicalInfoCard title="Current Medications" variant="info">
             <ul className="medication-list">
-              {patient.medications.map((m) => (
+              {view.medications.map((m) => (
                 <li key={m.name}>
                   <strong>{m.name} {m.dose}</strong> — {m.frequency}
                   <p className="muted">{m.relevance}</p>
@@ -145,7 +187,7 @@ export function PatientOverview() {
 
           <ClinicalInfoCard title="Contraindications" variant="warning">
             <ul className="contraindication-list">
-              {patient.contraindications.map((c) => (
+              {view.contraindications.map((c) => (
                 <li key={c.factor} className={`contra-${c.severity}`}>
                   <strong>{c.factor}</strong>
                   <span className={`severity-badge severity-${c.severity}`}>{c.severity}</span>
@@ -158,12 +200,10 @@ export function PatientOverview() {
       )}
 
       {activeTab === 'qol' && (
-        <PreferenceCard concerns={mockPatient.qolConcerns} preferences={mockPatient.patientPreferences} />
+        <PreferenceCard concerns={view.qolConcerns} preferences={view.patientPreferences} />
       )}
 
-      {activeTab === 'missing' && (
-        <CompactMissingDataCard items={patient.missingData} />
-      )}
+      {activeTab === 'missing' && <CompactMissingDataCard items={view.missingData} />}
 
       <StepFooter nextLabel="Begin Assessment" />
     </div>

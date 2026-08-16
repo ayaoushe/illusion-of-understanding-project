@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { assessmentTreatmentOptions } from '../data/mockData';
+import { useTreatmentOptions } from '../hooks/useTreatmentOptions';
 import { useWorkflow } from '../context/WorkflowContext';
 import type { FinalReflection } from '../types';
 import { PageHeader } from '../components/layout/PageHeader';
@@ -17,6 +17,7 @@ const emptyReflection: FinalReflection = {
 
 export function FinalReflection() {
   const { assessment, evidence, reflection, submitReflection } = useWorkflow();
+  const treatmentOptions = useTreatmentOptions();
   const [form, setForm] = useState<FinalReflection>(
     reflection ?? { ...emptyReflection, finalTreatment: assessment?.selectedTreatment ?? '' },
   );
@@ -48,11 +49,13 @@ export function FinalReflection() {
     <div className="page">
       <PageHeader title="Final Reflection" badge="Step 7" />
 
-      {submitted ? (
-        <FinalDecisionSummary assessment={assessment} evidence={evidence} reflection={form} />
-      ) : (
-        <FinalDecisionSummary assessment={assessment} evidence={evidence} reflection={null} />
-      )}
+      {/* Sobald eine Therapie gewählt ist, steht sie live im Kasten — nicht erst nach dem Absenden. */}
+      <FinalDecisionSummary
+        assessment={assessment}
+        evidence={evidence}
+        reflection={submitted || form.finalTreatment ? form : null}
+      />
+
 
       {!submitted && (
         <div className="reflection-form">
@@ -81,7 +84,7 @@ export function FinalReflection() {
               onChange={(e) => update('finalTreatment', e.target.value)}
             >
               <option value="">Select a treatment option...</option>
-              {assessmentTreatmentOptions.map((opt) => (
+              {treatmentOptions.map((opt) => (
                 <option key={opt.id} value={opt.id}>
                   {opt.label} [{opt.category}]
                 </option>

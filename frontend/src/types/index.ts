@@ -183,10 +183,69 @@ export interface SimilarCase {
   matchScore: number;
 }
 
+/** Echte klinische Felder aus MSK CHORD, gefiltert auf "vor Start der Erstlinie". */
+export interface ClinicalContext {
+  sex?: string | null;
+  histology?: {
+    cancer_type_detailed?: string | null;
+    oncotree_code?: string | null;
+    icd_o_description?: string | null;
+    primary_site?: string | null;
+    sample_type?: string | null;
+    metastatic_site?: string | null;
+  };
+  stage?: {
+    coarse?: string | null;
+    clinical_group?: string | null;
+    pathological_group?: string | null;
+    registry_path_group?: string | null;
+  };
+  diagnosis?: {
+    days_before_first_line: number;
+    description?: string | null;
+    source?: string | null;
+  } | null;
+  ecog?: {
+    value: number;
+    days_before_first_line: number;
+    n_measurements_before: number;
+    range_before: [number, number];
+  } | null;
+  tumor_markers?: Record<string, { unit?: string | null; points: Array<{ days_before_first_line: number; value: number }> }>;
+  tumor_sites?: Array<{ site: string; days_before_first_line: number; modality?: string | null; source?: string | null }>;
+  events_before_first_line?: { surgeries_before: number; radiation_before: number; progressions_before: number };
+  assay?: { msi_score?: number | null; gene_panel?: string | null };
+  /** Nur für die Auswertung — nicht vor der Entscheidung anzeigen. */
+  outcome?: { os_months?: number | null; os_status?: string | null };
+}
+
+/** Ähnlichster Trainingsfall laut Random-Forest-Proximity. */
+export interface SimilarNeighbor {
+  rank: number;
+  patient_id: string;
+  match_percent: number;
+  regime: string;
+  features: Record<string, string | number | null>;
+  matched_fields: string[];
+  os_months: number | null;
+  os_status: string;
+}
+
 export interface StudyCase {
   patient_id: string;
+  study_label?: string;
+  clinical?: ClinicalContext;
+  similar_cases?: SimilarNeighbor[];
+  /** Top-1-Regime des Modells */
+  prediction?: string;
+  confidence_percent?: number;
+  /** Alle Regime-Klassen mit Wahrscheinlichkeit (aus predictions.json) */
+  probabilities?: Record<string, number>;
   options: Array<{
-    features: Array<{ name: string; value: string }>;
+    regime?: string;
+    rank?: number;
+    probability?: number;
+    features: Array<{ name: string; value: string; weight?: number; explanation?: string }>;
   }>;
 }
 

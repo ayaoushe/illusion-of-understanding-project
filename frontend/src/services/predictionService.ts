@@ -14,7 +14,7 @@ export interface TreatmentPrediction {
   recommendations: Recommendation[];
 }
 
-const API_URL = "http://localhost:8000";
+const API_URL = "http://localhost:8010";
 
 export async function fetchTreatmentRecommendations(
   patient: StudyCase
