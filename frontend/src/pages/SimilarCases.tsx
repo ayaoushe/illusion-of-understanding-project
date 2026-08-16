@@ -16,7 +16,6 @@ export function SimilarCases() {
     recordInteraction({ type: 'similar_cases_view' });
   }, [recordInteraction]);
 
-  // Echte Nachbarfälle des gewählten Patienten; ohne sie bleibt der Platzhalter.
   useEffect(() => {
     if (!selectedPatientId) return;
     let cancelled = false;
@@ -27,7 +26,7 @@ export function SimilarCases() {
         if (real.length) setCases(real);
       })
       .catch(() => {
-        /* Platzhalter bleibt stehen */
+        /* Keep the placeholder if remote data is unavailable */
       });
     return () => {
       cancelled = true;
@@ -36,72 +35,78 @@ export function SimilarCases() {
 
   return (
     <div className="page">
-      <PageHeader title="Similar & Rare Cases" badge="Step 5" />
+      <PageHeader title="Similar Cases" badge="Step 5" />
 
       <div className="similar-cases-grid">
         {cases.map((c) => {
           const isExpanded = expandedCase === c.caseId;
+          const visibleCriteria = isExpanded ? c.matchCriteria : c.matchCriteria.slice(0, 4);
+          const isCounterfactual = typeof c.isCounterfactual === 'boolean' ? c.isCounterfactual : c.matchScore < 80;
+
           return (
             <div
               key={c.caseId}
-              className={`card similar-case-card ${c.isRare ? 'rare-case' : c.matchScore >= 80 ? 'supporting' : 'counterfactual'}`}
+              className={`card similar-case-card ${c.isRare ? 'rare-case' : isCounterfactual ? 'counterfactual' : 'supporting'}`}
             >
               <div className="case-header">
-                <div>
-                  <strong style={{ fontSize: '0.9rem' }}>{c.caseId}</strong>
+                <div className="case-title-wrap">
+                  <strong className="case-id">{c.caseId}</strong>
                   {c.isRare && <span className="rare-badge">RARE</span>}
                 </div>
+
                 <div className="case-meta">
                   <span className="match-score">{c.matchScore}% match</span>
-                  <span className="badge" style={c.matchScore >= 80 ? { background: 'rgba(22, 163, 74, 0.12)', color: 'var(--success)' } : { background: 'rgba(217, 119, 6, 0.12)', color: 'var(--warning)' }}>
-                    {c.matchScore >= 80 ? 'Supporting' : 'Counterfactual'}
+                  <span
+                    className="badge"
+                    style={
+                      !isCounterfactual
+                        ? { background: 'rgba(22, 163, 74, 0.12)', color: 'var(--success)' }
+                        : { background: 'rgba(217, 119, 6, 0.12)', color: 'var(--warning)' }
+                    }
+                  >
+                    {isCounterfactual ? 'Counterfactual' : 'Supporting'}
                   </span>
                 </div>
               </div>
 
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0 0 0.5rem' }}>{c.presentation}</p>
+              <p className="case-presentation">{c.presentation}</p>
 
-              <div className="match-criteria">
-                {c.matchCriteria.slice(0, 4).map((crit) => (
-                  <span key={crit.label} className={`criteria-chip ${crit.matched ? 'matched' : 'unmatched'}`}>
-                    {crit.label}
-                  </span>
-                ))}
-                {c.matchCriteria.length > 4 && (
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', padding: '0.2rem 0.4rem' }}>
-                    +{c.matchCriteria.length - 4} more
-                  </span>
-                )}
+              <div className="case-key-stats">
+                <div className="case-stat treatment-stat">
+                  <span className="case-stat-label">Treatment</span>
+                  <strong className="case-stat-value">{c.treatmentUsed}</strong>
+                </div>
+                <div className="case-stat outcome-stat">
+                  <span className="case-stat-label">Outcome</span>
+                  <strong className="case-stat-value outcome-text">{c.outcome}</strong>
+                </div>
               </div>
 
-              <div style={{ fontSize: '0.85rem', marginBottom: '0.35rem' }}>
-                <strong>Treatment:</strong> {c.treatmentUsed}
-              </div>
-              <div style={{ fontSize: '0.85rem', marginBottom: '0.35rem' }}>
-                <strong>Outcome:</strong> <span className="outcome-text">{c.outcome}</span>
-              </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Source: {c.source}
+              <div className="similarity-panel">
+                <div className="similarity-header">
+                  <span>Similarity factors</span>
+                </div>
+
+                <div className="match-criteria">
+                  {visibleCriteria.map((crit) => (
+                    <span key={crit.label} className={`criteria-chip ${crit.matched ? 'matched' : 'unmatched'}`}>
+                      {crit.label}
+                    </span>
+                  ))}
+                  {c.matchCriteria.length > 4 && (
+                    <button
+                      type="button"
+                      className="more-pill"
+                      aria-expanded={isExpanded}
+                      onClick={() => setExpandedCase(isExpanded ? null : c.caseId)}
+                    >
+                      {isExpanded ? 'Hide' : `+${c.matchCriteria.length - 4} more`}
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {c.matchCriteria.length > 4 && (
-                <details
-                  style={{ cursor: 'pointer', marginTop: '0.35rem' }}
-                  open={isExpanded}
-                  onToggle={() => setExpandedCase(isExpanded ? null : c.caseId)}
-                >
-                  <summary style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                    {isExpanded ? 'Hide details' : 'Show details'}
-                  </summary>
-                  <div className="match-criteria" style={{ marginTop: '0.35rem' }}>
-                    {c.matchCriteria.slice(4).map((crit) => (
-                      <span key={crit.label} className={`criteria-chip ${crit.matched ? 'matched' : 'unmatched'}`}>
-                        {crit.label}
-                      </span>
-                    ))}
-                  </div>
-                </details>
-              )}
+              <div className="case-source">Source: {c.source}</div>
 
               {c.isRare && (
                 <div className="rare-note">

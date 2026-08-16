@@ -1,59 +1,149 @@
-# illusion-of-understanding-project
+# OncoCDSS
 
-Interactive AI interface for medical decision-making (oncology context), focused on situational awareness and critical engagement with model recommendations.
+Clinical decision support prototype for oncology treatment planning. The application combines a React/Vite frontend with a FastAPI backend and a Python ML pipeline that exports curated study cases from a local MSK CHORD dataset for the interactive UI.
 
-## Stack (current)
+## Overview
 
-- **Frontend:** React 19, Vite, Tailwind CSS, Recharts (`frontend/`)
-- **Backend:** FastAPI + shared logic in `backend/medical_logic.py`
+This project is organized as follows:
 
-The previous Streamlit UI has been retired; `app.py` only points you here.
+- `frontend/` – React + TypeScript patient workflow UI
+- `backend/` – FastAPI application serving the clinical decision workflow API
+- `ml/` – ML training and case-selection pipeline
+- `data/` – local dataset and derived export files
+- `app.py` – legacy compatibility stub; the active app is frontend + backend
 
-## Run locally
+## Current architecture
 
-**1. Python** (repo root):
+The app is not a generic live-prediction dashboard for arbitrary patient IDs. Instead, it follows a curated export workflow:
 
-```bash
-pip install -r requirements.txt
+1. `ml/pipeline.py` loads the local MSK CHORD data
+2. it builds a model, selects curated study cases, and generates similar-case comparisons
+3. it writes the export to `frontend/public/study_cases.json`
+4. the frontend loads that static JSON and renders the selected patient cases and recommendations
+
+This keeps the app deterministic and makes the study cases reproducible and explainable.
+
+## Requirements
+
+### Python
+
+Install project dependencies from the repo root:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+Current Python dependencies include:
+
+- FastAPI
+- Uvicorn
+- NumPy
+- Pandas
+- scikit-learn
+- joblib
+- SHAP
+- PyTorch
+- Transformers
+
+### Node.js
+
+Install frontend dependencies:
+
+```powershell
+npm install --prefix frontend
+```
+
+### Dataset
+
+The ML pipeline expects a local MSK CHORD dataset folder under:
+
+```text
+data/msk_chord_2024/
+```
+
+The project is designed to use the dataset locally on the machine; the code does not hardcode a personal Windows path. If the data folder is missing, install or mount the dataset first and then rerun the pipeline.
+
+## Running the app
+
+### Option 1: use the bundled startup script
+
+From the repository root:
+
+```powershell
+powershell -File .\start-dev.ps1
+```
+
+This script will:
+
+- install Python dependencies if needed
+- install frontend dependencies if needed
+- start the backend on `http://127.0.0.1:8010`
+- start the frontend on `http://localhost:5173`
+
+### Option 2: run backend and frontend manually
+
+Backend:
+
+```powershell
 python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8010
 ```
 
-Or run `start-api.ps1` from the repo root.
+Frontend:
 
-**2. Frontend:**
-
-```bash
+```powershell
 cd frontend
-npm install
 npm run dev
 ```
 
-Open the URL Vite prints (e.g. `http://localhost:5173`). The dev server proxies API routes to `http://127.0.0.1:8010`.
+Then open the URL shown by Vite, typically:
 
-**Start both (Windows)**
-
-From the repository root you can launch both the backend and frontend together using the PowerShell helper:
-
-```powershell
-.\start-dev.ps1
+```text
+http://localhost:5173
 ```
 
-This opens the backend (uvicorn) and the frontend (Vite) in separate windows so you can view logs for each. Close the spawned windows to stop the servers.
+## ML pipeline and case export
 
-## REST API
+Run the export pipeline from the repo root:
 
-| Method | Path | Body (JSON) | Purpose |
-|--------|------|-------------|---------|
-| POST | `/predict` | `patient`, `user_decision` | Success %, confidence %, warnings, nudge, comparison |
-| POST | `/analyze` | `patient` | Feature importance + explanations (for charts) |
-| POST | `/scenario` | `patient`, `variable`, `value` | What-if (`tumor_size` \| `age` \| `stage`) |
-| POST | `/chat` | `message`, optional `patient` | Assistant reply |
-| GET | `/health` | — | Liveness |
+```powershell
+python ml/pipeline.py
+```
 
-`patient` fields: `age`, `stage`, `prior_treatment`, `tumor_size`, `symptom_severity`.
+The pipeline writes:
 
-Production build: set `VITE_API_URL` in `frontend/.env` to your API origin; the dev proxy is skipped when it is set.
+- `data/derived/predictions.json`
+- `frontend/public/study_cases.json`
 
-## Layout (React)
+If the case list or patient data changes in the pipeline, the frontend should be refreshed by regenerating the static JSON before testing the UI.
 
-Workflow steps in the left sidebar: Patient → Assessment → AI results → Explanation → Scenarios → Reflection. The assistant chat opens on the right (or bottom on small screens) after predictions are available.
+## API
+
+The active FastAPI backend currently exposes the following endpoints:
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/health` | Liveness check |
+| POST | `/treatment-recommendations` | Returns treatment probabilities and SHAP-style explanation summaries for a patient or case |
+
+## Frontend workflow
+
+The UI is organized around a clinical workflow:
+
+1. Patient Overview
+2. Human Assessment
+3. AI Evidence Synthesis
+4. Treatment Comparison
+5. Similar Cases
+6. Final Reflection
+
+The sidebar uses the curated cases defined in `frontend/src/config/studyCases.ts`, while the actual patient detail data comes from the generated JSON exported by the pipeline.
+
+## Notes
+
+- The repo is intentionally built around a curated, explainable case set rather than arbitrary real-time scoring of all patients.
+- If you want to display a different patient in the study set, that patient must exist in the exported dataset generated by the pipeline.
+- The frontend may temporarily display fallback mock content if a selected ID is not found in the generated study-case data; this should be treated as a data-sync issue rather than the source of truth.
+
+## Development status
+
+This project is a prototype clinical decision support interface for oncology case review and treatment comparison. It is designed for local Vite/FastAPI development and for curated educational study-case evaluation rather than production-grade deployment or general patient registry inference.

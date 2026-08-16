@@ -175,6 +175,7 @@ export interface TreatmentOption {
 export interface SimilarCase {
   caseId: string;
   isRare?: boolean;
+  isCounterfactual?: boolean;
   matchCriteria: Array<{ label: string; matched: boolean }>;
   presentation: string;
   treatmentUsed: string;
@@ -227,6 +228,7 @@ export interface SimilarNeighbor {
   regime: string;
   features: Record<string, string | number | null>;
   matched_fields: string[];
+  is_counterfactual?: boolean;
   os_months: number | null;
   os_status: string;
 }

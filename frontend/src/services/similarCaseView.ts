@@ -84,6 +84,7 @@ export function buildSimilarCases(c: StudyCase): SimilarCase[] {
 
     return {
       caseId: `Registry case ${n.patient_id}`,
+      isCounterfactual: Boolean(n.is_counterfactual),
       matchScore: n.match_percent,
       matchCriteria: criteria,
       presentation: presentation(n),

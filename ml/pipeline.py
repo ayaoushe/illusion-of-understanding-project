@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 
 import joblib
 import numpy as np
@@ -26,6 +27,8 @@ ORGANS = [
 CAT = ["HR", "HER2", "STAGE_HIGHEST_RECORDED", "SMOKING_PREDICTIONS_3_CLASSES", "MSI_TYPE"] + ORGANS
 ALL_ORIG = NUM + CAT
 ENDOCRINE = {"TAMOXIFEN", "LETROZOLE", "ANASTROZOLE", "LETROZOLE + PALBOCICLIB"}
+# ^ no longer used by select_cases (fixed STUDY_CASE_IDS below) — kept as
+# documentation of the original bucket-B criterion.
 
 
 def load_sources(): # hier werden die CSV-Datien, die data Ordner hinterlegt sind geladen
@@ -122,46 +125,40 @@ def make_get_sv(sv):
         return arr[sample_idx]
     return get_sv
 
-# Wählt reproduzierbar 12 Testpatienten aus, 
-# je 3 pro Kategorie: A sicher und richtig,
-# B unsicher bei Hormontherapie,
-# C knapp daneben liegend "wirkt sicher aber ist falsch"
-# D klinisch fragwürdig: HER2-positiv mit Chemo-Vorhersage
+# Feste Auswahl der 4 Studienfälle A-D, abgestimmt mit
+# frontend/src/data/studyCases.ts. Diese IDs wurden einmalig kuratiert
+# (siehe Analyse-Notizen) und sollen bei jedem Pipeline-Lauf exakt gleich
+# bleiben, statt aus einem automatisch generierten 12er-Pool neu gezogen
+# zu werden. So kann studyCases.ts fest auf diese Patienten verweisen
+# (Namen, MRNs, Studientexte), ohne dass ein Retrain die IDs verschiebt.
+#
+# A = sicher & richtig, B = unsicher bei Hormontherapie,
+# C = wirkt sicher, ist aber falsch, D = HER2-positiv mit Chemo-Vorhersage
+STUDY_CASE_IDS = {
+    "A": "P-0039112",
+    "B": "P-0011019",
+    "C": "P-0050258",
+    "D": "P-0068618",
+}
+
+
 def select_cases(pred, pid_test, y_test, ptop, raw, X_test):
-    """Deterministische Auswahl von 12 Fällen über 4 categories A/B/C/D."""
-    sel = pd.DataFrame({
-        "pos": np.arange(len(pred)), "patient_id": pid_test.values,
-        "true": y_test.values, "pred": pred, "ptop": ptop,
-    })
-    sel["correct"] = sel["true"] == sel["pred"]
+    """Gibt exakt die 4 fest zugeordneten Studienfälle zurück (Reihenfolge A-D).
 
-    def her2_of(pos):
-        return raw.loc[X_test.index[pos], "HER2"]
-
-    def pick_n(mask, n, exclude):
-        cand = sel[mask & ~sel["patient_id"].isin(exclude)].sort_values("patient_id")
-        return list(cand["patient_id"].head(n))
-
-    chosen, used = {}, set()
-    a_ids = pick_n(sel["correct"] & (sel["ptop"] >= 0.6), 3, used)
-    used.update(a_ids); [chosen.__setitem__(i, "A") for i in a_ids]
-    maskB = (sel["ptop"] <= 0.45) & (sel["pred"].isin(ENDOCRINE) | sel["true"].isin(ENDOCRINE))
-    b_ids = pick_n(maskB, 3, used)
-    used.update(b_ids); [chosen.__setitem__(i, "B") for i in b_ids]
-    maskC = (~sel["correct"]) & (sel["ptop"] > 0.45) & (sel["ptop"] < 0.6)
-    c_ids = pick_n(maskC, 3, used)
-    used.update(c_ids); [chosen.__setitem__(i, "C") for i in c_ids]
-    posD = [
-        p for p in sel["pos"]
-        if her2_of(p) == "Yes" and sel.loc[sel["pos"] == p, "pred"].iloc[0] == "CYCLOPHOSPHAMIDE + DOXORUBICIN"
-    ]
-    d_cand = sel[sel["pos"].isin(posD) & ~sel["patient_id"].isin(used)].sort_values("patient_id")
-    d_ids = list(d_cand["patient_id"].head(3))
-    used.update(d_ids); [chosen.__setitem__(i, "D") for i in d_ids]
-
-    order_cat = {"A": 0, "B": 1, "C": 2, "D": 3}
-    all_ids = sorted(a_ids + b_ids + c_ids + d_ids, key=lambda p: (order_cat[chosen[p]], p))
-    return all_ids
+    Bricht laut ab, falls eine der IDs im aktuellen Test-Split fehlt (z.B.
+    nach einem Datenupdate oder einer Änderung an build_labels/build_xy,
+    die die Train/Test-Zuordnung verschiebt) — lieber ein klarer Fehler
+    als ein stillschweigend unvollständiges study_cases.json.
+    """
+    available = set(pid_test.values)
+    missing = [pid for label, pid in STUDY_CASE_IDS.items() if pid not in available]
+    if missing:
+        raise ValueError(
+            "Study case IDs missing from the current test split (data or "
+            f"pipeline may have changed since curation): {missing}. "
+            "Re-curate STUDY_CASE_IDS or investigate before re-exporting."
+        )
+    return list(STUDY_CASE_IDS.values())
 
 # ---------------------------------------------------------------------------
 # Klinischer Kontext: echte Felder aus MSK CHORD, die das Modell selbst nicht
@@ -342,7 +339,47 @@ SIMILAR_FIELDS = [
 N_SIMILAR = 3
 
 
-def build_similar_cases(all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat):
+def _age_similarity_score(target_age, neighbor_age):
+    if target_age is None or neighbor_age is None:
+        return 0.0
+    try:
+        target_value = float(target_age)
+        neighbor_value = float(neighbor_age)
+    except (TypeError, ValueError):
+        return 0.0
+
+    diff = abs(target_value - neighbor_value)
+    if diff <= 2:
+        return 1.0
+    if diff <= 5:
+        return 0.75
+    if diff <= 10:
+        return 0.5
+    return 0.0
+
+
+def _is_counterfactual(target_row, candidate_row):
+    decision_fields = ["STAGE_HIGHEST_RECORDED", "HR", "HER2", "LYMPH_NODES", "LIVER", "BONE", "LUNG"]
+    target_age = target_row.get("CURRENT_AGE_DEID")
+    candidate_age = candidate_row.get("CURRENT_AGE_DEID")
+    if target_age is not None and candidate_age is not None:
+        try:
+            diff = abs(float(target_age) - float(candidate_age))
+        except (TypeError, ValueError):
+            diff = 0
+        if diff >= 8:
+            return True
+
+    for field in decision_fields:
+        if str(target_row.get(field)) == "nan" or str(candidate_row.get(field)) == "nan":
+            continue
+        if str(target_row.get(field)) != str(candidate_row.get(field)):
+            return True
+
+    return False
+
+
+def build_similar_cases(all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat, top3_by_pid=None):
     rf = pipe.named_steps["rf"]
     pre = pipe.named_steps["pre"]
     leaves_train = rf.apply(pre.transform(X_train))
@@ -360,28 +397,87 @@ def build_similar_cases(all_ids, pipe, X_train, y_train, pid_train, X_test, pid_
             return None
         return float(v) if isinstance(v, (int, float, np.number)) else str(v)
 
+    def is_supportive_outcome(candidate):
+        status = str(candidate.get("os_status", "")).upper()
+        months = candidate.get("os_months")
+        if status.startswith("1:") or status.startswith("DECEASED") or "DECEASED" in status:
+            return False if months is None else months >= 24
+        if months is not None:
+            return months >= 12
+        return True
+
     out = {}
     for pid in all_ids:
         pos = int(np.where(pid_test.values == pid)[0][0])
         prox = (leaves_train == leaves_test[pos]).mean(axis=1)
         target = row_of(pid)
+        target_age = value(target["CURRENT_AGE_DEID"])
+        top3 = set(top3_by_pid.get(pid, [])) if top3_by_pid else set()
 
-        neighbors = []
-        for rank, i in enumerate(np.argsort(-prox)[:N_SIMILAR], start=1):
+        ranked_candidates = []
+        for i in np.argsort(-prox):
             npid = pid_train.iloc[i]
+            if npid == pid:
+                continue
             r = row_of(npid)
-            os_months = pat_idx.loc[npid, "OS_MONTHS"]
-            neighbors.append({
-                "rank": rank,
+            neighbor_age = value(r["CURRENT_AGE_DEID"])
+            age_score = _age_similarity_score(target_age, neighbor_age)
+            rf_similarity = float(prox[i])
+            combined_score = (rf_similarity * 0.85) + (age_score * 0.15)
+
+            matched_fields = []
+            for field in SIMILAR_FIELDS:
+                if field == "CURRENT_AGE_DEID":
+                    if age_score >= 0.75:
+                        matched_fields.append(field)
+                elif str(r[field]) == str(target[field]):
+                    matched_fields.append(field)
+
+            candidate_regime = str(y_train.iloc[i])
+            is_treatment_counterfactual = bool(top3 and candidate_regime not in top3)
+            is_clinical_counterfactual = _is_counterfactual(target, r)
+            is_counterfactual = is_treatment_counterfactual or (not top3 and is_clinical_counterfactual)
+
+            ranked_candidates.append({
                 "patient_id": npid,
-                "match_percent": round(float(prox[i]) * 100),
-                "regime": str(y_train.iloc[i]),
+                "match_percent": round(combined_score * 100),
                 "features": {f: value(r[f]) for f in SIMILAR_FIELDS},
-                "matched_fields": [f for f in SIMILAR_FIELDS if str(r[f]) == str(target[f])],
-                "os_months": round(float(os_months), 1) if pd.notna(os_months) else None,
+                "matched_fields": matched_fields,
+                "is_counterfactual": is_counterfactual,
+                "regime": candidate_regime,
+                "os_months": round(float(pat_idx.loc[npid, "OS_MONTHS"]), 1) if pd.notna(pat_idx.loc[npid, "OS_MONTHS"]) else None,
                 "os_status": str(pat_idx.loc[npid, "OS_STATUS"]),
             })
-        out[pid] = neighbors
+
+        ranked_candidates.sort(key=lambda item: (item["is_counterfactual"], -item["match_percent"]))
+
+        viable_supporting = [c for c in ranked_candidates if not c["is_counterfactual"] and is_supportive_outcome(c)]
+        supporting = viable_supporting[:2]
+        if len(supporting) < 2:
+            supporting = [c for c in ranked_candidates if not c["is_counterfactual"]][:2]
+
+        if not supporting:
+            supporting = ranked_candidates[:2]
+
+        counterfactual = next((c for c in ranked_candidates if c["is_counterfactual"] and c["regime"] not in top3), None)
+        if counterfactual is None:
+            counterfactual = next((c for c in ranked_candidates if c["is_counterfactual"]), None)
+
+        if counterfactual is None and top3:
+            counterfactual = next((c for c in ranked_candidates if c["regime"] not in top3), None)
+
+        if counterfactual is None and ranked_candidates:
+            counterfactual = ranked_candidates[min(len(ranked_candidates) - 1, 2)]
+
+        selected = supporting + ([counterfactual] if counterfactual not in supporting and counterfactual is not None else [])
+        if len(selected) < N_SIMILAR:
+            for candidate in ranked_candidates:
+                if candidate not in selected:
+                    selected.append(candidate)
+                if len(selected) >= N_SIMILAR:
+                    break
+
+        out[pid] = selected[:N_SIMILAR]
     return out
 
 
@@ -483,8 +579,15 @@ def main():
 
     # echte klinische Felder aus MSK CHORD anhängen (siehe build_clinical_context)
     clinical = build_clinical_context(all_ids, labels, pat, samp)
+    top3_by_pid = {
+        pid: [regime for regime, _ in sorted(prob_map.items(), key=lambda kv: kv[1], reverse=True)[:3]]
+        for pid, prob_map in {
+            pid: {classes[i]: float(proba[pos, i]) for i in range(len(classes))}
+            for pos, pid in enumerate(pid_test.values)
+        }.items()
+    }
     similar = build_similar_cases(
-        all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat
+        all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat, top3_by_pid
     )
     for entry in predictions:
         entry["clinical"] = clinical.get(entry["patient_id"], {})
@@ -492,9 +595,15 @@ def main():
 
     with open(OUT_DIR + "predictions.json", "w", encoding="utf-8") as f:
         json.dump(predictions, f, indent=2, ensure_ascii=False)
+
+    project_root = Path(__file__).resolve().parent.parent
+    frontend_cases_path = project_root / "frontend" / "public" / "study_cases.json"
+    with open(frontend_cases_path, "w", encoding="utf-8") as f:
+        json.dump(predictions, f, indent=2, ensure_ascii=False)
+
     with open(OUT_DIR + "validation_truth.json", "w", encoding="utf-8") as f:
         json.dump(truth, f, indent=2, ensure_ascii=False)
-    print(f"exported {len(predictions)} curated cases -> {OUT_DIR}predictions.json")
+    print(f"exported {len(predictions)} curated cases -> {OUT_DIR}predictions.json and {frontend_cases_path}")
 
 
 if __name__ == "__main__":

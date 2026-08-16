@@ -49,7 +49,6 @@ export function Sidebar() {
   } = useWorkflow();
 
   const patient = selectedPatient;
-  const footerPatient = selectedPatient ?? mockPatient;
   const [showConfirm, setShowConfirm] = useState(false);
   const [isCaseMenuOpen, setIsCaseMenuOpen] = useState(false);
   const [pendingPatientId, setPendingPatientId] = useState<string | null>(null);
@@ -153,9 +152,7 @@ export function Sidebar() {
           {patient && (
             <>
               <span className="sidebar-patient-mrn">MRN {patient.mrn}</span>
-              <span className="sidebar-patient-diagnosis">
-                {patient.diagnosis.primaryDiagnosis} {'\u00b7'} Stage {patient.diagnosis.stage}
-              </span>
+            
             </>
           )}
         </div>
@@ -181,10 +178,6 @@ export function Sidebar() {
       />
 
       <div className="sidebar-footer">
-        <div className="sidebar-clinician">
-          <span>{footerPatient.session.clinician}</span>
-          <span>{footerPatient.session.date}</span>
-        </div>
         <p className="sidebar-research-note">
           Research prototype exploring how explanations influence clinical decision-making.
         </p>

@@ -56,6 +56,7 @@ export function getAssessmentTreatmentLabel(id: string): string {
   return option ? `${option.label} [${option.category}]` : id;
 }
 
+//MOCKPATIENTTTTTTTTT
 export const mockPatient: Patient = {
   name: 'Max Mustermann',
   mrn: '4821-7734',
@@ -184,35 +185,36 @@ export const mockPatient: Patient = {
     version: 'OncoCDSS v2.0',
   },
 };
+//MOCKKKPATIENT
 
 const patientProfileOverrides: Record<string, Partial<Patient>> = {
-  'P-0001568': {
+  'P-0039112': {
     name: 'Anna Seeler',
-    mrn: mrnFromId('P-0001568'),
+    mrn: mrnFromId('P-0039112'),
     age: 63,
     gender: 'Female',
     diagnosis: { primaryDiagnosis: 'Metastatic Breast Cancer', stage: 'IIA', histology: 'Ductal carcinoma', location: 'Right breast', icd10: 'C50.911', diagnosisDate: '2024-01-22' },
     performance: { ecog: 1, ecogDescription: 'Restricted activity, in bed <50% of day', lastAssessed: '2025-03-08' },
   },
-  'P-0000081': {
+  'P-0011019': {
     name: 'Bianca Stefen',
-    mrn: mrnFromId('P-0000081'),
+    mrn: mrnFromId('P-0011019'),
     age: 58,
     gender: 'Female',
     diagnosis: { primaryDiagnosis: 'Hormone-Receptor Positive Breast Cancer', stage: 'IIB', histology: 'Lobular carcinoma', location: 'Left breast', icd10: 'C50.812', diagnosisDate: '2023-11-10' },
     performance: { ecog: 0, ecogDescription: 'Fully active', lastAssessed: '2025-04-01' },
   },
-  'P-0002566': {
+  'P-0050258': {
     name: 'Clara Campista',
-    mrn: mrnFromId('P-0002566'),
+    mrn: mrnFromId('P-0050258'),
     age: 71,
     gender: 'Female',
     diagnosis: { primaryDiagnosis: 'Advanced Lung Adenocarcinoma', stage: 'IIIB', histology: 'Adenocarcinoma', location: 'Left upper lobe', icd10: 'C34.12', diagnosisDate: '2024-03-18' },
     performance: { ecog: 2, ecogDescription: 'Ambulatory and capable of self-care, but unable to work', lastAssessed: '2025-05-05' },
   },
-  'P-0001862': {
+  'P-0068618': {
     name: 'Diana Ernst',
-    mrn: mrnFromId('P-0001862'),
+    mrn: mrnFromId('P-0068618'),
     age: 67,
     gender: 'Female',
     diagnosis: { primaryDiagnosis: 'Oligometastatic NSCLC', stage: 'IVA', histology: 'Adenocarcinoma', location: 'Right lower lobe', icd10: 'C34.31', diagnosisDate: '2024-06-09' },
@@ -528,73 +530,6 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
   }),
 };
 
-export const mockTreatmentOptions: TreatmentOption[] = [
-  {
-    id: 'osimertinib',
-    name: 'EGFR TKI Monotherapy (Osimertinib)',
-    benefits: ['High efficacy for EGFR+ mutation', 'Outpatient therapy', 'Preserves QoL', 'CNS penetration'],
-    risks: ['Rash (40–50%)', 'Diarrhea (~30%)', 'Nail changes', 'QT prolongation (monitor EKG)'],
-    contraindications: ['Known hypersensitivity to osimertinib'],
-    comorbidityConsiderations: [
-      'Safe with controlled hypertension',
-      'No significant metabolic interaction with diabetes medications',
-      'Anxiety-compatible — no psychiatric adverse effects',
-      'Standard dosing acceptable at eGFR 64',
-    ],
-    qolImpact: 'Generally favorable — outpatient, manageable side effects, preserves daily function',
-    monitoring: 'EKG baseline and periodic; LFTs monthly; imaging at 8–12 weeks',
-    strength: 'NCCN Preferred',
-    evidenceStrength: 'strong',
-    uncertainty: 'low',
-    missingData: ['Long-term resistance mutation monitoring plan'],
-    sources: [
-      { title: 'FLAURA', url: 'https://pubmed.ncbi.nlm.nih.gov/36841857' },
-      { title: 'NCCN NSCLC Guidelines', url: 'https://pubmed.ncbi.nlm.nih.gov/35882123' },
-    ],
-  },
-  {
-    id: 'chemoradiation',
-    name: 'Concurrent Chemoradiation + Durvalumab',
-    benefits: ['Aggressive local control', 'Established for Stage III NSCLC', 'Potential for durable response'],
-    risks: ['Esophagitis (15–30%)', 'Pneumonitis (5–10%)', 'Myelosuppression', 'Significant fatigue'],
-    contraindications: ['Cisplatin at eGFR <60', 'Uncontrolled intercurrent illness'],
-    comorbidityConsiderations: [
-      'Durvalumab may worsen hypertension',
-      'Carboplatin required (not cisplatin) at eGFR 64',
-      'Hyperglycemia risk from corticosteroids with diabetes',
-      'High myelotoxicity risk with baseline anemia',
-      'Intensive schedule may exacerbate anxiety',
-    ],
-    qolImpact: 'Substantial short-term toxicity; potential long-term pulmonary fibrosis',
-    monitoring: 'Weekly labs during RT; PFTs baseline and post-RT; BP monitoring',
-    strength: 'NCCN Alternative',
-    evidenceStrength: 'moderate',
-    uncertainty: 'moderate',
-    missingData: ['LVEF assessment', 'Pulmonary function baseline'],
-    sources: [{ title: 'PACIFIC Trial', url: 'https://pubmed.ncbi.nlm.nih.gov/28102484' }],
-  },
-  {
-    id: 'neoadjuvant',
-    name: 'Neoadjuvant Chemotherapy + Surgery',
-    benefits: ['Potential curative intent', 'Tumor downstaging possible', 'Definitive local control if resectable'],
-    risks: ['Peripheral neuropathy', 'Infection risk', 'Delayed wound healing', 'Extended recovery'],
-    contraindications: ['Cisplatin contraindicated', 'Medically inoperable status TBD'],
-    comorbidityConsiderations: [
-      'Carboplatin less effective than cisplatin — efficacy concern',
-      'Diabetes increases surgical wound healing risk',
-      'Low hemoglobin raises perioperative risk',
-      'Major surgery may trigger anxiety decompensation',
-      'ECOG 1 borderline for aggressive multimodal approach',
-    ],
-    qolImpact: 'Major — extended timeline, recovery period, permanent changes from surgery',
-    monitoring: 'PFTs, cardiac clearance pre-op; weekly labs during chemo; post-op surveillance imaging',
-    strength: 'NCCN Alternative',
-    evidenceStrength: 'moderate',
-    uncertainty: 'high',
-    missingData: ['Surgical candidacy assessment', 'Cardiac clearance', 'Detailed pulmonary function'],
-    sources: [{ title: 'NCCN NSCLC Guidelines', url: 'https://pubmed.ncbi.nlm.nih.gov/35882123' }],
-  },
-];
 
 export const mockSimilarCases: SimilarCase[] = [
   {
@@ -651,74 +586,6 @@ export const mockSimilarCases: SimilarCase[] = [
   },
 ];
 
-export const mockWhatWouldChange: DecisionChangeFactor[] = [
-  {
-    category: 'Performance Status',
-    factor: 'Worsening ECOG to 2+',
-    description: 'Declining functional status would shift toward less intensive therapy',
-    trigger: 'Reassess treatment intensity; consider supportive care or single-agent TKI only',
-  },
-  {
-    category: 'Comorbidity',
-    factor: 'Uncontrolled blood pressure',
-    description: 'BP >160/100 despite medication would contraindicate immunotherapy components',
-    trigger: 'Avoid durvalumab; reconsider TKI monotherapy or RT alone',
-  },
-  {
-    category: 'Molecular',
-    factor: 'Different mutation status (e.g., ALK+)',
-    description: 'Would completely change targeted therapy selection',
-    trigger: 'Switch to appropriate TKI (e.g., alectinib for ALK+)',
-  },
-  {
-    category: 'Patient Preference',
-    factor: 'Patient prioritizes quality of life over aggressiveness',
-    description: 'Shift from curative-intent multimodal to symptom-focused approach',
-    trigger: 'Consider TKI monotherapy or palliative RT; avoid surgery',
-  },
-  {
-    category: 'Missing Data',
-    factor: 'LVEF <50% on cardiac workup',
-    description: 'Would contraindicate anthracycline-containing or cardiotoxic regimens',
-    trigger: 'Exclude chemoradiation with certain agents; favor TKI',
-  },
-  {
-    category: 'Disease Status',
-    factor: 'Disease progression on imaging',
-    description: 'New distant metastases would upstage and change treatment intent',
-    trigger: 'Re-stage; consider systemic therapy escalation or clinical trial',
-  },
-  {
-    category: 'Toxicity',
-    factor: 'Grade 3+ TKI adverse events',
-    description: 'Poor tolerance would necessitate treatment switch',
-    trigger: 'Dose reduction, switch to alternative TKI, or consider chemotherapy',
-  },
-];
 
-export const mockDecisionFactors: DecisionFactor[] = [
-  { category: 'Molecular Profile', description: 'EGFR Exon 19 deletion strongly supports TKI approach', impact: '+++' },
-  { category: 'Renal Function', description: 'eGFR 64 limits platinum chemotherapy — favors TKI', impact: '++' },
-  { category: 'Performance & QoL', description: 'ECOG 1 with outpatient preference aligns with TKI', impact: '++' },
-  { category: 'Anxiety History', description: 'Less intensive outpatient therapy better tolerated psychologically', impact: '+' },
-  { category: 'Lab Markers', description: 'Anemia and elevated LDH caution against myelotoxic regimens', impact: '+' },
-  { category: 'Patient Preferences', description: 'Values effectiveness with manageable side effects — TKI fits', impact: '++' },
-  { category: 'Guidelines', description: 'NCCN preferred approach for EGFR+ NSCLC with strong RCT evidence', impact: '+++' },
-  { category: 'Incomplete Workup', description: 'Missing surgical and cardiac assessments limit multimodal options', impact: '+' },
-];
 
-export const EXPLANATION_PROMPTS = [
-  { id: 'why', label: 'Why?', question: 'Why does the evidence support this direction?' },
-  { id: 'why-not', label: 'Why not?', question: 'What argues against the leading option?' },
-  { id: 'uncertainty', label: 'What increases uncertainty?', question: 'What factors make this decision less certain?' },
-  { id: 'contradicts', label: 'What contradicts?', question: 'What evidence contradicts the current assessment?' },
-  { id: 'change', label: 'What would change the outcome?', question: 'What would need to change for a different decision?' },
-] as const;
 
-export const REFLECTIVE_CHAT_PROMPTS = [
-  'Why do you trust this prediction?',
-  'What evidence contradicts your conclusion?',
-  'Would your decision change under greater uncertainty?',
-  'Which patient factor matters most to your final choice?',
-  'What would you tell the patient about remaining uncertainty?',
-];

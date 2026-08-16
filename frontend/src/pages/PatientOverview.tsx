@@ -77,9 +77,6 @@ export function PatientOverview() {
               MRN: {view.mrn} · {view.age} yrs · {view.gender}
             </p>
           </div>
-          <span className={`priority-badge priority-${view.priority.toLowerCase()}`}>
-            {view.priority} PRIORITY
-          </span>
         </div>
       </div>
 
