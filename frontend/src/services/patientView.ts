@@ -34,6 +34,7 @@
 import type { StudyCase } from '../types';
 import { STUDY_NAMES, mrnFromId } from '../config/studyCases';
 import { STAGE_AT_DECISION } from '../data/stageAtDecision';
+import { MISSING_DATA_LABELS } from '../data/missingDataCatalog';
 
 export interface Biomarker {
   label: string;
@@ -234,7 +235,6 @@ export function buildPatientView(c: StudyCase): PatientView {
 
 
   const ageForLogic = Number.isFinite(ageNum) ? ageNum : 55;
-  const nodePos = yesNo(f.LYMPH_NODES);
   const h = hashInt(c.patient_id);
 
   // HER2-enriched setzt HR-negativ voraus; HR+/HER2+ ist luminal B.
@@ -403,25 +403,13 @@ export function buildPatientView(c: StudyCase): PatientView {
   // ===================================================================
   // Ende des erfundenen Teils.
   //
-  // ABGELEITET — die Missing-Data-Liste beschreibt echte Lücken des
-  // Datensatzes: LVEF, Menopausenstatus, Knochendichte und BRCA sind in
-  // MSK CHORD tatsächlich nicht enthalten. Welcher Punkt erscheint, hängt
-  // am Rezeptorstatus und am Nodalbefund der Patientin, also an echten
-  // Merkmalen. Step 3 führt eine eigene Liste (EvidenceReview.tsx) — die
-  // beiden laufen auseinander, das ist noch offen.
+  // ECHTE LÜCKEN — LVEF, Menopausenstatus, Knochendichte und BRCA sind in
+  // MSK CHORD tatsächlich nicht enthalten. Die Liste kommt aus
+  // data/missingDataCatalog.ts, derselben Quelle wie der Reiter "Missing Data"
+  // in Step 3. Vorher filterte diese Stelle nach Rezeptorstatus und
+  // Nodalbefund, wodurch die Übersicht zwei und Step 3 vier Punkte zeigte.
   // ===================================================================
-  const missingData: string[] = [];
-
-  if (her2 || isMetastatic || nodePos) {
-    missingData.push('Baseline LVEF / echocardiogram not yet documented');
-  }
-  if (hr) {
-    missingData.push('Menopausal status not formally confirmed');
-    missingData.push('Baseline bone density (DEXA) not assessed');
-  }
-  if (!hr && !her2) {
-    missingData.push('Germline BRCA1/2 testing not yet performed');
-  }
+  const missingData = MISSING_DATA_LABELS;
 
   return {
     patientId: c.patient_id,

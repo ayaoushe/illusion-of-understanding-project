@@ -13,6 +13,7 @@ import {
   isPatientContextSource,
   isRegistrySource,
 } from '../data/sourceRegistry';
+import { MISSING_DATA_ITEMS } from '../data/missingDataCatalog';
 import type { PublishedCohort } from '../types';
 import type { SourceRegistryEntry } from '../data/sourceRegistry';
 
@@ -26,44 +27,9 @@ const uncertaintyExplanations: Record<string, string> = {
   high: 'Evidence is weakly matched or important patient-specific information is missing; recommendation should be interpreted cautiously.',
 };
 
-/**
- * Der Reiter "Missing Data" in Step 3.
- *
- * ACHTUNG — diese Liste ist fest verdrahtet und fuer alle vier Patientinnen
- * identisch. Sie wird NICHT aus `evidence.missingData` gespeist, obwohl das
- * Feld existiert und gefuellt ist. Step 1 (patientView.ts) baut seine eigene,
- * fallabhaengige Liste; die beiden zeigen derselben Patientin daher
- * unterschiedliche Luecken an. Bekannt und noch nicht aufgeloest.
- *
- * Wer den Text hier aendert, aendert ihn fuer alle Faelle und alle zehn
- * Therapieoptionen gleichzeitig.
- */
-const missingDataDetails = [
-  {
-    item: 'Baseline LVEF / echocardiogram not yet obtained',
-    whyMatters: 'Required before starting anthracycline or HER2-targeted (trastuzumab/pertuzumab) regimens',
-    impact: 'Limits confidence in cardiotoxic treatment options',
-    urgency: 'high' as const,
-  },
-  {
-    item: 'Menopausal status not formally confirmed',
-    whyMatters: 'Determines whether an aromatase inhibitor or ovarian suppression is appropriate',
-    impact: 'Affects choice between endocrine therapy options',
-    urgency: 'high' as const,
-  },
-  {
-    item: 'Baseline bone density (DEXA) not assessed',
-    whyMatters: 'Aromatase inhibitors and ovarian suppression accelerate bone loss',
-    impact: 'Affects monitoring and bone-protective therapy planning',
-    urgency: 'medium' as const,
-  },
-  {
-    item: 'Germline BRCA1/2 testing not yet performed',
-    whyMatters: 'Can affect chemotherapy sensitivity and future risk-reduction counseling',
-    impact: 'Uncertainty in long-term treatment and surveillance planning',
-    urgency: 'medium' as const,
-  },
-];
+// Gemeinsame Quelle mit Step 1 (data/missingDataCatalog.ts), damit die
+// Patientenuebersicht und dieser Reiter dieselben Punkte zeigen.
+const missingDataDetails = MISSING_DATA_ITEMS;
 
 
 //Renders evidence for the selected cases and assessed treatment
