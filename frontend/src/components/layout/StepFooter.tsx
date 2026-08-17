@@ -1,3 +1,5 @@
+//Footer for page navigation 
+
 import { useEffect, useCallback } from 'react';
 import { useWorkflow } from '../../context/WorkflowContext';
 import { WORKFLOW_STEPS } from '../../data/mockData';

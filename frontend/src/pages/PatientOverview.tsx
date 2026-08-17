@@ -9,6 +9,8 @@ import { ClinicalInfoCard } from '../components/cards/ClinicalInfoCard';
 import { PreferenceCard } from '../components/cards/PreferenceCard';
 import { CompactMissingDataCard } from '../components/cards/CompactMissingDataCard';
 
+
+//Step 1: Patient Clinical summary 
 const LAB_STATUS_CLASS: Record<string, string> = {
   LOW: 'status-low',
   ELEVATED: 'status-elevated',

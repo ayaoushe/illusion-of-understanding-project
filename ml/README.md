@@ -47,11 +47,11 @@ This writes to `data/derived/`:
 | `predictions.json`        | 12 curated cases, top-3 options each, with SHAP per option |
 | `validation_truth.json`   | `patient_id -> true label` (validation only; not shipped to UI) |
 
-To refresh the UI, copy the predictions into the frontend's static folder:
+The same 4-case payload is **also** written directly to `frontend/public/study_cases.json`
+in the same run — no manual copy step needed. If you point a differently-configured
+frontend at a different path, copy `data/derived/predictions.json` there yourself; the
+two files are otherwise identical.
 
-```bash
-cp data/derived/predictions.json frontend/public/predictions.json
-```
 
 ## What the pipeline does
 
@@ -70,9 +70,18 @@ cp data/derived/predictions.json frontend/public/predictions.json
    `RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=42)`.
 4. **Explanations** — TreeSHAP on the test set; one-hot SHAP values are aggregated back to the
    18 original features (summed per feature).
-5. **Curated export** — 4 cases for four situations (confident-correct, uncertain,
-   misclassified, counter-intuitive HER2→AC). For each case the **top-3 regimes** by probability
-   are exported, each with its own SHAP attribution toward that regime.
+5. **Curated export** — a **fixed set of 4 cases (A–D)**, one per situation, pinned by patient
+   ID in `STUDY_CASE_IDS` so `frontend/src/config/studyCases.ts` (names, MRNs, study labels)
+   can refer to them without shifting on a retrain:
+   - **A** — confident & correct
+   - **B** — uncertain, hormone-therapy-leaning prediction
+   - **C** — looks confident but is misclassified
+   - **D** — HER2-positive with a counter-intuitive chemo prediction
 
+   For each case the **top-3 regimes** by probability are exported, each with its own SHAP
+   attribution toward that regime. `select_cases` raises if any of the 4 pinned IDs falls out
+   of the test split (e.g. after a data update) rather than silently exporting an incomplete
+   `study_cases.json`.
+   
 Everything is seeded with `random_state=42`, so a fresh run reproduces the shipped
 `frontend/public/predictions.json` exactly (given the same data and library versions).

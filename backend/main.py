@@ -12,17 +12,16 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-
-
 app = FastAPI(title="OncoAI API", version="2.0.0")
 
+#These Folders hold the patient data and ML prediction/similar cases results
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ML_CASES_PATHS = [
     PROJECT_ROOT / "frontend" / "public" / "study_cases.json",
     PROJECT_ROOT / "data" / "derived" / "predictions.json",
 ]
 
-
+#Load all patient cases from file
 def _load_ml_cases() -> list[dict[str, Any]]:
     for path in ML_CASES_PATHS:
         if not path.exists():
@@ -39,7 +38,7 @@ def _load_ml_cases() -> list[dict[str, Any]]:
 
 ML_CASE_CACHE: list[dict[str, Any]] | None = None
 
-
+#Cache patient cases
 def _get_ml_case(patient: Any) -> dict[str, Any] | None:
     global ML_CASE_CACHE
     if ML_CASE_CACHE is None:
@@ -57,7 +56,7 @@ def _get_ml_case(patient: Any) -> dict[str, Any] | None:
 
     return None
 
-
+#Convert probability score to percentage
 def _probability_percent(value: Any) -> int:
     if value is None:
         return 0
@@ -67,7 +66,7 @@ def _probability_percent(value: Any) -> int:
         return int(round(float(value)))
     return 0
 
-
+#Transform the treatment recommendations for patients for UI 
 def _build_recommendations_from_ml_case(case: dict[str, Any]) -> list[dict[str, Any]]:
     options = case.get("options") or []
     recommendations: list[dict[str, Any]] = []

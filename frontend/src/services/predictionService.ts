@@ -16,6 +16,7 @@ export interface TreatmentPrediction {
 
 const API_URL = "http://localhost:8010";
 
+//Fetch Treatment Recommendations from backend
 export async function fetchTreatmentRecommendations(
   patient: StudyCase
 ): Promise<TreatmentPrediction> {

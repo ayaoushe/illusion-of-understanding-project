@@ -214,6 +214,7 @@ export function buildPatientView(c: StudyCase): PatientView {
   const dobMonth = String(((h >> 5) % 12) + 1).padStart(2, '0');
   const dobDay = String(((h >> 3) % 27) + 1).padStart(2, '0');
 
+  // Mockdaten die nicht im eigentlichen Datenset vorkommen
   const anemic = ageForLogic >= 70 || isMetastatic;
   const renalReduced = ageForLogic >= 70;
   const labs: LabValue[] = [
@@ -222,7 +223,8 @@ export function buildPatientView(c: StudyCase): PatientView {
     { label: 'LDH', value: isMetastatic ? '312' : '198', unit: 'U/L', status: isMetastatic ? 'ELEVATED' : 'NORMAL', normal: '140–280' },
     { label: 'eGFR', value: renalReduced ? '74' : '92', unit: 'mL/min', status: renalReduced ? 'LOW' : 'NORMAL', normal: '>90' },
   ];
-
+  //
+  
   const comorbidities: PatientView['comorbidities'] = [];
   if (isSmoker) {
     comorbidities.push({
@@ -260,6 +262,7 @@ export function buildPatientView(c: StudyCase): PatientView {
     });
   }
 
+  // Mockdaten die nicht im eigentlichen Datenset vorkommen
   const medications: PatientView['medications'] = [];
   if (ageForLogic >= 55) {
     medications.push({ name: 'Ramipril', dose: '5 mg', frequency: 'Daily', relevance: 'Blood pressure control' });
@@ -276,6 +279,7 @@ export function buildPatientView(c: StudyCase): PatientView {
   });
 }
   medications.push({ name: 'Pantoprazole', dose: '20 mg', frequency: 'Daily', relevance: 'Gastric protection' });
+  //
 
   const contraindications: PatientView['contraindications'] = [];
   if (her2) {
@@ -321,6 +325,8 @@ export function buildPatientView(c: StudyCase): PatientView {
   });
 }
 
+  // Mockdaten die nicht im eigentlichen Datenset vorkommen
+
   const qolConcerns: string[] = ['Maintaining daily functioning'];
   qolConcerns.push(ageForLogic >= 60 ? 'Preserving independence and physical functioning' : 'Continuing to work during treatment');
   if (her2 || !hr) qolConcerns.push('Concern about hair loss and neuropathy from chemotherapy');
@@ -337,7 +343,7 @@ export function buildPatientView(c: StudyCase): PatientView {
       : 'Flexible; accepts inpatient care if needed',
     familyInvolvement: ageForLogic >= 60 ? 'Adult children involved in decisions' : 'Partner involved in decisions',
   };
-
+//
   const missingData: string[] = [];
 
  

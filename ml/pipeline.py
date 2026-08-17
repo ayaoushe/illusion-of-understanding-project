@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 import json
@@ -193,6 +194,7 @@ def _clean(v):
     return v.strip() if isinstance(v, str) else v
 
 
+# Builds the patient clinical block that goes into study_cases.json
 def build_clinical_context(all_ids, labels, pat, samp) -> dict[str, dict]:
     ids = set(all_ids)
     t0_by_pid = labels.set_index("PATIENT_ID")["first_line_start_date"].to_dict()
@@ -338,7 +340,7 @@ SIMILAR_FIELDS = [
 ]
 N_SIMILAR = 3
 
-
+#Alter hebt den match score an
 def _age_similarity_score(target_age, neighbor_age):
     if target_age is None or neighbor_age is None:
         return 0.0
@@ -358,6 +360,7 @@ def _age_similarity_score(target_age, neighbor_age):
     return 0.0
 
 
+# Counterfactual ist true, wenn ein ähnlicher Nachbar sich in einem wichtigen decision field unterscheided
 def _is_counterfactual(target_row, candidate_row):
     decision_fields = ["STAGE_HIGHEST_RECORDED", "HR", "HER2", "LYMPH_NODES", "LIVER", "BONE", "LUNG"]
     target_age = target_row.get("CURRENT_AGE_DEID")
@@ -379,6 +382,7 @@ def _is_counterfactual(target_row, candidate_row):
     return False
 
 
+# Für alle Patienten werden die top similar RF Nachbarn gefunden und nach counterfactual geflagged
 def build_similar_cases(all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat, top3_by_pid=None):
     rf = pipe.named_steps["rf"]
     pre = pipe.named_steps["pre"]
@@ -481,7 +485,7 @@ def build_similar_cases(all_ids, pipe, X_train, y_train, pid_train, X_test, pid_
     return out
 
 
-# Baut für diese 12 Fälle die Ausgabestruktur mit den Top-3-Regimen,
+# Baut für diese Fälle die Ausgabestruktur mit den Top-3-Regimen,
 # deren Wahrscheinlichkeiten und je 18 nach Einfluss sortierten Feature-Erklärungen in Textform.
 def build_predictions(all_ids, pid_test, proba, classes, raw, X_test, X_test_imp, get_sv, y_test):
     feat_cols = list(X_test_imp.columns)

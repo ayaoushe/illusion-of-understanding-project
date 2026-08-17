@@ -1,4 +1,9 @@
-// Helper for the Workflow and saving current data
+// React context that owns all cross-step workflow state: which case is selected,
+// which step is active/locked, the human assessment, the fetched AI evidence, the
+// final reflection, and interaction telemetry. Individual step components
+// (PatientOverview, HumanAssessment, EvidenceReview, ...) read/write this via
+// `useWorkflow()` instead of managing their own state or prop-drilling.
+
 
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 import type {
@@ -39,7 +44,7 @@ interface WorkflowContextValue {
 
 const WorkflowContext = createContext<WorkflowContextValue | null>(null);
 
-//Locked Pages (Not immediatly accessible)
+// Steps that require a completed human assessment before they can be opened
 const GATED_STEPS: WorkflowStepId[] = ['evidence', 'treatment', 'similar', 'reflection'];
 
 

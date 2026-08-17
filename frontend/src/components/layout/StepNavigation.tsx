@@ -1,3 +1,5 @@
+// Renders the sidebar's step list and locks/unlocks steps based on workflow progress.
+
 import type { WorkflowStep, WorkflowStepId } from '../../types';
 
 interface StepNavigationProps {

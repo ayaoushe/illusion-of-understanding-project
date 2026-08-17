@@ -1,4 +1,5 @@
 /*
+Step 4: Treatment Comparisons of top 3 model generated treatments for the patient
 ML-Model Predictions for the Case Studies
 - Case Studies A,B,C,D
 - Predicition represents the prediction with the highest confidence percentage
@@ -6,10 +7,6 @@ ML-Model Predictions for the Case Studies
 - Options delivers the top 3 recommendations and the features that contributed to the prediction including their weight
 
 */
-
-
-
-
 
 import { PageHeader } from "../components/layout/PageHeader";
 import { StepFooter } from "../components/layout/StepFooter";

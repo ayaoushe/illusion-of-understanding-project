@@ -16,6 +16,8 @@ import {
 import type { PublishedCohort } from '../types';
 import type { SourceRegistryEntry } from '../data/sourceRegistry';
 
+//Step 3: Clinicans unlocks Evidence for and against their assessment
+
 type EvidenceTabId = 'evidence' | 'missing' | 'risks' | 'published' | 'sources';
 
 const uncertaintyExplanations: Record<string, string> = {
@@ -51,6 +53,8 @@ const missingDataDetails = [
   },
 ];
 
+
+//Renders evidence for the selected cases and assessed treatment
 export function EvidenceReview() {
   const { assessment, evidence, evidenceLoading } = useWorkflow();
   const [activeTab, setActiveTab] = useState<EvidenceTabId>('evidence');
@@ -76,6 +80,7 @@ export function EvidenceReview() {
     );
   }
 
+  //Tracks which tabs have been opened at leat once to unlock continue button
   const handleTabChange = (tabId: string) => {
     const nextTab = tabId as EvidenceTabId;
     setActiveTab(nextTab);
@@ -110,6 +115,7 @@ export function EvidenceReview() {
     [referencedSourceIds],
   );
 
+  //Flag evidence with missing or caution badge
   const getBadge = (text: string) => {
     if (/missing|caution/i.test(text)) {
       return 'Caution';
