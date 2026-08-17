@@ -26,21 +26,27 @@ const uncertaintyExplanations: Record<string, string> = {
 
 const missingDataDetails = [
   {
-    item: 'Surgical candidacy assessment pending thoracic surgery consultation',
-    whyMatters: 'Determines if neoadjuvant or surgical approach is viable',
-    impact: 'May open curative-intent surgical options',
+    item: 'Baseline LVEF / echocardiogram not yet obtained',
+    whyMatters: 'Required before starting anthracycline or HER2-targeted (trastuzumab/pertuzumab) regimens',
+    impact: 'Limits confidence in cardiotoxic treatment options',
     urgency: 'high' as const,
   },
   {
-    item: 'Cardiac ejection fraction not yet obtained',
-    whyMatters: 'Required for cardiotoxic chemotherapy regimens',
-    impact: 'Limits chemoradiation options',
+    item: 'Menopausal status not formally confirmed',
+    whyMatters: 'Determines whether an aromatase inhibitor or ovarian suppression is appropriate',
+    impact: 'Affects choice between endocrine therapy options',
     urgency: 'high' as const,
   },
   {
-    item: 'Detailed toxicity history from prior treatments (none documented)',
-    whyMatters: 'Baseline tolerance profile for treatment planning',
-    impact: 'Uncertainty in tolerability assessment',
+    item: 'Baseline bone density (DEXA) not assessed',
+    whyMatters: 'Aromatase inhibitors and ovarian suppression accelerate bone loss',
+    impact: 'Affects monitoring and bone-protective therapy planning',
+    urgency: 'medium' as const,
+  },
+  {
+    item: 'Germline BRCA1/2 testing not yet performed',
+    whyMatters: 'Can affect chemotherapy sensitivity and future risk-reduction counseling',
+    impact: 'Uncertainty in long-term treatment and surveillance planning',
     urgency: 'medium' as const,
   },
 ];

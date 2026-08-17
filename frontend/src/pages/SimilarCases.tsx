@@ -37,6 +37,15 @@ export function SimilarCases() {
     <div className="page">
       <PageHeader title="Similar Cases" badge="Step 5" />
 
+      <div className="card" style={{ marginBottom: '0.9rem', padding: '0.8rem 1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+          <span className="label">Clinical context</span>
+        </div>
+        <p style={{ fontSize: '0.85rem', margin: 0 }}>
+          Compare this patient with prior cases that match on key clinical features. Matching cases reflect treatments the model recommends; counterfactual cases show alternative regimens for context only.
+        </p>
+      </div>
+
       <div className="similar-cases-grid">
         {cases.map((c) => {
           const isExpanded = expandedCase === c.caseId;

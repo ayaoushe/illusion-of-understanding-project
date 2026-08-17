@@ -238,13 +238,20 @@ export function buildPatientView(c: StudyCase): PatientView {
       implications: 'Monitor blood pressure during systemic therapy.',
     });
   }
-  if (ageForLogic >= 68) {
+  if (ageForLogic >= 60) {
     comorbidities.push({
       name: 'Type 2 diabetes mellitus',
       status: 'Controlled',
       implications: 'Monitor glucose, especially under corticosteroid premedication.',
     });
   }
+  if (ageForLogic >= 45 && ageForLogic < 60) {
+  comorbidities.push({
+    name: 'Dyslipidemia',
+    status: 'Controlled',
+    implications: 'Consider cardiovascular risk during long-term systemic treatment.',
+  });
+}
   if (comorbidities.length === 0) {
     comorbidities.push({
       name: 'No relevant comorbidities',
@@ -254,12 +261,20 @@ export function buildPatientView(c: StudyCase): PatientView {
   }
 
   const medications: PatientView['medications'] = [];
-  if (ageForLogic >= 60) {
+  if (ageForLogic >= 55) {
     medications.push({ name: 'Ramipril', dose: '5 mg', frequency: 'Daily', relevance: 'Blood pressure control' });
   }
-  if (ageForLogic >= 68) {
+  if (ageForLogic >= 60) {
     medications.push({ name: 'Metformin', dose: '500 mg', frequency: 'Twice daily', relevance: 'Monitor renal function with nephrotoxic agents' });
   }
+  if (ageForLogic >= 45 && ageForLogic < 60) {
+  medications.push({
+    name: 'Atorvastatin',
+    dose: '20 mg',
+    frequency: 'Daily',
+    relevance: 'Lipid management',
+  });
+}
   medications.push({ name: 'Pantoprazole', dose: '20 mg', frequency: 'Daily', relevance: 'Gastric protection' });
 
   const contraindications: PatientView['contraindications'] = [];
@@ -270,6 +285,13 @@ export function buildPatientView(c: StudyCase): PatientView {
       detail: 'LVEF monitoring required before and during HER2-targeted therapy.',
     });
   }
+  if (isSmoker) {
+  contraindications.push({
+    factor: 'Pulmonary risk',
+    severity: 'low',
+    detail: 'Smoking history may increase pulmonary complications and should be considered during treatment planning.',
+  });
+}
   if (isMetastatic) {
     contraindications.push({
       factor: 'Curative-intent local therapy',
@@ -291,11 +313,18 @@ export function buildPatientView(c: StudyCase): PatientView {
       detail: 'Reduced eGFR — dose adjustment for renally cleared drugs may apply.',
     });
   }
+  if (contraindications.length === 0) {
+  contraindications.push({
+    factor: 'No major contraindications identified',
+    severity: 'low',
+    detail: 'No major treatment-limiting contraindication documented.',
+  });
+}
 
   const qolConcerns: string[] = ['Maintaining daily functioning'];
-  qolConcerns.push(ageForLogic >= 65 ? 'Preserving independence at home' : 'Continuing to work during treatment');
+  qolConcerns.push(ageForLogic >= 60 ? 'Preserving independence and physical functioning' : 'Continuing to work during treatment');
   if (her2 || !hr) qolConcerns.push('Concern about hair loss and neuropathy from chemotherapy');
-  if (hr) qolConcerns.push('Menopausal symptoms from endocrine therapy');
+  if (hr) qolConcerns.push('Managing menopausal symptoms from endocrine therapy');
   if (isMetastatic) qolConcerns.push('Managing fatigue and overall symptom burden');
   if (isSmoker) qolConcerns.push('Support to stop smoking');
 
@@ -303,19 +332,25 @@ export function buildPatientView(c: StudyCase): PatientView {
     priorityQoL: isMetastatic
       ? 'Prioritizes quality of life and symptom control'
       : 'Willing to tolerate side effects for curative benefit',
-    hospitalPreference: ageForLogic >= 70 || isMetastatic
+    hospitalPreference: ageForLogic >= 60 || isMetastatic
       ? 'Prefers outpatient / minimal hospital stays'
       : 'Flexible; accepts inpatient care if needed',
-    familyInvolvement: ageForLogic >= 65 ? 'Adult children involved in decisions' : 'Partner involved in decisions',
+    familyInvolvement: ageForLogic >= 60 ? 'Adult children involved in decisions' : 'Partner involved in decisions',
   };
 
   const missingData: string[] = [];
-  if (her2) missingData.push('LVEF (baseline cardiac function) not yet documented');
-  missingData.push('Ki-67 proliferation index pending');
-  if (hr && !isMetastatic) missingData.push('Genomic recurrence score (Oncotype/MammaPrint) outstanding');
-  if (isMetastatic) missingData.push('Biopsy re-confirmation of receptor status at metastatic site pending');
-  if (nodePos) missingData.push('Axillary staging (sentinel vs. dissection) to be finalized');
-  if (isSmoker) missingData.push('Pulmonary function assessment pending');
+
+ 
+  if (her2 || isMetastatic || nodePos) {
+    missingData.push('Baseline LVEF / echocardiogram not yet documented');
+  }
+  if (hr) {
+    missingData.push('Menopausal status not formally confirmed');
+    missingData.push('Baseline bone density (DEXA) not assessed');
+  }
+  if (!hr && !her2) {
+    missingData.push('Germline BRCA1/2 testing not yet performed');
+  }
 
   return {
     patientId: c.patient_id,

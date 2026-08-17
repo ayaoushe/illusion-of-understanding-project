@@ -20,7 +20,18 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
   { id: 'reflection', label: 'Final Reflection', shortLabel: 'Reflection', number: 6 },
 ];
 
-export const TREATMENT_OPTION_IDS = ['osimertinib', 'chemoradiation', 'neoadjuvant'] as const;
+export const TREATMENT_OPTION_IDS = [
+  'ANASTROZOLE',
+  'LETROZOLE',
+  'LETROZOLE + PALBOCICLIB',
+  'TAMOXIFEN',
+  'LEUPROLIDE',
+  'CAPECITABINE',
+  'PACLITAXEL',
+  'CYCLOPHOSPHAMIDE + DOXORUBICIN',
+  'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE',
+  'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB',
+] as const;
 
 /**
  * Treatment options for the assessment dropdowns.
@@ -246,39 +257,46 @@ export function getPatientProfile(patientId: string | null | undefined): Patient
 
 export const mockRiskFlags = [
   {
-    id: 'renal',
-    title: 'Renal Function Concern',
+    id: 'cardiac',
+    title: 'Cardiotoxicity Risk',
     severity: 'moderate' as const,
-    description: 'eGFR 64 limits platinum-based chemotherapy; dose adjustments required',
-    relatedTreatments: ['chemoradiation', 'neoadjuvant'],
+    description: 'Anthracyclines (doxorubicin) and HER2-targeted agents (trastuzumab/pertuzumab) carry a risk of LVEF decline; baseline and on-treatment cardiac monitoring is required.',
+    relatedTreatments: ['CYCLOPHOSPHAMIDE + DOXORUBICIN', 'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB'],
   },
   {
-    id: 'hypertension',
-    title: 'Hypertension Risk',
+    id: 'myelosuppression',
+    title: 'Myelosuppression / Neutropenia Risk',
     severity: 'moderate' as const,
-    description: 'Durvalumab and some chemo agents may worsen blood pressure control',
-    relatedTreatments: ['chemoradiation'],
+    description: 'Combination chemotherapy regimens carry meaningful neutropenia risk; growth-factor support and dose delays may be needed.',
+    relatedTreatments: ['CYCLOPHOSPHAMIDE + DOXORUBICIN', 'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE', 'PACLITAXEL', 'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB'],
   },
   {
-    id: 'anemia',
-    title: 'Baseline Anemia',
+    id: 'bone-health',
+    title: 'Bone Density / Fracture Risk',
+    severity: 'low' as const,
+    description: 'Aromatase inhibitors and ovarian suppression accelerate bone loss; baseline DEXA and calcium/vitamin D or bisphosphonate planning should be considered.',
+    relatedTreatments: ['ANASTROZOLE', 'LETROZOLE', 'LETROZOLE + PALBOCICLIB', 'LEUPROLIDE'],
+  },
+  {
+    id: 'thromboembolic',
+    title: 'Thromboembolic / Endometrial Risk',
     severity: 'moderate' as const,
-    description: 'Hgb 11.8 g/dL increases myelosuppression risk with intensive regimens',
-    relatedTreatments: ['chemoradiation', 'neoadjuvant'],
+    description: 'Tamoxifen is associated with increased risk of venous thromboembolism and endometrial changes; gynecologic monitoring is advised.',
+    relatedTreatments: ['TAMOXIFEN'],
+  },
+  {
+    id: 'hepatic-renal',
+    title: 'Hepatic / Renal Function Concern',
+    severity: 'moderate' as const,
+    description: 'Capecitabine and combination chemotherapy require adequate hepatic and renal clearance; dose adjustments may be needed if function is impaired.',
+    relatedTreatments: ['CAPECITABINE', 'CYCLOPHOSPHAMIDE + DOXORUBICIN'],
   },
   {
     id: 'neuropathy',
-    title: 'Neuropathy / QoL Risk',
+    title: 'Peripheral Neuropathy Risk',
     severity: 'low' as const,
-    description: 'Patient explicitly concerned about peripheral neuropathy from platinum agents',
-    relatedTreatments: ['neoadjuvant', 'chemoradiation'],
-  },
-  {
-    id: 'frailty',
-    title: 'ECOG & Frailty Consideration',
-    severity: 'low' as const,
-    description: 'ECOG 1 is favorable but age 66 with comorbidities warrants cautious escalation',
-    relatedTreatments: ['neoadjuvant'],
+    description: 'Taxane-based regimens (paclitaxel) carry a dose-dependent risk of peripheral neuropathy, which can affect quality of life and treatment adherence.',
+    relatedTreatments: ['PACLITAXEL', 'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB'],
   },
 ];
 
@@ -287,47 +305,48 @@ export const mockAiEvidence: AiEvidenceSynthesis = {
   disclaimer:
     'Evidence-based synthesis of guidelines and literature. This is decision support — not a final recommendation. All outputs require clinician verification.',
   uncertaintyLevel: 'moderate',
-  uncertaintySummary: 'Strong molecular evidence supports TKI therapy, but surgical candidacy and cardiac function remain undetermined.',
+  uncertaintySummary: 'Hormone-receptor and HER2 status strongly inform the endocrine vs. chemotherapy decision, but baseline cardiac and bone-health workup remain incomplete.',
   uncertaintyDescription:
-    'Strong molecular evidence supports TKI therapy, but surgical candidacy and cardiac function remain undetermined. Patient similarity to published cohorts is moderate.',
+    'Molecular subtype (HR/HER2 status) and stage support the recommended regimen, but missing baseline cardiac and bone-health data limit full confidence. Patient similarity to published cohorts is moderate.',
 
   evidenceFor: [
-    { text: 'EGFR Exon 19 deletion is a strong TKI-sensitizing mutation supported by first-line osimertinib trial data.', source: 'FLAURA_OSIMERTINIB_NEJM' },
-    { text: 'First-line osimertinib improved progression-free survival versus gefitinib or erlotinib in EGFR-mutated advanced NSCLC.', source: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM' },
-    { text: 'Outpatient TKI aligns with patient preference for minimal hospitalization', source: 'Patient context' },
-    { text: 'Oral targeted therapy avoids nephrotoxic platinum agents given mild renal impairment', source: 'Clinical data' },
-    { text: 'Lower myelotoxicity vs chemotherapy given baseline anemia', source: 'Lab values' },
+    { text: 'Hormone-receptor-positive, node-positive early breast cancer is a well-established indication for anthracycline-based adjuvant chemotherapy.', source: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET' },
+    { text: 'HR status and stage align with the treatment pathway supported by large adjuvant meta-analyses.', source: 'EBCTCG_POLYCHEMO_REGIMENS_LANCET' },
+    { text: 'Regimen aligns with the assessment\'s selected treatment pathway for this case.', source: 'Patient context' },
   ],
 
   evidenceAgainst: [
-    { text: 'Stage IIIB may benefit from concurrent chemoradiation with consolidation immunotherapy in unresectable disease', source: 'PACIFIC_DURVALUMAB_PMC' },
-    { text: 'Surgical candidacy not yet assessed — multimodal approach may be viable', source: 'Missing data' },
-    { text: 'LVEF unknown — limits assessment of cardiotoxic regimens', source: 'Missing data' },
+    { text: 'Baseline cardiac function (LVEF) has not yet been documented — relevant for anthracycline or HER2-targeted therapy.', source: 'Missing data' },
+    { text: 'Menopausal status and bone density have not been confirmed, which affects endocrine therapy selection and monitoring.', source: 'Missing data' },
   ],
 
-  missingData: mockPatient.missingData,
+  missingData: [
+    'Baseline LVEF / echocardiogram not yet documented',
+    'Menopausal status not formally confirmed',
+    'Baseline bone density (DEXA) not assessed',
+    'Germline BRCA1/2 testing not yet performed',
+  ],
 
   riskFlags: mockRiskFlags,
   publishedCohorts: [
     {
-      cohortName: 'FLAURA: Osimertinib overall survival in EGFR+ advanced NSCLC',
-      population: 'Untreated EGFR-mutated advanced NSCLC receiving first-line osimertinib',
+      cohortName: 'EBCTCG: Anthracycline- and taxane-containing chemotherapy in early breast cancer',
+      population: 'Patients with early-stage operable breast cancer across 86 randomised trials of anthracycline/taxane regimens',
       similarityLevel: 'Moderate',
-      matchingFactors: ['EGFR mutation', 'First-line TKI setting', 'Outpatient preference'],
-      limitationFactors: ['Trial population metastatic/advanced, not locally advanced IIIB', 'Trial population younger than this case'],
-      implication: 'Supports targeted therapy with close monitoring.',
-      sourceLabel: 'FLAURA_OSIMERTINIB_NEJM',
+      matchingFactors: ['Early-stage disease', 'HR-positive biology', 'Node-positive disease'],
+      limitationFactors: ['Aggregate trial population, not individually matched', 'Cardiac and renal fitness not accounted for'],
+      implication: 'Supports chemotherapy backbone selection with close toxicity monitoring.',
+      sourceLabel: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET',
       sourceUrl: '',
     },
   ],
 
   keyReasoningFactors: [
-    { factor: 'EGFR mutation status', weight: 'high', direction: 'supports' },
-    { factor: 'Renal function (eGFR 64)', weight: 'high', direction: 'cautions' },
-    { factor: 'Patient QoL preferences', weight: 'medium', direction: 'supports' },
-    { factor: 'Baseline anemia', weight: 'medium', direction: 'cautions' },
-    { factor: 'Anxiety history', weight: 'medium', direction: 'supports' },
-    { factor: 'Incomplete cardiac workup', weight: 'medium', direction: 'cautions' },
+    { factor: 'Hormone-receptor (HR) status', weight: 'high', direction: 'supports' },
+    { factor: 'HER2 status', weight: 'high', direction: 'supports' },
+    { factor: 'Stage / nodal involvement', weight: 'high', direction: 'supports' },
+    { factor: 'Baseline cardiac workup', weight: 'medium', direction: 'cautions' },
+    { factor: 'Bone health / menopausal status', weight: 'medium', direction: 'cautions' },
   ],
 
   sources: [],
@@ -339,6 +358,7 @@ function createTreatmentEvidenceProfile(params: {
   uncertaintyDescription: string;
   evidenceFor: Array<{ text: string; source: string }>;
   evidenceAgainst: Array<{ text: string; source: string }>;
+  missingData: string[];
   riskFlags: RiskFlag[];
   publishedCohorts: PublishedCohort[];
   sources: Array<{ title: string; year: number; type: string; url: string }>;
@@ -352,7 +372,7 @@ function createTreatmentEvidenceProfile(params: {
     uncertaintyDescription: params.uncertaintyDescription,
     evidenceFor: params.evidenceFor,
     evidenceAgainst: params.evidenceAgainst,
-    missingData: mockPatient.missingData,
+    missingData: params.missingData,
     riskFlags: params.riskFlags,
     publishedCohorts: params.publishedCohorts,
     sources: params.sources,
@@ -360,176 +380,350 @@ function createTreatmentEvidenceProfile(params: {
   };
 }
 
+const commonMissingData = [
+  'Baseline LVEF / echocardiogram not yet documented',
+  'Menopausal status not formally confirmed',
+  'Baseline bone density (DEXA) not assessed',
+  'Germline BRCA1/2 testing not yet performed',
+];
+
+/**
+ * Evidence synthesis per treatment regime.
+ *
+ * Die Keys entsprechen exakt den Regime-Strings des ML-Modells (siehe `classes` in
+ * model_meta.json und `assessmentTreatmentOptions` oben) — nicht generischen Wirkstoff-IDs.
+ */
 export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
-  osimertinib: createTreatmentEvidenceProfile({
+  ANASTROZOLE: createTreatmentEvidenceProfile({
     uncertaintyLevel: 'moderate',
-    uncertaintySummary: 'Strong targeted-therapy evidence remains the best fit for this patient, but missing cardiac and surgical data keep confidence moderate.',
-    uncertaintyDescription: 'The EGFR-targeted pathway is well supported, yet unresolved surgical candidacy and cardiac workup still affect certainty.',
+    uncertaintySummary: 'Anastrozole is well supported for postmenopausal, HR-positive early breast cancer, but menopausal status and bone health are unconfirmed.',
+    uncertaintyDescription: 'The ATAC trial provides strong long-term evidence for anastrozole over tamoxifen in postmenopausal HR-positive disease, but confirmation of menopausal status and baseline bone density would improve confidence.',
     evidenceFor: [
-      { text: 'EGFR Exon 19 deletion aligns with first-line osimertinib evidence in EGFR-mutated advanced NSCLC.', source: 'FLAURA_OSIMERTINIB_NEJM' },
-      { text: 'First-line osimertinib demonstrated improved progression-free survival versus gefitinib or erlotinib.', source: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM' },
-      { text: 'Osimertinib offers outpatient delivery that suits the patient\'s preference for minimal hospitalization.', source: 'Patient context' },
-      { text: 'Oral targeted therapy is preferred given mild renal impairment and baseline diabetes.', source: 'Clinical data' },
+      { text: 'HR-positive status supports adjuvant aromatase inhibitor therapy over observation alone.', source: 'ATAC_ANASTROZOLE_LANCET_ONCOL' },
+      { text: 'Anastrozole showed superior long-term efficacy and a more favorable safety profile than tamoxifen in postmenopausal HR-positive early breast cancer.', source: 'ATAC_ANASTROZOLE_LANCET_ONCOL' },
+      { text: 'Oral outpatient therapy aligns with a preference for minimal hospital visits.', source: 'Patient context' },
     ],
     evidenceAgainst: [
-      { text: 'Stage IIIB disease may still justify chemoradiation with consolidation durvalumab in unresectable locally advanced disease.', source: 'PACIFIC_DURVALUMAB_PMC' },
-      { text: 'Missing cardiac evaluation limits confidence in any highly intensive regimen.', source: 'Missing data' },
-      { text: 'Surgical candidacy not yet assessed — multimodal approach may remain viable.', source: 'Missing data' },
+      { text: 'Menopausal status has not been formally confirmed — required to appropriately select an aromatase inhibitor.', source: 'Missing data' },
+      { text: 'Baseline bone density is unknown.', source: 'Missing data' },
+      { text: 'Aromatase inhibitors accelerate bone loss and increase fracture risk, which guidelines recommend assessing before treatment.', source: 'ASCO_BONE_HEALTH_JCO' },
     ],
-    riskFlags: [mockRiskFlags[0], mockRiskFlags[2], mockRiskFlags[3]],
+    missingData: commonMissingData,
+    riskFlags: [mockRiskFlags[2]],
     publishedCohorts: [
-      { cohortName: 'FLAURA: Osimertinib overall survival in EGFR+ advanced NSCLC', population: 'Untreated EGFR-mutated advanced NSCLC, first-line osimertinib', similarityLevel: 'Moderate', matchingFactors: ['EGFR mutation', 'First-line TKI setting', 'Outpatient preference'], limitationFactors: ['Trial population metastatic/advanced, not locally advanced IIIB', 'Limited surgical data'], implication: 'Strong support for targeted therapy with close monitoring.', sourceLabel: 'FLAURA_OSIMERTINIB_NEJM', sourceUrl: '' },
-      { cohortName: 'FLAURA: Osimertinib vs gefitinib/erlotinib', population: 'First-line EGFR-mutated advanced NSCLC randomized to osimertinib or first-generation TKI', similarityLevel: 'Moderate', matchingFactors: ['EGFR mutation', 'First-line targeted therapy'], limitationFactors: ['Advanced/metastatic trial population', 'Not stage IIIB-specific'], implication: 'Supports osimertinib over older EGFR TKIs when available.', sourceLabel: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM', sourceUrl: '' },
+      { cohortName: 'ATAC: Anastrozole vs tamoxifen in postmenopausal early breast cancer', population: 'Postmenopausal women with HR-positive early-stage breast cancer', similarityLevel: 'Moderate', matchingFactors: ['HR-positive disease', 'Early-stage', 'Adjuvant endocrine setting'], limitationFactors: ['Requires confirmed postmenopausal status', 'Long follow-up trial population may differ demographically'], implication: 'Strong support for anastrozole if postmenopausal status is confirmed.', sourceLabel: 'ATAC_ANASTROZOLE_LANCET_ONCOL', sourceUrl: '' },
     ],
     sources: [],
     reasoningFactors: [
-      { factor: 'EGFR mutation status', weight: 'high', direction: 'supports' },
-      { factor: 'Renal function', weight: 'medium', direction: 'supports' },
-      { factor: 'Cardiac workup', weight: 'medium', direction: 'cautions' },
+      { factor: 'HR-positive status', weight: 'high', direction: 'supports' },
+      { factor: 'Menopausal status unconfirmed', weight: 'medium', direction: 'cautions' },
+      { factor: 'Bone health', weight: 'low', direction: 'cautions' },
     ],
   }),
-  erlotinib: createTreatmentEvidenceProfile({
+
+  LETROZOLE: createTreatmentEvidenceProfile({
     uncertaintyLevel: 'moderate',
-    uncertaintySummary: 'Erlotinib remains a reasonable EGFR-directed option, although it is less favored than osimertinib for this case.',
-    uncertaintyDescription: 'The evidence is clinically reasonable, but lower efficacy versus osimertinib makes the choice less compelling than newer agents.',
+    uncertaintySummary: 'Letrozole is a well-evidenced first-line aromatase inhibitor for HR-positive disease, with efficacy comparable to or better than tamoxifen.',
+    uncertaintyDescription: 'BIG 1-98 supports letrozole as at least as effective as tamoxifen in postmenopausal HR-positive breast cancer, though menopausal confirmation and bone-health baseline remain outstanding.',
     evidenceFor: [
-      { text: 'Erlotinib improved progression-free survival versus chemotherapy as first-line treatment in EGFR mutation-positive advanced NSCLC.', source: 'EURTAC_ERLOTINIB_LANCET' },
-      { text: 'It may be acceptable when oral therapy and tolerability are prioritized.', source: 'Patient context' },
-      { text: 'The outpatient regimen aligns with quality-of-life goals and reduced hospital exposure.', source: 'Patient context' },
+      { text: 'Letrozole demonstrated improved disease-free survival compared with tamoxifen in postmenopausal HR-positive early breast cancer.', source: 'BIG198_LETROZOLE_NEJM' },
+      { text: 'HR-positive status supports an aromatase-inhibitor-based approach.', source: 'Patient context' },
     ],
     evidenceAgainst: [
-      { text: 'First-line osimertinib demonstrated superior progression-free survival versus gefitinib or erlotinib in EGFR-mutated NSCLC.', source: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM' },
-      { text: 'Without complete cardiac workup, escalation to intensive disease-directed regimens remains uncertain.', source: 'Missing data' },
+      { text: 'Menopausal status has not been formally confirmed.', source: 'Missing data' },
+      { text: 'Baseline bone density is unknown.', source: 'Missing data' },
     ],
-    riskFlags: [mockRiskFlags[0], mockRiskFlags[2]],
+    missingData: commonMissingData,
+    riskFlags: [mockRiskFlags[2]],
     publishedCohorts: [
-      { cohortName: 'EURTAC: Erlotinib in EGFR+ advanced NSCLC', population: 'European patients with EGFR mutation-positive advanced NSCLC, first-line erlotinib', similarityLevel: 'Moderate', matchingFactors: ['EGFR mutation', 'Oral therapy preference', 'First-line TKI setting'], limitationFactors: ['Older generation TKI', 'Advanced/metastatic trial population'], implication: 'Reasonable fallback if newer agents are not available or tolerated.', sourceLabel: 'EURTAC_ERLOTINIB_LANCET', sourceUrl: '' },
-      { cohortName: 'FLAURA comparator: osimertinib vs first-generation TKI', population: 'First-line EGFR-mutated advanced NSCLC randomized to osimertinib or gefitinib/erlotinib', similarityLevel: 'Partial', matchingFactors: ['EGFR mutation', 'First-line targeted strategy'], limitationFactors: ['Shows superiority of osimertinib over erlotinib', 'Not locally advanced IIIB-specific'], implication: 'Cautions against erlotinib when osimertinib is available.', sourceLabel: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM', sourceUrl: '' },
+      { cohortName: 'BIG 1-98: Letrozole vs tamoxifen as initial adjuvant therapy', population: 'Postmenopausal women with endocrine-responsive early breast cancer', similarityLevel: 'Moderate', matchingFactors: ['HR-positive disease', 'Early-stage', 'Adjuvant endocrine setting'], limitationFactors: ['Requires confirmed postmenopausal status'], implication: 'Supports letrozole as an effective first-line endocrine option.', sourceLabel: 'BIG198_LETROZOLE_NEJM', sourceUrl: '' },
     ],
     sources: [],
     reasoningFactors: [
-      { factor: 'First-line EGFR targeting', weight: 'high', direction: 'supports' },
-      { factor: 'Treatment convenience', weight: 'medium', direction: 'supports' },
-      { factor: 'Relative efficacy gap', weight: 'medium', direction: 'cautions' },
+      { factor: 'HR-positive status', weight: 'high', direction: 'supports' },
+      { factor: 'Menopausal status unconfirmed', weight: 'medium', direction: 'cautions' },
     ],
   }),
-  gefitinib: createTreatmentEvidenceProfile({
+
+  'LETROZOLE + PALBOCICLIB': createTreatmentEvidenceProfile({
     uncertaintyLevel: 'moderate',
-    uncertaintySummary: 'Gefitinib is a plausible EGFR-directed alternative, but it is less favored than newer genotypically optimized agents.',
-    uncertaintyDescription: 'This option has targeted-therapy rationale, though the evidence base is less contemporary than osimertinib.',
+    uncertaintySummary: 'Adding palbociclib to letrozole meaningfully extends progression-free survival in HR-positive/HER2-negative disease, but this benefit is best established in the advanced/metastatic setting.',
+    uncertaintyDescription: 'PALOMA-2 strongly supports this combination for HR-positive, HER2-negative advanced disease; applicability to earlier-stage disease and hematologic monitoring needs remain considerations.',
     evidenceFor: [
-      { text: 'Gefitinib improved outcomes versus chemotherapy in EGFR mutation-positive pulmonary adenocarcinoma.', source: 'IPASS_GEFITINIB_NEJM' },
-      { text: 'Gefitinib demonstrated benefit over chemotherapy in EGFR-mutated NSCLC in a dedicated randomized trial.', source: 'GEFITINIB_EGFR_MUTATION_NEJM' },
-      { text: 'Oral administration supports a lower-burden treatment experience.', source: 'Patient context' },
+      { text: 'Palbociclib plus letrozole significantly prolonged progression-free survival compared with letrozole alone in HR-positive, HER2-negative advanced breast cancer.', source: 'PALOMA2_LETROZOLE_PALBOCICLIB_NEJM' },
+      { text: 'HR-positive, HER2-negative status matches the population shown to benefit from CDK4/6 inhibitor combination therapy.', source: 'Patient context' },
     ],
     evidenceAgainst: [
-      { text: 'First-line osimertinib demonstrated superior progression-free survival versus gefitinib in EGFR-mutated advanced NSCLC.', source: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM' },
-      { text: 'Therapy selection should be revisited if symptoms or disease burden worsen.', source: 'Missing data' },
+      { text: 'The trial supporting this combination enrolled patients with advanced/metastatic disease, so applicability to earlier-stage disease is less direct.', source: 'PALOMA2_LETROZOLE_PALBOCICLIB_NEJM' },
+      { text: 'Neutropenia was the most common toxicity with palbociclib and requires regular blood count monitoring.', source: 'PALOMA2_LETROZOLE_PALBOCICLIB_NEJM' },
     ],
-    riskFlags: [mockRiskFlags[0], mockRiskFlags[3]],
+    missingData: commonMissingData,
+    riskFlags: [mockRiskFlags[1], mockRiskFlags[2]],
     publishedCohorts: [
-      { cohortName: 'IPASS: Gefitinib in EGFR-selected pulmonary adenocarcinoma', population: 'Patients with EGFR mutation-positive pulmonary adenocarcinoma', similarityLevel: 'Partial', matchingFactors: ['EGFR mutation', 'Oral targeted therapy'], limitationFactors: ['Older evidence base', 'Not stage IIIB-specific'], implication: 'May be suitable if a less intensive treatment pathway is preferred.', sourceLabel: 'IPASS_GEFITINIB_NEJM', sourceUrl: '' },
+      { cohortName: 'PALOMA-2: Palbociclib plus letrozole as first-line therapy', population: 'HR-positive, HER2-negative advanced breast cancer, no prior systemic therapy for advanced disease', similarityLevel: 'Moderate', matchingFactors: ['HR-positive', 'HER2-negative', 'Endocrine-based combination'], limitationFactors: ['Advanced/metastatic trial population', 'Higher hematologic toxicity than endocrine monotherapy'], implication: 'Supports combination therapy when disease extent and monitoring capacity allow.', sourceLabel: 'PALOMA2_LETROZOLE_PALBOCICLIB_NEJM', sourceUrl: '' },
     ],
     sources: [],
     reasoningFactors: [
-      { factor: 'Targeted therapy rationale', weight: 'medium', direction: 'supports' },
-      { factor: 'Need for newer-generation option', weight: 'medium', direction: 'cautions' },
+      { factor: 'HR-positive / HER2-negative status', weight: 'high', direction: 'supports' },
+      { factor: 'Hematologic monitoring burden', weight: 'medium', direction: 'cautions' },
     ],
   }),
-  afatinib: createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'moderate',
-    uncertaintySummary: 'Afatinib remains a viable EGFR-directed option, but toxicity and resistance concerns make it more uncertain than newer agents.',
-    uncertaintyDescription: 'This path has meaningful targeted-therapy support but should be weighed against side-effect burden and treatment convenience.',
-    evidenceFor: [
-      { text: 'Afatinib is an established irreversible EGFR inhibitor for EGFR mutation-positive NSCLC, including del19 mutations.', source: 'AFATINIB_LUX_LUNG_REVIEW_PMC' },
-      { text: 'LUX-Lung 7 evaluated afatinib versus gefitinib in EGFR mutation-positive NSCLC.', source: 'AFATINIB_LUX_LUNG_7_PMC' },
-      { text: 'It can be considered when a non-osimertinib EGFR TKI is preferred.', source: 'Patient context' },
-    ],
-    evidenceAgainst: [
-      { text: 'Higher toxicity burden may be less acceptable in a patient with QoL concerns and baseline anemia.', source: 'Patient context' },
-      { text: 'First-line osimertinib demonstrated superior progression-free survival versus gefitinib, a relevant comparator for afatinib selection.', source: 'FLAURA_FIRSTLINE_OSIMERTINIB_NEJM' },
-    ],
-    riskFlags: [mockRiskFlags[2], mockRiskFlags[3]],
-    publishedCohorts: [
-      { cohortName: 'LUX-Lung review: Afatinib in EGFR+ NSCLC', population: 'EGFR-mutant NSCLC patients receiving afatinib across LUX-Lung trials', similarityLevel: 'Partial', matchingFactors: ['EGFR del19 mutation', 'Mutation-driven strategy'], limitationFactors: ['Higher toxicity burden', 'Less contemporary than osimertinib'], implication: 'Useful if a more conservative targeted approach is needed.', sourceLabel: 'AFATINIB_LUX_LUNG_REVIEW_PMC', sourceUrl: '' },
-    ],
-    sources: [],
-    reasoningFactors: [
-      { factor: 'Targeted strategy', weight: 'medium', direction: 'supports' },
-      { factor: 'Tolerability', weight: 'medium', direction: 'cautions' },
-    ],
-  }),
-  'carboplatin-pemetrexed': createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'high',
-    uncertaintySummary: 'Platinum-based chemotherapy remains a plausible option, but renal and anemia concerns make it less suitable than targeted therapy.',
-    uncertaintyDescription: 'The evidence base is broad, yet features of the patient profile create meaningful concern around tolerability and toxicity.',
-    evidenceFor: [
-      { text: 'Pemetrexed is an established agent for advanced nonsquamous NSCLC, often combined with platinum chemotherapy.', source: 'PEMETREXED_NSCLC_REVIEW_PMC' },
-      { text: 'Carboplatin plus pemetrexed is a standard protocol for locally advanced or metastatic nonsquamous NSCLC.', source: 'CARBOPLATIN_PEMETREXED_EVIQ' },
-    ],
-    evidenceAgainst: [
-      { text: 'Renal function and anemia increase the risk of toxicity and treatment delays.', source: 'Clinical data' },
-      { text: 'Patient preference for minimal hospitalization and outpatient care argues against a highly intensive regimen.', source: 'Patient context' },
-      { text: 'Incomplete cardiac workup limits confidence in an aggressive plan.', source: 'Missing data' },
-    ],
-    riskFlags: [mockRiskFlags[0], mockRiskFlags[2], mockRiskFlags[4]],
-    publishedCohorts: [
-      { cohortName: 'Pemetrexed in advanced nonsquamous NSCLC', population: 'Patients with advanced nonsquamous NSCLC receiving pemetrexed-based chemotherapy', similarityLevel: 'Moderate', matchingFactors: ['Nonsquamous histology', 'Systemic therapy context'], limitationFactors: ['Higher toxicity risk', 'Renal impairment in this patient'], implication: 'Reasonable if clinical fitness and treatment goals favor intensity.', sourceLabel: 'PEMETREXED_NSCLC_REVIEW_PMC', sourceUrl: '' },
-    ],
-    sources: [],
-    reasoningFactors: [
-      { factor: 'Disease burden', weight: 'medium', direction: 'supports' },
-      { factor: 'Renal function', weight: 'high', direction: 'cautions' },
-      { factor: 'QoL preference', weight: 'medium', direction: 'cautions' },
-    ],
-  }),
-  pembrolizumab: createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'high',
-    uncertaintySummary: 'Immunotherapy is plausible in selected PD-L1-positive disease, but the patient\'s case lacks confirming context and raises concern for toxicity.',
-    uncertaintyDescription: 'The evidence is variable and the patient\'s incomplete workup makes immune-based therapy a less certain fit.',
-    evidenceFor: [
-      { text: 'Pembrolizumab plus pemetrexed and platinum improved outcomes in metastatic nonsquamous NSCLC in KEYNOTE-189.', source: 'KEYNOTE_189_PEMBROLIZUMAB_PMC' },
-      { text: 'Five-year outcomes from KEYNOTE-189 support pembrolizumab combination therapy in metastatic nonsquamous NSCLC.', source: 'KEYNOTE_189_PDF' },
-    ],
-    evidenceAgainst: [
-      { text: 'This pathway may be less attractive if quality-of-life and tolerance are primary goals.', source: 'Patient context' },
-      { text: 'Incomplete cardiac workup and inflammatory markers limit confidence in benefit.', source: 'Missing data' },
-    ],
-    riskFlags: [mockRiskFlags[1], mockRiskFlags[2], mockRiskFlags[3]],
-    publishedCohorts: [
-      { cohortName: 'KEYNOTE-189: Pembrolizumab plus pemetrexed and platinum', population: 'Previously untreated metastatic nonsquamous NSCLC', similarityLevel: 'Partial', matchingFactors: ['Nonsquamous histology', 'Systemic therapy context'], limitationFactors: ['Metastatic trial population', 'EGFR+ patient not typical ICI-first population'], implication: 'Could be revisited if biomarker and tolerance data improve.', sourceLabel: 'KEYNOTE_189_PEMBROLIZUMAB_PMC', sourceUrl: '' },
-    ],
-    sources: [],
-    reasoningFactors: [
-      { factor: 'Immune-biology fit', weight: 'medium', direction: 'supports' },
-      { factor: 'Toxicity tolerance', weight: 'high', direction: 'cautions' },
-    ],
-  }),
-  palliative: createTreatmentEvidenceProfile({
+
+  TAMOXIFEN: createTreatmentEvidenceProfile({
     uncertaintyLevel: 'low',
-    uncertaintySummary: 'Best supportive care has clear rationale when symptom control and quality of life are the primary goals.',
-    uncertaintyDescription: 'The evidence is less disease-directed, but the patient preference and symptom burden make this a reasonable path when goals are comfort and function.',
+    uncertaintySummary: 'Tamoxifen has decades of patient-level meta-analytic support for HR-positive breast cancer regardless of menopausal status, making it a reliable option here.',
+    uncertaintyDescription: 'The evidence base for tamoxifen in HR-positive disease is exceptionally mature; the main open questions relate to thromboembolic and endometrial monitoring rather than efficacy.',
     evidenceFor: [
-      { text: 'Early palliative care improved quality of life and mood in metastatic NSCLC without compromising survival.', source: 'EARLY_PALLIATIVE_CARE_NSCLC_PDF' },
-      { text: 'ASCO guidelines support early integration of palliative care for patients with cancer.', source: 'ASCO_PALLIATIVE_CARE_JCO' },
-      { text: 'The patient\'s outpatient preference and QoL concerns support a less intensive approach.', source: 'Patient context' },
+      { text: 'Five years of adjuvant tamoxifen substantially reduces recurrence and mortality in HR-positive early breast cancer, regardless of menopausal status.', source: 'EBCTCG_TAMOXIFEN_LANCET' },
+      { text: 'Tamoxifen does not require confirmed menopausal status, which suits this case while that workup is pending.', source: 'Patient context' },
     ],
     evidenceAgainst: [
-      { text: 'If curative or disease-control intent is still desired, this approach may under-treat the cancer.', source: 'Clinical data' },
-      { text: 'Incomplete disease and workup data limit confidence in ruling out more active treatment.', source: 'Missing data' },
+      { text: 'Tamoxifen carries a higher risk of venous thromboembolism and endometrial changes than aromatase inhibitors, warranting gynecologic monitoring.', source: 'ATAC_ANASTROZOLE_LANCET_ONCOL' },
+      { text: 'Baseline bone density and cardiac workup are still pending.', source: 'Missing data' },
     ],
-    riskFlags: [mockRiskFlags[3], mockRiskFlags[4]],
+    missingData: commonMissingData,
+    riskFlags: [mockRiskFlags[3]],
     publishedCohorts: [
-      { cohortName: 'Early palliative care in metastatic NSCLC', population: 'Patients with newly diagnosed metastatic NSCLC receiving early palliative care', similarityLevel: 'Moderate', matchingFactors: ['QoL-centered goals', 'Symptom-focused management'], limitationFactors: ['Metastatic trial population', 'Less disease-directed benefit'], implication: 'Good fit when symptom relief is the dominant objective.', sourceLabel: 'EARLY_PALLIATIVE_CARE_NSCLC_PDF', sourceUrl: '' },
+      { cohortName: 'EBCTCG: Adjuvant tamoxifen patient-level meta-analysis', population: 'HR-positive early breast cancer across 20 randomised trials of about 5 years of tamoxifen', similarityLevel: 'High', matchingFactors: ['HR-positive disease', 'Early-stage', 'Adjuvant endocrine setting'], limitationFactors: ['Meta-analytic aggregate, not individually matched', 'Menopausal status not required but affects concurrent agent choice'], implication: 'Strong, broadly applicable support for tamoxifen in this HR-positive case.', sourceLabel: 'EBCTCG_TAMOXIFEN_LANCET', sourceUrl: '' },
     ],
     sources: [],
     reasoningFactors: [
-      { factor: 'QoL goals', weight: 'high', direction: 'supports' },
-      { factor: 'Disease-control intent', weight: 'medium', direction: 'cautions' },
+      { factor: 'HR-positive status', weight: 'high', direction: 'supports' },
+      { factor: 'Menopausal status not required for eligibility', weight: 'medium', direction: 'supports' },
+      { factor: 'Thromboembolic / endometrial risk', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+
+  LEUPROLIDE: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Ovarian suppression with leuprolide adds benefit mainly in premenopausal, higher-risk HR-positive disease, most clearly when paired with an aromatase inhibitor or tamoxifen.',
+    uncertaintyDescription: 'The SOFT trial supports ovarian suppression in premenopausal HR-positive breast cancer, particularly in younger patients or those who remain premenopausal after chemotherapy; confirmation of menopausal status and prior chemotherapy exposure would sharpen this recommendation.',
+    evidenceFor: [
+      { text: 'Adding ovarian function suppression to endocrine therapy reduced disease recurrence in premenopausal HR-positive early breast cancer.', source: 'SOFT_OVARIAN_SUPPRESSION_NEJM' },
+      { text: 'Absolute benefit was largest in younger women and those remaining premenopausal after chemotherapy.', source: 'SOFT_OVARIAN_SUPPRESSION_NEJM' },
+    ],
+    evidenceAgainst: [
+      { text: 'Menopausal status has not been formally confirmed, which affects whether ovarian suppression adds meaningful benefit.', source: 'Missing data' },
+      { text: 'Adding ovarian suppression was associated with a higher frequency of menopausal-type side effects than endocrine therapy alone.', source: 'SOFT_OVARIAN_SUPPRESSION_NEJM' },
+    ],
+    missingData: commonMissingData,
+    riskFlags: [mockRiskFlags[2]],
+    publishedCohorts: [
+      { cohortName: 'SOFT: Ovarian suppression added to endocrine therapy', population: 'Premenopausal women with HR-positive early breast cancer', similarityLevel: 'Moderate', matchingFactors: ['HR-positive disease', 'Early-stage', 'Candidate for ovarian suppression'], limitationFactors: ['Requires confirmed premenopausal status', 'Benefit varies by age and chemotherapy history'], implication: 'Reasonable if the patient is confirmed premenopausal and at meaningful recurrence risk.', sourceLabel: 'SOFT_OVARIAN_SUPPRESSION_NEJM', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'HR-positive status', weight: 'high', direction: 'supports' },
+      { factor: 'Menopausal status unconfirmed', weight: 'high', direction: 'cautions' },
+    ],
+  }),
+
+  CAPECITABINE: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Capecitabine has the clearest evidence base as an escalation strategy for HER2-negative disease with residual tumor after neoadjuvant chemotherapy.',
+    uncertaintyDescription: 'CREATE-X establishes a survival benefit for capecitabine specifically in HER2-negative patients with residual invasive disease after neoadjuvant chemotherapy; applicability outside that setting is less direct.',
+    evidenceFor: [
+      { text: 'Adjuvant capecitabine improved disease-free and overall survival in HER2-negative breast cancer with residual disease after neoadjuvant chemotherapy.', source: 'CREATEX_CAPECITABINE_NEJM' },
+      { text: 'Oral outpatient dosing suits a preference for minimal hospital visits.', source: 'Patient context' },
+    ],
+    evidenceAgainst: [
+      { text: 'The trial establishing this survival benefit specifically enrolled patients with residual disease after neoadjuvant chemotherapy, so applicability may be narrower outside that context.', source: 'CREATEX_CAPECITABINE_NEJM' },
+      { text: 'Hepatic and renal function have not been fully characterized, which affects capecitabine dosing.', source: 'Missing data' },
+    ],
+    missingData: commonMissingData,
+    riskFlags: [mockRiskFlags[4]],
+    publishedCohorts: [
+      { cohortName: 'CREATE-X: Adjuvant capecitabine after preoperative chemotherapy', population: 'HER2-negative breast cancer with residual invasive disease after neoadjuvant chemotherapy', similarityLevel: 'Partial', matchingFactors: ['HER2-negative disease', 'Chemotherapy-eligible'], limitationFactors: ['Trial specifically enrolled patients with residual disease post-neoadjuvant therapy'], implication: 'Most compelling if used as escalation after incomplete response to standard chemotherapy.', sourceLabel: 'CREATEX_CAPECITABINE_NEJM', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'HER2-negative status', weight: 'high', direction: 'supports' },
+      { factor: 'Hepatic/renal function unconfirmed', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+
+  PACLITAXEL: createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Taxane-based chemotherapy is well supported for early-stage breast cancer, with the main open questions relating to neuropathy risk and cardiac baseline.',
+    uncertaintyDescription: 'Large patient-level meta-analyses support taxane-containing regimens for reducing recurrence in early breast cancer; neuropathy risk and incomplete cardiac workup temper confidence.',
+    evidenceFor: [
+      { text: 'Taxane-containing chemotherapy regimens reduced recurrence compared with regimens omitting taxanes in early-stage operable breast cancer.', source: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET' },
+      { text: 'Disease stage and nodal status support systemic chemotherapy.', source: 'Clinical data' },
+    ],
+    evidenceAgainst: [
+      { text: 'Taxane-containing regimens carry a dose-dependent risk of peripheral neuropathy, which can affect quality of life and treatment adherence.', source: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET' },
+      { text: 'Baseline cardiac workup is incomplete.', source: 'Missing data' },
+    ],
+    missingData: commonMissingData,
+    riskFlags: [mockRiskFlags[1], mockRiskFlags[5]],
+    publishedCohorts: [
+      { cohortName: 'EBCTCG: Taxane-containing chemotherapy in early breast cancer', population: 'Patients with early-stage operable breast cancer across 86 randomised trials', similarityLevel: 'Moderate', matchingFactors: ['Early-stage disease', 'Chemotherapy-eligible'], limitationFactors: ['Aggregate trial population, not individually matched', 'Neuropathy risk not captured in efficacy endpoints'], implication: 'Supports taxane-based chemotherapy with neuropathy monitoring.', sourceLabel: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'Stage / nodal involvement', weight: 'high', direction: 'supports' },
+      { factor: 'Neuropathy risk', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+
+  'CYCLOPHOSPHAMIDE + DOXORUBICIN': createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Anthracycline-based combination chemotherapy has strong outcome data for node-positive early breast cancer, but cardiotoxicity risk requires a documented baseline LVEF.',
+    uncertaintyDescription: 'Patient-level meta-analyses consistently show anthracycline-based regimens reduce recurrence and mortality versus non-anthracycline or no chemotherapy; the main caution is unconfirmed cardiac baseline before starting doxorubicin.',
+    evidenceFor: [
+      { text: 'Anthracycline-based chemotherapy substantially reduced breast cancer recurrence and mortality compared with regimens without anthracyclines.', source: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET' },
+      { text: 'Cyclophosphamide plus an anthracycline is one of the best-studied adjuvant regimens for node-positive early breast cancer.', source: 'EBCTCG_POLYCHEMO_REGIMENS_LANCET' },
+      { text: 'Nodal involvement and disease stage support a standard anthracycline-based approach.', source: 'Clinical data' },
+    ],
+    evidenceAgainst: [
+      { text: 'Baseline LVEF has not been documented.', source: 'Missing data' },
+      { text: 'Anthracyclines carry a recognized cardiotoxicity risk; guidelines recommend baseline LVEF assessment before starting therapy.', source: 'ESC_CARDIOONCOLOGY_JACC' },
+    ],
+    missingData: commonMissingData,
+    riskFlags: [mockRiskFlags[0], mockRiskFlags[1], mockRiskFlags[4]],
+    publishedCohorts: [
+      { cohortName: 'EBCTCG: Anthracycline-based chemotherapy in early breast cancer', population: 'Node-positive and node-negative early breast cancer across 86 randomised trials', similarityLevel: 'Moderate', matchingFactors: ['Node-positive disease', 'Early-stage', 'Chemotherapy-eligible'], limitationFactors: ['Aggregate trial population, not individually matched', 'Cardiac fitness at baseline not accounted for'], implication: 'Strong support for this regimen once baseline cardiac function is confirmed adequate.', sourceLabel: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET', sourceUrl: '' },
+      { cohortName: 'EBCTCG: Polychemotherapy regimen comparisons', population: 'Early breast cancer patients across 123 randomised trials comparing chemotherapy regimens', similarityLevel: 'Moderate', matchingFactors: ['Node-positive disease', 'Anthracycline-based regimen'], limitationFactors: ['Aggregate trial population, not individually matched'], implication: 'Confirms anthracycline-based regimens outperform CMF for higher-risk disease.', sourceLabel: 'EBCTCG_POLYCHEMO_REGIMENS_LANCET', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'Nodal involvement', weight: 'high', direction: 'supports' },
+      { factor: 'Baseline cardiac workup', weight: 'high', direction: 'cautions' },
+      { factor: 'Myelosuppression risk', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+
+  'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE': createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Classic CMF chemotherapy remains a reasonable non-anthracycline option, though modern anthracycline/taxane-based regimens generally show superior outcomes.',
+    uncertaintyDescription: 'Large meta-analyses show CMF reduces recurrence versus no chemotherapy, but anthracycline-based regimens are generally more effective — CMF is most relevant when anthracyclines are contraindicated (e.g., unconfirmed or reduced cardiac function).',
+    evidenceFor: [
+      { text: 'CMF chemotherapy reduces recurrence and mortality compared with no adjuvant chemotherapy in early breast cancer.', source: 'EBCTCG_POLYCHEMO_REGIMENS_LANCET' },
+      { text: 'Anthracyclines carry a recognized cardiotoxicity risk and guidelines recommend baseline LVEF assessment before starting one, which is not yet available for this case.', source: 'ESC_CARDIOONCOLOGY_JACC' },
+    ],
+    evidenceAgainst: [
+      { text: 'Anthracycline-based regimens showed superior outcomes to CMF in the same meta-analysis.', source: 'EBCTCG_POLYCHEMO_REGIMENS_LANCET' },
+      { text: 'Methotrexate component requires adequate renal function.', source: 'Missing data' },
+    ],
+    missingData: commonMissingData,
+    riskFlags: [mockRiskFlags[1]],
+    publishedCohorts: [
+      { cohortName: 'EBCTCG: CMF vs anthracycline-based regimens', population: 'Early breast cancer patients across 123 randomised trials comparing chemotherapy regimens', similarityLevel: 'Partial', matchingFactors: ['Chemotherapy-eligible', 'Early-stage disease'], limitationFactors: ['CMF shown to be less effective than anthracycline-based regimens in the same analysis'], implication: 'Reasonable fallback if anthracyclines are not appropriate.', sourceLabel: 'EBCTCG_POLYCHEMO_REGIMENS_LANCET', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'Non-anthracycline option', weight: 'medium', direction: 'supports' },
+      { factor: 'Lower efficacy than anthracycline-based regimens', weight: 'medium', direction: 'cautions' },
+    ],
+  }),
+
+  'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB': createTreatmentEvidenceProfile({
+    uncertaintyLevel: 'moderate',
+    uncertaintySummary: 'Dual HER2 blockade with pertuzumab and trastuzumab plus a taxane is strongly supported for HER2-positive disease, though baseline cardiac function must be confirmed first.',
+    uncertaintyDescription: 'CLEOPATRA established a substantial survival benefit for adding pertuzumab to trastuzumab and taxane chemotherapy in HER2-positive disease; the regimen requires confirmed baseline and on-treatment cardiac monitoring given trastuzumab-related cardiotoxicity risk.',
+    evidenceFor: [
+      { text: 'Adding pertuzumab to trastuzumab and taxane chemotherapy significantly improved progression-free and overall survival in HER2-positive breast cancer.', source: 'CLEOPATRA_PERTUZUMAB_TRASTUZUMAB_NEJM' },
+      { text: 'HER2-positive status directly matches the population shown to benefit from dual HER2 blockade.', source: 'Patient context' },
+    ],
+    evidenceAgainst: [
+      { text: 'Baseline LVEF has not been documented.', source: 'Missing data' },
+      { text: 'HER2-targeted therapy (trastuzumab/pertuzumab) carries a recognized cardiotoxicity risk; guidelines recommend baseline and every-3-month LVEF monitoring.', source: 'ESC_CARDIOONCOLOGY_JACC' },
+      { text: 'The trial combining pertuzumab, trastuzumab and taxane chemotherapy reported meaningful rates of neutropenia and diarrhea requiring monitoring.', source: 'CLEOPATRA_PERTUZUMAB_TRASTUZUMAB_NEJM' },
+    ],
+    missingData: commonMissingData,
+    riskFlags: [mockRiskFlags[0], mockRiskFlags[1], mockRiskFlags[5]],
+    publishedCohorts: [
+      { cohortName: 'CLEOPATRA: Pertuzumab, trastuzumab and taxane chemotherapy', population: 'HER2-positive breast cancer treated with pertuzumab, trastuzumab, and taxane chemotherapy', similarityLevel: 'Moderate', matchingFactors: ['HER2-positive disease', 'Chemotherapy-eligible'], limitationFactors: ['Original trial population was metastatic; here applied in an earlier-stage context', 'Requires confirmed baseline cardiac function'], implication: 'Strong support for dual HER2 blockade once cardiac clearance is confirmed.', sourceLabel: 'CLEOPATRA_PERTUZUMAB_TRASTUZUMAB_NEJM', sourceUrl: '' },
+    ],
+    sources: [],
+    reasoningFactors: [
+      { factor: 'HER2-positive status', weight: 'high', direction: 'supports' },
+      { factor: 'Baseline cardiac workup', weight: 'high', direction: 'cautions' },
     ],
   }),
 };
 
+/**
+ * Zusätzliche, fallspezifische Evidenz-Ergänzungen für die 4 Studienfälle (A–D), die
+ * NICHT vom gewählten Regime abhängen (z.B. Organbefall aus den Fall-Daten).
+ * Modell-Konfidenz-Aussagen gehören NICHT hierher — die werden in aiService.ts aus
+ * `patientModelPredictions` dynamisch für das jeweils gewählte Regime gebaut, damit
+ * die Aussage immer zur tatsächlich ausgewählten Behandlung passt (nicht immer zur
+ * Top-1-Vorhersage). Wird additiv über das treatmentId-basierte Profil aus
+ * `mockTreatmentEvidenceById` gemergt (siehe `getEvidenceForTreatment` in aiService.ts),
+ * ohne die Basis-Patientendaten in `mockPatient` / `patientProfileOverrides` zu verändern.
+ */
+export const patientEvidenceOverrides: Record<string, { evidenceFor?: Array<{ text: string; source: string }>; evidenceAgainst?: Array<{ text: string; source: string }> }> = {
+  'P-0011019': {
+    evidenceAgainst: [
+      { text: 'Liver and lung involvement noted in the case data — relevant for chemotherapy tolerability and monitoring.', source: 'Clinical data' },
+    ],
+  },
+};
+
+/**
+ * Reale Modell-Wahrscheinlichkeiten je Regime für die 4 Studienfälle (aus predictions.json).
+ * `aiService.ts` liest daraus die Konfidenz/den Rang für das TATSÄCHLICH gewählte Regime
+ * (nicht immer die Top-1-Vorhersage) und baut daraus einen passenden Evidenz-Satz.
+ */
+export const patientModelPredictions: Record<string, { probabilities: Record<string, number> }> = {
+  'P-0039112': {
+    probabilities: {
+      'CYCLOPHOSPHAMIDE + DOXORUBICIN': 0.6308,
+      LEUPROLIDE: 0.1558,
+      'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB': 0.09,
+      LETROZOLE: 0.06,
+      PACLITAXEL: 0.05,
+      TAMOXIFEN: 0.0133,
+      ANASTROZOLE: 0.0,
+      CAPECITABINE: 0.0,
+      'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE': 0.0,
+      'LETROZOLE + PALBOCICLIB': 0.0,
+    },
+  },
+  'P-0011019': {
+    probabilities: {
+      LETROZOLE: 0.2933,
+      ANASTROZOLE: 0.2533,
+      'CYCLOPHOSPHAMIDE + DOXORUBICIN': 0.2033,
+      'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE': 0.1767,
+      TAMOXIFEN: 0.0433,
+      CAPECITABINE: 0.0133,
+      LEUPROLIDE: 0.0133,
+      PACLITAXEL: 0.0033,
+      'LETROZOLE + PALBOCICLIB': 0.0,
+      'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB': 0.0,
+    },
+  },
+  'P-0050258': {
+    probabilities: {
+      TAMOXIFEN: 0.4267,
+      'CYCLOPHOSPHAMIDE + DOXORUBICIN': 0.22,
+      LEUPROLIDE: 0.2133,
+      'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE': 0.0933,
+      LETROZOLE: 0.0433,
+      ANASTROZOLE: 0.0033,
+      CAPECITABINE: 0.0,
+      'LETROZOLE + PALBOCICLIB': 0.0,
+      PACLITAXEL: 0.0,
+      'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB': 0.0,
+    },
+  },
+  'P-0068618': {
+    probabilities: {
+      'CYCLOPHOSPHAMIDE + DOXORUBICIN': 0.73,
+      LEUPROLIDE: 0.1133,
+      'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB': 0.0867,
+      LETROZOLE: 0.0367,
+      TAMOXIFEN: 0.0167,
+      ANASTROZOLE: 0.0067,
+      'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE': 0.0067,
+      PACLITAXEL: 0.0033,
+      CAPECITABINE: 0.0,
+      'LETROZOLE + PALBOCICLIB': 0.0,
+    },
+  },
+};
 
 export const mockSimilarCases: SimilarCase[] = [
   {
@@ -585,7 +779,3 @@ export const mockSimilarCases: SimilarCase[] = [
     source: 'Institutional database (rare presentation)',
   },
 ];
-
-
-
-

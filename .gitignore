@@ -27,3 +27,8 @@ Thumbs.db
 # Regenerate locally via `python ml/pipeline.py`. The UI copy of predictions lives in
 # frontend/public/predictions.json and IS tracked.
 /data/
+
+
+#Frontend
+frontend/.vite/deps
+
