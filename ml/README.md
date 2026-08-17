@@ -70,7 +70,7 @@ cp data/derived/predictions.json frontend/public/predictions.json
    `RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=42)`.
 4. **Explanations** — TreeSHAP on the test set; one-hot SHAP values are aggregated back to the
    18 original features (summed per feature).
-5. **Curated export** — 12 cases across four situations (confident-correct, uncertain,
+5. **Curated export** — 4 cases for four situations (confident-correct, uncertain,
    misclassified, counter-intuitive HER2→AC). For each case the **top-3 regimes** by probability
    are exported, each with its own SHAP attribution toward that regime.
 

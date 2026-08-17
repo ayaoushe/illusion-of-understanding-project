@@ -1,11 +1,12 @@
 import type { HumanAssessment, AiEvidenceSynthesis, EvidenceItem } from '../types';
-import { mockTreatmentEvidenceById, patientEvidenceOverrides, patientModelPredictions } from '../data/mockData';
+import { mockTreatmentEvidenceById } from '../data/mockData';
+import { fetchCase, rankedRegimes } from './caseService';
 
 const DEFAULT_TREATMENT_ID = 'CYCLOPHOSPHAMIDE + DOXORUBICIN';
 
 /**
- * Lightweight evidence service that prefers an API endpoint when available,
- * but falls back to treatment-specific mock evidence for buildable demos.
+ *
+ * 
  * 
  * This gets called after the Assessment is completed, and returns the AI Evidence Synthesis for the selected treatment and patient.
  * 
@@ -47,58 +48,123 @@ export async function getEvidenceForTreatment(treatmentId: string, patientId: st
  * (lower model confidence than the top alternative), so the synthesis never
  * silently reports the wrong regime's confidence.
  */
-function buildModelPredictionEvidence(patientId: string, treatmentId: string): { evidenceFor: EvidenceItem[]; evidenceAgainst: EvidenceItem[] } {
-  const prediction = patientModelPredictions[patientId];
-  const probability = prediction?.probabilities[treatmentId];
-  if (!prediction || probability == null) {
-    return { evidenceFor: [], evidenceAgainst: [] };
-  }
+async function buildModelPredictionEvidence(
+  patientId: string,
+  treatmentId: string,
+): Promise<{
+  evidenceFor: EvidenceItem[];
+  evidenceAgainst: EvidenceItem[];
+}> {
+  const studyCase = await fetchCase(patientId);
 
-  const ranked = Object.entries(prediction.probabilities).sort((a, b) => b[1] - a[1]);
-  const rank = ranked.findIndex(([id]) => id === treatmentId) + 1;
-  const percent = Math.round(probability * 100);
-
-  if (rank > 0 && rank < 4) {
+  if (!studyCase) {
     return {
-      evidenceFor: [
-        { text: `Model confidence for this regimen is ${percent}% (rank ${rank} of ${ranked.length})`, source: 'Patient context' },
-      ],
+      evidenceFor: [],
+      evidenceAgainst: [],
+    };
+  }
+//Get all treatments for the patient
+  const ranked = rankedRegimes(studyCase);
+
+//Find probability for the treatment that was selected
+  const selected = ranked.find(({ id }) => id === treatmentId);
+
+  if (!selected) {
+    return {
+      evidenceFor: [],
       evidenceAgainst: [],
     };
   }
 
-  const [topId, topProbability] = ranked[0];
-  const topPercent = Math.round(topProbability * 100);
+  const rank = ranked.findIndex(({ id }) => id === treatmentId) + 1;
+  const percent = Math.round(selected.probability * 100);
+
+  const evidence: EvidenceItem = {
+    text: `Model confidence for this regimen is ${percent}% (rank ${rank} of ${ranked.length})`,
+    source: 'Patient context',
+  };
+
+  if (rank <= 3) {
+    return {
+      evidenceFor: [evidence],
+      evidenceAgainst: [],
+    };
+  }
+
   return {
     evidenceFor: [],
-    evidenceAgainst: [
-      { text: `Model confidence for this regimen is ${percent}% (rank ${rank} of ${ranked.length})`, source: 'Patient context' },
-    ],
+    evidenceAgainst: [evidence],
   };
 }
 
-function normalizeEvidence(payload: Partial<AiEvidenceSynthesis> | undefined, treatmentId: string, patientId: string): AiEvidenceSynthesis {
-  const fallback = mockTreatmentEvidenceById[treatmentId] ?? mockTreatmentEvidenceById[DEFAULT_TREATMENT_ID];
+async function normalizeEvidence(
+  payload: Partial<AiEvidenceSynthesis> | undefined,
+  treatmentId: string,
+  patientId: string,
+): Promise<AiEvidenceSynthesis> {
+  const fallback =
+    mockTreatmentEvidenceById[treatmentId] ??
+    mockTreatmentEvidenceById[DEFAULT_TREATMENT_ID];
 
-  const baseEvidenceFor = payload?.evidenceFor ?? fallback.evidenceFor;
-  const baseEvidenceAgainst = payload?.evidenceAgainst ?? fallback.evidenceAgainst;
+  const baseEvidenceFor =
+    payload?.evidenceFor ?? fallback.evidenceFor;
 
-  const caseNotes = patientEvidenceOverrides[patientId];
-  const modelEvidence = buildModelPredictionEvidence(patientId, treatmentId);
+  const baseEvidenceAgainst =
+    payload?.evidenceAgainst ?? fallback.evidenceAgainst;
+
+
+  // Get treatment probability/ranking directly from study_cases.json.
+  const modelEvidence =
+    await buildModelPredictionEvidence(
+      patientId,
+      treatmentId,
+    );
 
   return {
     ...fallback,
     ...payload,
-    uncertaintyLevel: payload?.uncertaintyLevel ?? fallback.uncertaintyLevel,
-    uncertaintySummary: payload?.uncertaintySummary ?? fallback.uncertaintySummary,
-    uncertaintyDescription: payload?.uncertaintyDescription ?? fallback.uncertaintyDescription,
-    evidenceFor: [...baseEvidenceFor, ...(caseNotes?.evidenceFor ?? []), ...modelEvidence.evidenceFor],
-    evidenceAgainst: [...baseEvidenceAgainst, ...(caseNotes?.evidenceAgainst ?? []), ...modelEvidence.evidenceAgainst],
-    missingData: payload?.missingData ?? fallback.missingData,
-    riskFlags: payload?.riskFlags ?? fallback.riskFlags,
-    publishedCohorts: payload?.publishedCohorts ?? fallback.publishedCohorts,
-    sources: payload?.sources ?? fallback.sources,
-    keyReasoningFactors: payload?.keyReasoningFactors ?? fallback.keyReasoningFactors,
+
+    uncertaintyLevel:
+      payload?.uncertaintyLevel ??
+      fallback.uncertaintyLevel,
+
+    uncertaintySummary:
+      payload?.uncertaintySummary ??
+      fallback.uncertaintySummary,
+
+    uncertaintyDescription:
+      payload?.uncertaintyDescription ??
+      fallback.uncertaintyDescription,
+
+    evidenceFor: [
+      ...baseEvidenceFor,
+      ...modelEvidence.evidenceFor,
+    ],
+
+    evidenceAgainst: [
+      ...baseEvidenceAgainst,
+      ...modelEvidence.evidenceAgainst,
+    ],
+
+    missingData:
+      payload?.missingData ??
+      fallback.missingData,
+
+    riskFlags:
+      payload?.riskFlags ??
+      fallback.riskFlags,
+
+    publishedCohorts:
+      payload?.publishedCohorts ??
+      fallback.publishedCohorts,
+
+    sources:
+      payload?.sources ??
+      fallback.sources,
+
+    keyReasoningFactors:
+      payload?.keyReasoningFactors ??
+      fallback.keyReasoningFactors,
   };
 }
 

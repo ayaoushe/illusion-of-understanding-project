@@ -2,10 +2,7 @@ import type {
   Patient,
   AiEvidenceSynthesis,
   PublishedCohort,
-  TreatmentOption,
   SimilarCase,
-  DecisionChangeFactor,
-  DecisionFactor,
   WorkflowStep,
   RiskFlag,
 } from '../types';
@@ -67,7 +64,7 @@ export function getAssessmentTreatmentLabel(id: string): string {
   return option ? `${option.label} [${option.category}]` : id;
 }
 
-//MOCKPATIENTTTTTTTTT
+//Mockpatient als fallback
 export const mockPatient: Patient = {
   name: 'Max Mustermann',
   mrn: '4821-7734',
@@ -198,6 +195,8 @@ export const mockPatient: Patient = {
 };
 //MOCKKKPATIENT
 
+
+//Patient Profiles from the Dataset
 const patientProfileOverrides: Record<string, Partial<Patient>> = {
   'P-0039112': {
     name: 'Anna Seeler',
@@ -255,6 +254,7 @@ export function getPatientProfile(patientId: string | null | undefined): Patient
   };
 }
 
+//Risk Flags for the AI Evidence
 export const mockRiskFlags = [
   {
     id: 'cardiac',
@@ -300,57 +300,8 @@ export const mockRiskFlags = [
   },
 ];
 
-export const mockAiEvidence: AiEvidenceSynthesis = {
-  title: 'AI Evidence Synthesis',
-  disclaimer:
-    'Evidence-based synthesis of guidelines and literature. This is decision support — not a final recommendation. All outputs require clinician verification.',
-  uncertaintyLevel: 'moderate',
-  uncertaintySummary: 'Hormone-receptor and HER2 status strongly inform the endocrine vs. chemotherapy decision, but baseline cardiac and bone-health workup remain incomplete.',
-  uncertaintyDescription:
-    'Molecular subtype (HR/HER2 status) and stage support the recommended regimen, but missing baseline cardiac and bone-health data limit full confidence. Patient similarity to published cohorts is moderate.',
 
-  evidenceFor: [
-    { text: 'Hormone-receptor-positive, node-positive early breast cancer is a well-established indication for anthracycline-based adjuvant chemotherapy.', source: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET' },
-    { text: 'HR status and stage align with the treatment pathway supported by large adjuvant meta-analyses.', source: 'EBCTCG_POLYCHEMO_REGIMENS_LANCET' },
-    { text: 'Regimen aligns with the assessment\'s selected treatment pathway for this case.', source: 'Patient context' },
-  ],
-
-  evidenceAgainst: [
-    { text: 'Baseline cardiac function (LVEF) has not yet been documented — relevant for anthracycline or HER2-targeted therapy.', source: 'Missing data' },
-    { text: 'Menopausal status and bone density have not been confirmed, which affects endocrine therapy selection and monitoring.', source: 'Missing data' },
-  ],
-
-  missingData: [
-    'Baseline LVEF / echocardiogram not yet documented',
-    'Menopausal status not formally confirmed',
-    'Baseline bone density (DEXA) not assessed',
-    'Germline BRCA1/2 testing not yet performed',
-  ],
-
-  riskFlags: mockRiskFlags,
-  publishedCohorts: [
-    {
-      cohortName: 'EBCTCG: Anthracycline- and taxane-containing chemotherapy in early breast cancer',
-      population: 'Patients with early-stage operable breast cancer across 86 randomised trials of anthracycline/taxane regimens',
-      similarityLevel: 'Moderate',
-      matchingFactors: ['Early-stage disease', 'HR-positive biology', 'Node-positive disease'],
-      limitationFactors: ['Aggregate trial population, not individually matched', 'Cardiac and renal fitness not accounted for'],
-      implication: 'Supports chemotherapy backbone selection with close toxicity monitoring.',
-      sourceLabel: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET',
-      sourceUrl: '',
-    },
-  ],
-
-  keyReasoningFactors: [
-    { factor: 'Hormone-receptor (HR) status', weight: 'high', direction: 'supports' },
-    { factor: 'HER2 status', weight: 'high', direction: 'supports' },
-    { factor: 'Stage / nodal involvement', weight: 'high', direction: 'supports' },
-    { factor: 'Baseline cardiac workup', weight: 'medium', direction: 'cautions' },
-    { factor: 'Bone health / menopausal status', weight: 'medium', direction: 'cautions' },
-  ],
-
-  sources: [],
-};
+// Function to create Evidence Profiles for every regime
 
 function createTreatmentEvidenceProfile(params: {
   uncertaintyLevel: AiEvidenceSynthesis['uncertaintyLevel'];
@@ -380,6 +331,7 @@ function createTreatmentEvidenceProfile(params: {
   };
 }
 
+// Missing Data samples
 const commonMissingData = [
   'Baseline LVEF / echocardiogram not yet documented',
   'Menopausal status not formally confirmed',
@@ -643,88 +595,10 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
   }),
 };
 
-/**
- * Zusätzliche, fallspezifische Evidenz-Ergänzungen für die 4 Studienfälle (A–D), die
- * NICHT vom gewählten Regime abhängen (z.B. Organbefall aus den Fall-Daten).
- * Modell-Konfidenz-Aussagen gehören NICHT hierher — die werden in aiService.ts aus
- * `patientModelPredictions` dynamisch für das jeweils gewählte Regime gebaut, damit
- * die Aussage immer zur tatsächlich ausgewählten Behandlung passt (nicht immer zur
- * Top-1-Vorhersage). Wird additiv über das treatmentId-basierte Profil aus
- * `mockTreatmentEvidenceById` gemergt (siehe `getEvidenceForTreatment` in aiService.ts),
- * ohne die Basis-Patientendaten in `mockPatient` / `patientProfileOverrides` zu verändern.
- */
-export const patientEvidenceOverrides: Record<string, { evidenceFor?: Array<{ text: string; source: string }>; evidenceAgainst?: Array<{ text: string; source: string }> }> = {
-  'P-0011019': {
-    evidenceAgainst: [
-      { text: 'Liver and lung involvement noted in the case data — relevant for chemotherapy tolerability and monitoring.', source: 'Clinical data' },
-    ],
-  },
-};
 
-/**
- * Reale Modell-Wahrscheinlichkeiten je Regime für die 4 Studienfälle (aus predictions.json).
- * `aiService.ts` liest daraus die Konfidenz/den Rang für das TATSÄCHLICH gewählte Regime
- * (nicht immer die Top-1-Vorhersage) und baut daraus einen passenden Evidenz-Satz.
- */
-export const patientModelPredictions: Record<string, { probabilities: Record<string, number> }> = {
-  'P-0039112': {
-    probabilities: {
-      'CYCLOPHOSPHAMIDE + DOXORUBICIN': 0.6308,
-      LEUPROLIDE: 0.1558,
-      'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB': 0.09,
-      LETROZOLE: 0.06,
-      PACLITAXEL: 0.05,
-      TAMOXIFEN: 0.0133,
-      ANASTROZOLE: 0.0,
-      CAPECITABINE: 0.0,
-      'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE': 0.0,
-      'LETROZOLE + PALBOCICLIB': 0.0,
-    },
-  },
-  'P-0011019': {
-    probabilities: {
-      LETROZOLE: 0.2933,
-      ANASTROZOLE: 0.2533,
-      'CYCLOPHOSPHAMIDE + DOXORUBICIN': 0.2033,
-      'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE': 0.1767,
-      TAMOXIFEN: 0.0433,
-      CAPECITABINE: 0.0133,
-      LEUPROLIDE: 0.0133,
-      PACLITAXEL: 0.0033,
-      'LETROZOLE + PALBOCICLIB': 0.0,
-      'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB': 0.0,
-    },
-  },
-  'P-0050258': {
-    probabilities: {
-      TAMOXIFEN: 0.4267,
-      'CYCLOPHOSPHAMIDE + DOXORUBICIN': 0.22,
-      LEUPROLIDE: 0.2133,
-      'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE': 0.0933,
-      LETROZOLE: 0.0433,
-      ANASTROZOLE: 0.0033,
-      CAPECITABINE: 0.0,
-      'LETROZOLE + PALBOCICLIB': 0.0,
-      PACLITAXEL: 0.0,
-      'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB': 0.0,
-    },
-  },
-  'P-0068618': {
-    probabilities: {
-      'CYCLOPHOSPHAMIDE + DOXORUBICIN': 0.73,
-      LEUPROLIDE: 0.1133,
-      'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB': 0.0867,
-      LETROZOLE: 0.0367,
-      TAMOXIFEN: 0.0167,
-      ANASTROZOLE: 0.0067,
-      'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE': 0.0067,
-      PACLITAXEL: 0.0033,
-      CAPECITABINE: 0.0,
-      'LETROZOLE + PALBOCICLIB': 0.0,
-    },
-  },
-};
 
+
+// Mock Similar Case, used if Similar Cases wont load
 export const mockSimilarCases: SimilarCase[] = [
   {
     caseId: 'Case #2847',

@@ -1,12 +1,8 @@
 /**
  * Centralized source registry for Step 3 (AI Evidence Synthesis).
  * All evidence citations must reference a source ID from this registry.
- *
- * Rules:
- * - Citation chips open source.url directly in a new tab (target="_blank", rel="noopener noreferrer").
- * - No popover/modal before opening a source.
- * - Patient-context claims use plain labels only — no citation chips.
- * - If no registry source fits a claim, leave it uncited.
+ * Citation chips open source.url directly in a new tab.
+ * Patient-context claims use plain labels only.
  */
 
 export type SourceUrlType = 'PDF' | 'PMC full text' | 'Publisher full text' | 'Guideline / protocol';
@@ -19,6 +15,7 @@ export interface SourceRegistryEntry {
   urlType: SourceUrlType;
   useFor: string[];
 }
+
 
 export const sourceRegistry: Record<string, SourceRegistryEntry> = {
   ATAC_ANASTROZOLE_LANCET_ONCOL: {
@@ -184,7 +181,7 @@ export const sourceRegistry: Record<string, SourceRegistryEntry> = {
   },
 };
 
-/** Plain-text labels for patient-specific claims — no citation chips. */
+/** Plain-text labels for patient-specific claims */
 export const PATIENT_CONTEXT_LABELS = new Set([
   'Patient context',
   'Clinical data',

@@ -1,4 +1,5 @@
 # start-dev.ps1
+# Start backend and frontend: 
 # Run from the repository root:
 # powershell -File .\start-dev.ps1
 $ErrorActionPreference = "Stop"

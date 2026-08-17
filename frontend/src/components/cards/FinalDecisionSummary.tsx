@@ -35,7 +35,7 @@ export function FinalDecisionSummary({ assessment, evidence, reflection }: Final
             <p className="summary-reasoning" style={{ fontSize: '0.8rem' }}>{evidence.uncertaintyDescription}</p>
             <div className="bullet-list compact">
               {evidence.keyReasoningFactors.slice(0, 3).map((f) => (
-                <li key={f.factor} style={{ fontSize: '0.8rem' }}>
+                <li key={f.factor} style={{ fontSize: '0.8rem', listStyle: 'none'  }}>
                   {f.factor} (<span className={`direction-${f.direction}`}>{f.direction}</span>)
                 </li>
               ))}
