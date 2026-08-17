@@ -3,11 +3,10 @@ import type {
   Patient,
   AiEvidenceSynthesis,
   PublishedCohort,
-  SimilarCase,
   WorkflowStep,
   RiskFlag,
 } from '../types';
-import { mrnFromId } from '../config/studyCases';
+import { STUDY_NAMES, mrnFromId } from '../config/studyCases';
 
 //Workflowsteps
 export const WORKFLOW_STEPS: WorkflowStep[] = [
@@ -19,19 +18,6 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
   { id: 'reflection', label: 'Final Reflection', shortLabel: 'Reflection', number: 6 },
 ];
 
-//Treatment option IDs
-export const TREATMENT_OPTION_IDS = [
-  'ANASTROZOLE',
-  'LETROZOLE',
-  'LETROZOLE + PALBOCICLIB',
-  'TAMOXIFEN',
-  'LEUPROLIDE',
-  'CAPECITABINE',
-  'PACLITAXEL',
-  'CYCLOPHOSPHAMIDE + DOXORUBICIN',
-  'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE',
-  'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB',
-] as const;
 
 /**
  * Treatment options for the assessment dropdowns.
@@ -67,193 +53,20 @@ export function getAssessmentTreatmentLabel(id: string): string {
   return option ? `${option.label} [${option.category}]` : id;
 }
 
-//Mockpatient als fallback
-export const mockPatient: Patient = {
-  name: 'Max Mustermann',
-  mrn: '4821-7734',
-  dateOfBirth: '1958-03-14',
-  age: 66,
-  gender: 'Male',
-  priority: 'HIGH',
-
-  diagnosis: {
-    primaryDiagnosis: 'Non-Small Cell Lung Cancer (NSCLC)',
-    stage: 'IIIB',
-    histology: 'Adenocarcinoma',
-    location: 'Right Upper Lobe (RUL)',
-    icd10: 'C34.10',
-    diagnosisDate: '2024-09-03',
-  },
-
-  performance: {
-    ecog: 1,
-    ecogDescription: 'Restricted activity, in bed <50% of day',
-    lastAssessed: '2025-04-12',
-  },
-
-  molecular: {
-    egfr: { mutation: 'Exon 19 deletion', status: 'Positive' },
-    alk: { status: 'Negative' },
-    pdl1: { tps: '42%', level: 'Intermediate' },
-    tmb: { value: 8, unit: 'mut/Mb', level: 'Intermediate' },
-    kras: { status: 'Negative' },
-  },
-
-  imaging: [
-    {
-      type: 'PET-CT',
-      date: '2025-04-28',
-      findings: 'Primary: 4.2cm RUL mass. Mediastinal LN involvement (4R, 7). No distant mets.',
-    },
-    {
-      type: 'Brain MRI',
-      date: '2025-02-10',
-      findings: 'No intracranial metastases detected.',
-    },
-    {
-      type: 'CT Chest/Abd',
-      date: '2024-09-15',
-      findings: 'Baseline: 3.8cm RUL mass, ipsilateral hilar adenopathy.',
-    },
-  ],
-
-  labs: {
-    hemoglobin: { value: 11.8, unit: 'g/dL', status: 'LOW', normal: '12.0-16.0' },
-    wbc: { value: 6.2, unit: 'K/uL', status: 'NORMAL', normal: '4.5-11.0' },
-    platelets: { value: 185, unit: 'K/uL', status: 'NORMAL', normal: '150-400' },
-    ldh: { value: 425, unit: 'U/L', status: 'ELEVATED', normal: '140-280' },
-    creatinine: { value: 0.9, unit: 'mg/dL', status: 'NORMAL', normal: '0.7-1.3' },
-    egfr: { value: 64, unit: 'mL/min', stage: 'G2', status: 'MILD_REDUCED' },
-    albumin: { value: 3.8, unit: 'g/dL', status: 'NORMAL', normal: '3.5-5.0' },
-    ast: { value: 28, unit: 'U/L', status: 'NORMAL', normal: '10-40' },
-    alt: { value: 32, unit: 'U/L', status: 'NORMAL', normal: '7-56' },
-    inflammation: { crp: { value: 8.2, unit: 'mg/L', status: 'ELEVATED', normal: '<3.0' } },
-  },
-
-  comorbidities: [
-    {
-      name: 'Type 2 Diabetes Mellitus',
-      status: 'Controlled',
-      hba1c: '7.2%',
-      implications: 'Renal-sparing approach preferred; monitor glucose with steroids',
-    },
-    {
-      name: 'Hypertension',
-      status: 'Controlled',
-      medication: 'Amlodipine 5mg',
-      implications: 'Avoid treatments that significantly raise blood pressure',
-    },
-    {
-      name: 'Former smoker',
-      status: 'Quit 2018',
-      packyears: 30,
-      quityear: 2018,
-      implications: 'High lung cancer risk history; pulmonary reserve consideration',
-    },
-    {
-      name: 'Mild CKD',
-      status: 'eGFR 64 mL/min (G2)',
-      implications: 'Renal dose adjustment may apply for platinum agents',
-    },
-  ],
-
-  medications: [
-    { name: 'Amlodipine', dose: '5mg', frequency: 'Daily', relevance: 'BP management; drug interaction screening' },
-    { name: 'Metformin', dose: '500mg', frequency: 'Twice daily', relevance: 'Monitor renal function with nephrotoxic agents' },
-    { name: 'Omeprazole', dose: '20mg', frequency: 'Daily', relevance: 'May affect oral TKI absorption' },
-    { name: 'Lorazepam', dose: '0.5mg', frequency: 'PRN anxiety', relevance: 'Anxiety history — QoL and adherence factor' },
-  ],
-
-  contraindications: [
-    { factor: 'Cisplatin', severity: 'high', detail: 'eGFR 64 — platinum nephrotoxicity risk' },
-    { factor: 'Aggressive multimodal therapy', severity: 'moderate', detail: 'Patient preference for minimal hospitalization' },
-    { factor: 'Uncontrolled cardiac status', severity: 'moderate', detail: 'LVEF not yet documented — needed for some regimens' },
-  ],
-
-  qolConcerns: [
-    'Anxiety management (uses PRN lorazepam)',
-    'Prefers minimal hospital stays if possible',
-    'Concerned about peripheral neuropathy risk',
-    'Wishes to maintain independence at home',
-  ],
-
-  patientPreferences: {
-    priorityQoL: 'Moderate — willing to tolerate side effects for effectiveness',
-    hospitalPreference: 'Minimal overnight stays',
-    familyInvolvement: 'Daughter involved in treatment decisions',
-  },
-
-  missingData: [
-    'Surgical candidacy assessment pending thoracic surgery consultation',
-    'Cardiac ejection fraction not yet obtained',
-    'Detailed toxicity history from prior treatments (none documented)',
-  ],
-
-  session: {
-    clinician: 'Dr. A. Petrov, MD — Oncology',
-    date: '2026-06-18',
-    time: '14:57',
-    version: 'OncoCDSS v2.0',
-  },
-};
-
-
-
-//Patient Profiles from the Dataset
-const patientProfileOverrides: Record<string, Partial<Patient>> = {
-  'P-0039112': {
-    name: 'Anna Seeler',
-    mrn: mrnFromId('P-0039112'),
-    age: 63,
-    gender: 'Female',
-    diagnosis: { primaryDiagnosis: 'Metastatic Breast Cancer', stage: 'IIA', histology: 'Ductal carcinoma', location: 'Right breast', icd10: 'C50.911', diagnosisDate: '2024-01-22' },
-    performance: { ecog: 1, ecogDescription: 'Restricted activity, in bed <50% of day', lastAssessed: '2025-03-08' },
-  },
-  'P-0011019': {
-    name: 'Bianca Stefen',
-    mrn: mrnFromId('P-0011019'),
-    age: 58,
-    gender: 'Female',
-    diagnosis: { primaryDiagnosis: 'Hormone-Receptor Positive Breast Cancer', stage: 'IIB', histology: 'Lobular carcinoma', location: 'Left breast', icd10: 'C50.812', diagnosisDate: '2023-11-10' },
-    performance: { ecog: 0, ecogDescription: 'Fully active', lastAssessed: '2025-04-01' },
-  },
-  'P-0050258': {
-    name: 'Clara Campista',
-    mrn: mrnFromId('P-0050258'),
-    age: 71,
-    gender: 'Female',
-    diagnosis: { primaryDiagnosis: 'Advanced Lung Adenocarcinoma', stage: 'IIIB', histology: 'Adenocarcinoma', location: 'Left upper lobe', icd10: 'C34.12', diagnosisDate: '2024-03-18' },
-    performance: { ecog: 2, ecogDescription: 'Ambulatory and capable of self-care, but unable to work', lastAssessed: '2025-05-05' },
-  },
-  'P-0068618': {
-    name: 'Diana Ernst',
-    mrn: mrnFromId('P-0068618'),
-    age: 67,
-    gender: 'Female',
-    diagnosis: { primaryDiagnosis: 'Oligometastatic NSCLC', stage: 'IVA', histology: 'Adenocarcinoma', location: 'Right lower lobe', icd10: 'C34.31', diagnosisDate: '2024-06-09' },
-    performance: { ecog: 1, ecogDescription: 'Restricted activity, in bed <50% of day', lastAssessed: '2025-04-20' },
-  },
-};
-
+/**
+ * Minimalprofil fuer Sidebar und Fallauswahl: Name und Aktenzeichen.
+ *
+ * Die frueheren statischen NSCLC-Profile (mockPatient, patientProfileOverrides)
+ * sind entfernt. Sie wurden seit der Umstellung der Patient Overview auf
+ * study_cases.json nirgends mehr angezeigt, enthielten aber Lungenkrebs-
+ * Diagnosen unter den IDs der Brustkrebs-Studienfaelle. Alles Fallbezogene
+ * kommt heute aus services/patientView.ts.
+ */
 export function getPatientProfile(patientId: string | null | undefined): Patient {
-  if (!patientId) return mockPatient;
-  const overrides = patientProfileOverrides[patientId];
-  if (!overrides) return mockPatient;
-
+  const id = patientId ?? '';
   return {
-    ...mockPatient,
-    ...overrides,
-    diagnosis: { ...mockPatient.diagnosis, ...(overrides.diagnosis ?? {}) },
-    performance: { ...mockPatient.performance, ...(overrides.performance ?? {}) },
-    molecular: {
-      ...mockPatient.molecular,
-      ...(overrides.molecular ?? {}),
-      egfr: { ...mockPatient.molecular.egfr, ...((overrides.molecular?.egfr) ?? {}) },
-      alk: { ...mockPatient.molecular.alk, ...((overrides.molecular?.alk) ?? {}) },
-      pdl1: { ...mockPatient.molecular.pdl1, ...((overrides.molecular?.pdl1) ?? {}) },
-      tmb: { ...mockPatient.molecular.tmb, ...((overrides.molecular?.tmb) ?? {}) },
-      kras: { ...mockPatient.molecular.kras, ...((overrides.molecular?.kras) ?? {}) },
-    },
+    name: STUDY_NAMES[id] ?? 'No patient selected',
+    mrn: id ? mrnFromId(id) : '—',
   };
 }
 
@@ -602,57 +415,3 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
 
 
 // Mock Similar Case, used if Similar Cases wont load
-export const mockSimilarCases: SimilarCase[] = [
-  {
-    caseId: 'Case #2847',
-    matchScore: 92,
-    matchCriteria: [
-      { label: 'Same tumor type (NSCLC)', matched: true },
-      { label: 'Same stage (IIIB)', matched: true },
-      { label: 'Same mutation (EGFR Exon 19 del)', matched: true },
-      { label: 'Similar age (62–70)', matched: true },
-      { label: 'Similar ECOG (1)', matched: true },
-      { label: 'Similar renal impairment', matched: true },
-      { label: 'Similar comorbidities', matched: false },
-    ],
-    presentation: 'Female, 68y, EGFR+ Exon 19 del NSCLC IIIB, eGFR 58, ECOG 1',
-    treatmentUsed: 'Osimertinib 80mg daily',
-    outcome: 'Excellent response — 28mo PFS, well-tolerated, no grade 3+ AE',
-    source: 'FLAURA Trial cohort',
-  },
-  {
-    caseId: 'Case #3102',
-    matchScore: 78,
-    matchCriteria: [
-      { label: 'Same tumor type (NSCLC)', matched: true },
-      { label: 'Same stage (IIIB)', matched: true },
-      { label: 'Same mutation (EGFR+)', matched: true },
-      { label: 'Similar age (62–70)', matched: true },
-      { label: 'Similar ECOG (1)', matched: true },
-      { label: 'Hypertension present', matched: true },
-      { label: 'Anxiety history', matched: true },
-    ],
-    presentation: 'Male, 64y, EGFR+ del NSCLC IIIB, HTN, anxiety, preferred outpatient treatment',
-    treatmentUsed: 'Osimertinib with supportive care protocol',
-    outcome: 'Good response — 18mo PFS, anxiety managed with psychiatry collaboration',
-    source: 'Institutional database',
-  },
-  {
-    caseId: 'Case #1956',
-    matchScore: 71,
-    isRare: true,
-    matchCriteria: [
-      { label: 'Same tumor type (NSCLC)', matched: true },
-      { label: 'Same stage (IIIB)', matched: true },
-      { label: 'Same mutation (EGFR+)', matched: true },
-      { label: 'Low hemoglobin at baseline', matched: true },
-      { label: 'Similar age (62–70)', matched: true },
-      { label: 'Anemia management needed', matched: true },
-      { label: 'Prior treatment history', matched: false },
-    ],
-    presentation: 'Female, 67y, EGFR+ NSCLC IIIB, Hgb 11.2, iron deficiency anemia',
-    treatmentUsed: 'Osimertinib + iron supplementation + hematology referral',
-    outcome: 'Hgb improved to 13.1 after 4 weeks; maintained treatment response',
-    source: 'Institutional database (rare presentation)',
-  },
-];

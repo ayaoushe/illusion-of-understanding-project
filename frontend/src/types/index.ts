@@ -44,68 +44,16 @@ export interface InteractionTelemetry {
   warningsShown: string[];
 }
 
+/**
+ * Kopfdaten fuer Sidebar und Fallauswahl.
+ *
+ * Frueher das vollstaendige NSCLC-Demoprofil (Diagnose, Molekularstatus, Labor,
+ * Komorbiditaeten). Gelesen wurden davon immer nur Name und Aktenzeichen; die
+ * Fallansicht baut services/patientView.ts aus study_cases.json.
+ */
 export interface Patient {
   name: string;
   mrn: string;
-  dateOfBirth: string;
-  age: number;
-  gender: string;
-  priority: string;
-  diagnosis: {
-    primaryDiagnosis: string;
-    stage: string;
-    histology: string;
-    location: string;
-    icd10: string;
-    diagnosisDate: string;
-  };
-  performance: {
-    ecog: number;
-    ecogDescription: string;
-    lastAssessed: string;
-  };
-  molecular: {
-    egfr: { mutation: string; status: string };
-    alk: { status: string };
-    pdl1: { tps: string; level: string };
-    tmb: { value: number; unit: string; level: string };
-    kras: { status: string };
-  };
-  imaging: Array<{ type: string; date: string; findings: string }>;
-  labs: Record<string, unknown>;
-  comorbidities: Array<{
-    name: string;
-    status: string;
-    implications: string;
-    hba1c?: string;
-    medication?: string;
-    packyears?: number;
-    quityear?: number;
-  }>;
-  medications: Array<{
-    name: string;
-    dose: string;
-    frequency: string;
-    relevance: string;
-  }>;
-  contraindications: Array<{
-    factor: string;
-    severity: 'high' | 'moderate' | 'low';
-    detail: string;
-  }>;
-  qolConcerns: string[];
-  patientPreferences: {
-    priorityQoL: string;
-    hospitalPreference: string;
-    familyInvolvement: string;
-  };
-  missingData: string[];
-  session: {
-    clinician: string;
-    date: string;
-    time: string;
-    version: string;
-  };
 }
 
 export interface RiskFlag {

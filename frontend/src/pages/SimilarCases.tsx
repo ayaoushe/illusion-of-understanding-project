@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { mockSimilarCases } from '../data/mockData';
 import { fetchCase } from '../services/caseService';
 import { buildSimilarCases } from '../services/similarCaseView';
 import { useWorkflow } from '../context/WorkflowContext';
@@ -12,7 +11,9 @@ import { StepFooter } from '../components/layout/StepFooter';
 export function SimilarCases() {
   const { recordInteraction, selectedPatientId } = useWorkflow();
   const [expandedCase, setExpandedCase] = useState<string | null>(null);
-  const [cases, setCases] = useState<SimilarCase[]>(mockSimilarCases);
+  // Leer starten statt mit NSCLC-Platzhaltern: bis die echten Nachbarn geladen
+  // sind, soll nichts dastehen, was wie ein Vergleichsfall aussieht.
+  const [cases, setCases] = useState<SimilarCase[]>([]);
 
   useEffect(() => {
     recordInteraction({ type: 'similar_cases_view' });
@@ -28,7 +29,7 @@ export function SimilarCases() {
         if (real.length) setCases(real);
       })
       .catch(() => {
-        /* Placeholder if remote data is unavailable */
+        /* Ohne Falldaten bleibt die Liste leer. */
       });
     return () => {
       cancelled = true;
@@ -49,6 +50,13 @@ export function SimilarCases() {
       </div>
 
       <div className="similar-cases-grid">
+        {cases.length === 0 && (
+          <div className="card">
+            <p className="muted" style={{ margin: 0 }}>
+              {selectedPatientId ? 'Loading comparable cases…' : 'Select a case to begin.'}
+            </p>
+          </div>
+        )}
         {cases.map((c) => {
           const isExpanded = expandedCase === c.caseId;
           const visibleCriteria = isExpanded ? c.matchCriteria : c.matchCriteria.slice(0, 4);
