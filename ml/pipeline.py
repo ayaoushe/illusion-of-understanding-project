@@ -227,13 +227,30 @@ def build_clinical_context(all_ids, labels, pat, samp) -> dict[str, dict]:
         }
 
         # 3 genaues Stadium (Registerangabe, feiner als "Stage 1-3")
+        #
+        # Wichtig für die zeitliche Trennung: PATHOLOGICAL_GROUP aus der Sample-
+        # Datei ist das Stadium NACH der Operation. Wurde vor Therapiebeginn nicht
+        # operiert, ist es ein Behandlungsergebnis (ypT0 erscheint dort als "0")
+        # und darf im Entscheidungsmoment nicht gezeigt werden. Das klinische
+        # Stadium bei Diagnosestellung steht in der Diagnose-Zeitleiste; die
+        # Sample-Datei lässt CLINICAL_GROUP oft leer. Code 99 heißt "nicht
+        # klassifiziert" und wird zu None.
         dx_rows = _before(dx, pid, t0)
         dx_row = dx_rows.iloc[-1] if len(dx_rows) else None
+
+        def _group(v):
+            v = _clean(v)
+            return None if v in (None, "99") else v
+
         stage = {
             "coarse": _clean(prow["STAGE_HIGHEST_RECORDED"]) if prow is not None else None,
-            "clinical_group": _clean(srow["CLINICAL_GROUP"]) if srow is not None else None,
-            "pathological_group": _clean(srow["PATHOLOGICAL_GROUP"]) if srow is not None else None,
-            "registry_path_group": _clean(dx_row["PATH_GROUP"]) if dx_row is not None else None,
+            # Diagnose-Zeitleiste zuerst, Sample-Datei als Rückfall.
+            "clinical_group": (
+                _group(dx_row["CLINICAL_GROUP"]) if dx_row is not None else None
+            ) or (_group(srow["CLINICAL_GROUP"]) if srow is not None else None),
+            "clinical_summary": _clean(dx_row["SUMMARY"]) if dx_row is not None else None,
+            "pathological_group": _group(srow["PATHOLOGICAL_GROUP"]) if srow is not None else None,
+            "registry_path_group": _group(dx_row["PATH_GROUP"]) if dx_row is not None else None,
         }
 
         # 4 Diagnose (Datum relativ zum Therapiestart + Registertext)

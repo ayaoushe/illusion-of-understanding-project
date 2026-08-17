@@ -1,5 +1,6 @@
 import type { StudyCase } from '../types';
 import { STUDY_NAMES, mrnFromId } from '../config/studyCases';
+import { STAGE_AT_DECISION } from '../data/stageAtDecision';
 
 export interface Biomarker {
   label: string;
@@ -127,8 +128,15 @@ export function buildPatientView(c: StudyCase): PatientView {
   const ageNum = parseInt(f.CURRENT_AGE_DEID ?? '', 10);
   const age = Number.isFinite(ageNum) ? String(ageNum) : '—';
   const birthYear = Number.isFinite(ageNum) ? 2026 - ageNum : 1970;
-  // Registerangabe ist genauer als das grobe "Stage 1-3" des Modell-Merkmals.
-  const preciseGroup = clinical.stage?.pathological_group ?? clinical.stage?.registry_path_group ?? null;
+  // Das Stadium zum Entscheidungszeitpunkt (s. data/stageAtDecision.ts). Das
+  // pathologische Stadium der Sample-Datei ist ein Nach-OP-Befund und taugt nur,
+  // wenn vor Therapiebeginn überhaupt operiert wurde.
+  const operatedBeforeDecision = (clinical.events_before_first_line?.surgeries_before ?? 0) > 0;
+  const preciseGroup =
+    STAGE_AT_DECISION[c.patient_id]?.group ??
+    (operatedBeforeDecision
+      ? (clinical.stage?.pathological_group ?? clinical.stage?.registry_path_group ?? null)
+      : (clinical.stage?.clinical_group ?? null));
   const stage = preciseGroup ? `Stage ${preciseGroup}` : (f.STAGE_HIGHEST_RECORDED ?? 'unknown');
   // Die Organ-Flags in MSK CHORD bedeuten "jemals dokumentierte Beteiligung",
   // nicht "aktuell metastasiert". Nur das Stadium entscheidet über M1.

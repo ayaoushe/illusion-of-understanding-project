@@ -197,7 +197,11 @@ export interface ClinicalContext {
   };
   stage?: {
     coarse?: string | null;
+    /** Klinisches Stadium bei Diagnosestellung — vor der Entscheidung bekannt. */
     clinical_group?: string | null;
+    /** Freitext des Registers, z. B. "Regional to lymph nodes". */
+    clinical_summary?: string | null;
+    /** Stadium NACH der Operation — nur zulässig, wenn vor Therapiebeginn operiert wurde. */
     pathological_group?: string | null;
     registry_path_group?: string | null;
   };
