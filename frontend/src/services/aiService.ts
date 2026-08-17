@@ -1,18 +1,32 @@
+/**
+ * Liefert die AI Evidence Synthesis (Step 3) zur Therapiewahl des Arztes.
+ *
+ * WICHTIG — `mockTreatmentEvidenceById` ist trotz des Namens KEIN toter
+ * Mock-Code, sondern die produktive Evidenzquelle dieser Anwendung. Dort
+ * liegen die zehn Regime-Profile mit Evidence For/Against, Risk Flags,
+ * Missing Data, Published Cohorts und Quellen. Nicht loeschen.
+ *
+ * Was daran fallbezogen ist und was nicht:
+ *
+ *   pro REGIME      alles aus dem Profil - Evidenztexte, Risk Flags, Kohorten,
+ *                   Quellen. Fuer alle vier Patientinnen identisch.
+ *   pro PATIENTIN   nur die Modellwahrscheinlichkeit, die
+ *                   buildModelPredictionEvidence() aus study_cases.json liest.
+ *
+ * Wer den Fallbezug erweitern will, setzt dort an - nicht in den Profilen.
+ *
+ * Reihenfolge: liegt VITE_API_BASE_URL vor, wird der Backend-Endpunkt gefragt
+ * und seine Antwort ueber das Profil gelegt; ohne die Variable laeuft alles
+ * rein im Frontend. Faellt der Endpunkt aus, greift ebenfalls das Profil.
+ */
 import type { HumanAssessment, AiEvidenceSynthesis, EvidenceItem } from '../types';
 import { mockTreatmentEvidenceById } from '../data/mockData';
 import { fetchCase, rankedRegimes } from './caseService';
 
+/** Fallback, wenn im Assessment nichts ausgewaehlt wurde. */
 const DEFAULT_TREATMENT_ID = 'CYCLOPHOSPHAMIDE + DOXORUBICIN';
 
-/**
- *
- * 
- * 
- * This gets called after the Assessment is completed, and returns the AI Evidence Synthesis for the selected treatment and patient.
- * 
- * 
- * 
- */
+/** Wird nach Abschluss des Assessments aufgerufen (Step 2 -> Step 3). */
 export async function fetchEvidenceSynthesis(
   patientId: string,
   assessment: HumanAssessment,

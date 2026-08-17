@@ -1,4 +1,37 @@
 
+"""
+Erzeugt aus MSK CHORD 2024 das Modell und alles, was das Frontend anzeigt.
+
+Ablauf: Rohdaten laden -> Erstlinientherapie je Patientin bestimmen -> Merkmale
+bauen -> RandomForest trainieren -> fuer die vier Studienfaelle Vorhersagen,
+SHAP-Werte, klinischen Kontext, Nachbarfaelle und Vergleichskohorten nach
+frontend/public/study_cases.json schreiben.
+
+DREI REGELN, an denen hier schon Fehler hingen:
+
+1. t0 ist der Beginn der Erstlinientherapie. Alle Zeitleisten werden mit
+   _before() darauf gefiltert. Was nach t0 dokumentiert wurde, darf die
+   Patientin im Entscheidungsmoment nicht sehen - sonst zeigt die Oberflaeche
+   Information aus der Zukunft. Genau so kam frueher ein Rezidiv in die
+   Patientenuebersicht und ein Nach-OP-Stadium ("Stage 0", ypT0) in die
+   Diagnose. Wer eine neue Datenquelle ergaenzt: immer durch _before().
+
+2. Das Modell sieht ausschliesslich NUM + CAT, also die 18 Merkmale unten.
+   Alles andere in build_clinical_context() ist reine Anzeige und beeinflusst
+   keine Vorhersage. Umgekehrt heisst das: die ORGANS-Flags sind undatiert
+   ("jemals im Verlauf") und geraten trotzdem ins Modell - eine bekannte
+   Schwaeche, kein Versehen.
+
+3. outcome (OS_MONTHS, OS_STATUS) der Indexpatientin ist nur fuer die spaetere
+   Auswertung. Es steht in study_cases.json, wird im Frontend aber nirgends
+   gelesen und darf dort auch nicht auftauchen. Bei den Nachbarfaellen aus dem
+   Trainingsset ist das Outcome dagegen erwuenscht - das sind abgeschlossene
+   Verlaeufe, die ein Arzt kennen wuerde.
+
+RANDOM_STATE ist ueberall 42, damit Split und Modell reproduzierbar bleiben.
+Aendert man ihn, aendern sich alle Wahrscheinlichkeiten im Frontend.
+"""
+
 from __future__ import annotations
 
 import json

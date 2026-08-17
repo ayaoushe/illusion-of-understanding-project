@@ -1,3 +1,36 @@
+/**
+ * Baut die Patientenübersicht (Step 1) aus einem Studienfall.
+ *
+ * ACHTUNG — diese Datei mischt drei Sorten von Daten, und man sieht ihnen das
+ * im UI nicht an. Wer hier etwas ändert oder Werte übernimmt, muss wissen,
+ * welche Sorte er vor sich hat:
+ *
+ *   ECHT        aus MSK CHORD, unverändert. Alter, Geschlecht, Stadium,
+ *               Histologie, Lokalisation, alle Biomarker, ECOG, Tumorsites.
+ *
+ *   ABGELEITET  regelbasiert aus echten Werten berechnet. MRN, Subtyp,
+ *               ICD-10, Diagnosedatum, Priority, Missing Data. Kein neuer
+ *               Inhalt, aber eine Interpretation — die Regel kann falsch sein.
+ *
+ *   ERFUNDEN    frei erfunden, nur plausibel gemacht. Labor, Komorbiditäten,
+ *               Medikation, QoL, Präferenzen, Tag und Monat des Geburtsdatums.
+ *               Steht so in keiner Akte. Die betreffenden Stellen sind unten
+ *               einzeln markiert.
+ *
+ * Zwei Regeln, an denen schon Fehler hingen:
+ *
+ *   1. Zeitliche Trennung. Sichtbar ist nur, was VOR Beginn der Erstlinie
+ *      dokumentiert war. Die Organ-Flags des Modells (LIVER, BONE, …) sind
+ *      undatiert und bedeuten "jemals im Verlauf" — sie dürfen die Anzeige
+ *      nicht steuern. Deshalb kommen Tumorlokalisationen aus den datierten
+ *      Registerbefunden und die Metastasierung allein aus dem Stadium.
+ *
+ *   2. Das pathologische Stadium ist ein Nach-OP-Befund. Es zählt nur, wenn
+ *      vor Therapiebeginn tatsächlich operiert wurde (siehe stageAtDecision.ts).
+ *
+ * Das Modell selbst sieht von alldem nur die 18 Merkmale aus `options[].features`
+ * — nichts, was hier zusätzlich berechnet oder erfunden wird.
+ */
 import type { StudyCase } from '../types';
 import { STUDY_NAMES, mrnFromId } from '../config/studyCases';
 import { STAGE_AT_DECISION } from '../data/stageAtDecision';
@@ -77,6 +110,12 @@ function yesNo(v: string | undefined): boolean {
   return (v ?? '').toLowerCase() === 'yes';
 }
 
+/**
+ * ERFUNDEN — erzeugt aus der Patienten-ID eine feste Pseudozufallszahl.
+ * Damit werden Tag und Monat von Geburts- und Diagnosedatum gewürfelt, wenn
+ * das Register nichts hergibt. Gleiche ID -> gleiches Datum, damit die Anzeige
+ * zwischen zwei Aufrufen nicht springt. Diese Tage bedeuten nichts.
+ */
 function hashInt(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
@@ -222,7 +261,16 @@ export function buildPatientView(c: StudyCase): PatientView {
   const dobMonth = String(((h >> 5) % 12) + 1).padStart(2, '0');
   const dobDay = String(((h >> 3) % 27) + 1).padStart(2, '0');
 
-  // Mockdaten die nicht im eigentlichen Datenset vorkommen
+  // ===================================================================
+  // ERFUNDEN — ab hier bis zu den Missing Data steht nichts mehr aus dem
+  // Register. MSK CHORD enthält kein Routinelabor, keine Komorbiditäten,
+  // keine Medikation und keine Präferenzen; für die Studie braucht die
+  // Oberfläche aber gefüllte Karten. Erzeugt wird alles aus zwei Schaltern:
+  // Alter und Stadium. Keiner dieser Werte darf in eine Auswertung.
+  //
+  // Echt ist an dieser Stelle nur der Raucherstatus (Modellmerkmal).
+  // ===================================================================
+
   const anemic = ageForLogic >= 70 || isMetastatic;
   const renalReduced = ageForLogic >= 70;
   const labs: LabValue[] = [
@@ -351,10 +399,19 @@ export function buildPatientView(c: StudyCase): PatientView {
       : 'Flexible; accepts inpatient care if needed',
     familyInvolvement: ageForLogic >= 60 ? 'Adult children involved in decisions' : 'Partner involved in decisions',
   };
-//
+
+  // ===================================================================
+  // Ende des erfundenen Teils.
+  //
+  // ABGELEITET — die Missing-Data-Liste beschreibt echte Lücken des
+  // Datensatzes: LVEF, Menopausenstatus, Knochendichte und BRCA sind in
+  // MSK CHORD tatsächlich nicht enthalten. Welcher Punkt erscheint, hängt
+  // am Rezeptorstatus und am Nodalbefund der Patientin, also an echten
+  // Merkmalen. Step 3 führt eine eigene Liste (EvidenceReview.tsx) — die
+  // beiden laufen auseinander, das ist noch offen.
+  // ===================================================================
   const missingData: string[] = [];
 
- 
   if (her2 || isMetastatic || nodePos) {
     missingData.push('Baseline LVEF / echocardiogram not yet documented');
   }

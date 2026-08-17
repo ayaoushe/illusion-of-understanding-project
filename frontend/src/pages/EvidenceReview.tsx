@@ -26,6 +26,18 @@ const uncertaintyExplanations: Record<string, string> = {
   high: 'Evidence is weakly matched or important patient-specific information is missing; recommendation should be interpreted cautiously.',
 };
 
+/**
+ * Der Reiter "Missing Data" in Step 3.
+ *
+ * ACHTUNG — diese Liste ist fest verdrahtet und fuer alle vier Patientinnen
+ * identisch. Sie wird NICHT aus `evidence.missingData` gespeist, obwohl das
+ * Feld existiert und gefuellt ist. Step 1 (patientView.ts) baut seine eigene,
+ * fallabhaengige Liste; die beiden zeigen derselben Patientin daher
+ * unterschiedliche Luecken an. Bekannt und noch nicht aufgeloest.
+ *
+ * Wer den Text hier aendert, aendert ihn fuer alle Faelle und alle zehn
+ * Therapieoptionen gleichzeitig.
+ */
 const missingDataDetails = [
   {
     item: 'Baseline LVEF / echocardiogram not yet obtained',
