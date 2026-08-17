@@ -7,6 +7,8 @@ import type { SimilarCase } from '../types';
 import { PageHeader } from '../components/layout/PageHeader';
 import { StepFooter } from '../components/layout/StepFooter';
 
+
+//Step 5: Shows the patients most similar cases to show how they were treated and the outcome
 export function SimilarCases() {
   const { recordInteraction, selectedPatientId } = useWorkflow();
   const [expandedCase, setExpandedCase] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export function SimilarCases() {
         if (real.length) setCases(real);
       })
       .catch(() => {
-        /* Keep the placeholder if remote data is unavailable */
+        /* Placeholder if remote data is unavailable */
       });
     return () => {
       cancelled = true;

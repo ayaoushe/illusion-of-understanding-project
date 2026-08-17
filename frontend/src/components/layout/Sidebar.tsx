@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getPatientProfile, mockPatient } from '../../data/mockData';
+import { getPatientProfile } from '../../data/mockData';
 import { useWorkflow } from '../../context/WorkflowContext';
 import { StepNavigation } from './StepNavigation';
 import { fetchCases } from '../../services/caseService';
@@ -36,6 +36,7 @@ function ConfirmModal({
   );
 }
 
+//Left Sidebar for navigation and case selection
 export function Sidebar() {
   const {
     steps,
@@ -55,12 +56,14 @@ export function Sidebar() {
   const [cases, setCases] = useState<StudyCase[] | null>(null);
   const caseSelectorRef = useRef<HTMLDivElement | null>(null);
 
+  //Case list for the switching dropdown and case selection
   useEffect(() => {
     fetchCases()
       .then(setCases)
       .catch(() => setCases([]));
   }, []);
 
+  //Order Cases from A-B
   const orderedCases = useMemo(
     () =>
       cases
@@ -82,6 +85,7 @@ export function Sidebar() {
     return () => document.removeEventListener('mousedown', handlePointerDown);
   }, [isCaseMenuOpen]);
 
+  //If case is switched the workflow resets
   const handlePatientSelect = (nextPatientId: string) => {
     if (!nextPatientId || nextPatientId === selectedPatientId) return;
     setIsCaseMenuOpen(false);

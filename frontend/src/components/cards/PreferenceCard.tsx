@@ -1,3 +1,5 @@
+//Card design for Preferences in Patient Overview
+
 import { useState } from 'react';
 
 interface PreferenceCardProps {

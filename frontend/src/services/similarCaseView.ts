@@ -26,6 +26,8 @@ const FIELD_ORDER = [
   'TUMOR_PURITY',
 ];
 
+/** Converts one raw feature value into the human-readable chip label shown per criterion. */
+
 function criterionLabel(field: string, value: string | number | null): string {
   const v = value === null ? '—' : String(value);
   const yes = v.toLowerCase() === 'yes';
@@ -59,6 +61,8 @@ function criterionLabel(field: string, value: string | number | null): string {
   }
 }
 
+/** Short line of a neighbor case for the card header. */
+
 function presentation(n: SimilarNeighbor): string {
   const f = n.features;
   const age = f.CURRENT_AGE_DEID === null ? '—' : Math.round(Number(f.CURRENT_AGE_DEID));
@@ -68,12 +72,14 @@ function presentation(n: SimilarNeighbor): string {
   return `Female, ${age}y, ${hr}/${her2}, ${f.STAGE_HIGHEST_RECORDED ?? '—'}, ${nodes}`;
 }
 
+/** Formats a neighbor's real registry outcome */
 function outcomeText(n: SimilarNeighbor): string {
   const status = n.os_status.includes('DECEASED') ? 'deceased' : 'alive at last follow-up';
   if (n.os_months === null) return `Follow-up not recorded, ${status}`;
   return `${n.os_months.toFixed(0)} months overall survival, ${status}`;
 }
 
+/** Builds the similar Cases */
 export function buildSimilarCases(c: StudyCase): SimilarCase[] {
   const neighbors = c.similar_cases ?? [];
   return neighbors.map((n) => {

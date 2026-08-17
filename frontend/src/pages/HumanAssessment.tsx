@@ -5,6 +5,9 @@ import type { HumanAssessment } from '../types';
 import { PageHeader } from '../components/layout/PageHeader';
 import { StepFooter } from '../components/layout/StepFooter';
 
+
+//Step 2: The clinican records a treatment before seeing any AI evidence
+
 const emptyForm: HumanAssessment = {
   selectedTreatment: '',
   clinicalReasoning: '',
@@ -20,6 +23,9 @@ export function HumanAssessment() {
   const [form, setForm] = useState<HumanAssessment>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
 
+  // Marks when the clinician started this step, used for the assessment-duration
+  // telemetry consumed by detectBiasWarnings (e.g. flagging rushed decisions).
+  
   useEffect(() => {
     startAssessment();
   }, [startAssessment]);
@@ -37,6 +43,7 @@ export function HumanAssessment() {
     setSubmitting(false);
   };
 
+  //Assessment is locked after submission
   if (assessmentComplete) {
     return (
       <div className="page">

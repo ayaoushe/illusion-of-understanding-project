@@ -1,3 +1,4 @@
+
 import type {
   Patient,
   AiEvidenceSynthesis,
@@ -8,6 +9,7 @@ import type {
 } from '../types';
 import { mrnFromId } from '../config/studyCases';
 
+//Workflowsteps
 export const WORKFLOW_STEPS: WorkflowStep[] = [
   { id: 'overview', label: 'Patient Overview', shortLabel: 'Overview', number: 1 },
   { id: 'assessment', label: 'Human Initial Assessment', shortLabel: 'Assessment', number: 2 },
@@ -17,6 +19,7 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
   { id: 'reflection', label: 'Final Reflection', shortLabel: 'Reflection', number: 6 },
 ];
 
+//Treatment option IDs
 export const TREATMENT_OPTION_IDS = [
   'ANASTROZOLE',
   'LETROZOLE',
@@ -193,7 +196,7 @@ export const mockPatient: Patient = {
     version: 'OncoCDSS v2.0',
   },
 };
-//MOCKKKPATIENT
+
 
 
 //Patient Profiles from the Dataset

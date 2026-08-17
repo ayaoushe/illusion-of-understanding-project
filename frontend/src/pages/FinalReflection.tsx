@@ -5,6 +5,9 @@ import type { FinalReflection } from '../types';
 import { PageHeader } from '../components/layout/PageHeader';
 import { FinalDecisionSummary } from '../components/cards/FinalDecisionSummary';
 
+//Step 6:  Captures whether/how the AI evidence changed the
+//clinician's mind and their final treatment decision, so it can be compared
+ //against the initial HumanAssessment
 const emptyReflection: FinalReflection = {
   changedMind: 'no',
   finalTreatment: '',
