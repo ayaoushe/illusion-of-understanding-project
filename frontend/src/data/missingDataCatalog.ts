@@ -55,6 +55,12 @@ export const MISSING_DATA_ITEMS: MissingDataItem[] = [
     impact: 'Uncertainty in long-term treatment and surveillance planning',
     urgency: 'medium',
   },
+  {
+    item: 'Oncotype DX recurrence score not yet obtained',
+    whyMatters: 'Can help estimate genomic recurrence risk and chemotherapy benefit in selected HR-positive disease',
+    impact: 'Limits confidence in escalation to chemotherapy',
+    urgency: 'high',
+  },
 ];
 
 /** Kurzform für die Karte in Step 1. */

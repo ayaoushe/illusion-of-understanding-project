@@ -6,11 +6,24 @@ import type { SimilarCase } from '../types';
 import { PageHeader } from '../components/layout/PageHeader';
 import { StepFooter } from '../components/layout/StepFooter';
 
+/** Badge background/text color per relation — kept inline since relation is dynamic. */
+const RELATION_STYLE: Record<SimilarCase['relation'], { background: string; color: string }> = {
+  current: { background: 'rgba(100, 116, 139, 0.12)', color: 'var(--muted, #64748b)' },
+  supporting_ai: { background: 'rgba(22, 163, 74, 0.12)', color: 'var(--success, #16a34a)' },
+  supporting_doctor: { background: 'rgba(37, 99, 235, 0.12)', color: 'var(--info, #2563eb)' },
+  not_supporting: { background: 'rgba(217, 119, 6, 0.12)', color: 'var(--warning, #d97706)' },
+};
+
+const CARD_CLASS: Record<SimilarCase['relation'], string> = {
+  current: 'current-case',
+  supporting_ai: 'supporting supporting-ai',
+  supporting_doctor: 'supporting supporting-doctor',
+  not_supporting: 'counterfactual',
+};
 
 //Step 5: Shows the patients most similar cases to show how they were treated and the outcome
 export function SimilarCases() {
-  const { recordInteraction, selectedPatientId } = useWorkflow();
-  const [expandedCase, setExpandedCase] = useState<string | null>(null);
+  const { recordInteraction, selectedPatientId, assessment } = useWorkflow();
   // Leer starten statt mit NSCLC-Platzhaltern: bis die echten Nachbarn geladen
   // sind, soll nichts dastehen, was wie ein Vergleichsfall aussieht.
   const [cases, setCases] = useState<SimilarCase[]>([]);
@@ -25,7 +38,7 @@ export function SimilarCases() {
     fetchCase(selectedPatientId)
       .then((c) => {
         if (cancelled || !c) return;
-        const real = buildSimilarCases(c);
+        const real = buildSimilarCases(c, assessment?.selectedTreatment ?? null);
         if (real.length) setCases(real);
       })
       .catch(() => {
@@ -34,7 +47,7 @@ export function SimilarCases() {
     return () => {
       cancelled = true;
     };
-  }, [selectedPatientId]);
+  }, [selectedPatientId, assessment?.selectedTreatment]);
 
   return (
     <div className="page">
@@ -45,7 +58,9 @@ export function SimilarCases() {
           <span className="label">Clinical context</span>
         </div>
         <p style={{ fontSize: '0.85rem', margin: 0 }}>
-          Compare this patient with prior cases that match on key clinical features. Matching cases reflect treatments the model recommends; counterfactual cases show alternative regimens for context only.
+          Compare this patient with prior registry cases that match on key clinical features. Two cases received the
+          same treatment as the AI recommendation or the doctor's actual choice; two received a different treatment
+          than both, for contrast.
         </p>
       </div>
 
@@ -57,15 +72,20 @@ export function SimilarCases() {
             </p>
           </div>
         )}
-        {cases.map((c) => {
-          const isExpanded = expandedCase === c.caseId;
-          const visibleCriteria = isExpanded ? c.matchCriteria : c.matchCriteria.slice(0, 4);
-          const isCounterfactual = typeof c.isCounterfactual === 'boolean' ? c.isCounterfactual : c.matchScore < 80;
+        {cases.map((c, index) => {
+          const isCurrent = c.relation === 'current';
+          const badgeStyle = RELATION_STYLE[c.relation];
+          const counterfactualIndex =
+            c.relation === 'not_supporting'
+              ? cases.slice(0, index + 1).filter((item) => item.relation === 'not_supporting').length
+              : 0;
+          const positionClass =
+            c.relation === 'not_supporting' ? `counterfactual-${counterfactualIndex}` : '';
 
           return (
             <div
               key={c.caseId}
-              className={`card similar-case-card ${c.isRare ? 'rare-case' : isCounterfactual ? 'counterfactual' : 'supporting'}`}
+              className={`card similar-case-card ${CARD_CLASS[c.relation]} ${c.isRare ? 'rare-case' : ''} ${positionClass}`}
             >
               <div className="case-header">
                 <div className="case-title-wrap">
@@ -74,64 +94,52 @@ export function SimilarCases() {
                 </div>
 
                 <div className="case-meta">
-                  <span className="match-score">{c.matchScore}% match</span>
-                  <span
-                    className="badge"
-                    style={
-                      !isCounterfactual
-                        ? { background: 'rgba(22, 163, 74, 0.12)', color: 'var(--success)' }
-                        : { background: 'rgba(217, 119, 6, 0.12)', color: 'var(--warning)' }
-                    }
-                  >
-                    {isCounterfactual ? 'Counterfactual' : 'Supporting'}
+                  {!isCurrent && <span className="match-score">{c.matchScore}% match</span>}
+                  <span className="badge" style={badgeStyle}>
+                    {c.relationLabel}
                   </span>
                 </div>
               </div>
 
               <p className="case-presentation">{c.presentation}</p>
 
-              <div className="case-key-stats">
-                <div className="case-stat treatment-stat">
-                  <span className="case-stat-label">Treatment</span>
-                  <strong className="case-stat-value">{c.treatmentUsed}</strong>
+              {isCurrent ? (
+                <p className="muted" style={{ fontSize: '0.82rem', margin: '0 0 0.6rem' }}>
+                  {c.relationDescription}
+                </p>
+              ) : (
+                <div className="case-key-stats">
+                  <div className="case-stat treatment-stat">
+                    <span className="case-stat-label">Treatment</span>
+                    <strong className="case-stat-value">{c.treatmentUsed}</strong>
+                  </div>
+                  <div className="case-stat outcome-stat">
+                    <span className="case-stat-label">Outcome</span>
+                    <strong className="case-stat-value outcome-text">{c.outcome}</strong>
+                  </div>
                 </div>
-                <div className="case-stat outcome-stat">
-                  <span className="case-stat-label">Outcome</span>
-                  <strong className="case-stat-value outcome-text">{c.outcome}</strong>
-                </div>
-              </div>
+              )}
 
               <div className="similarity-panel">
                 <div className="similarity-header">
-                  <span>Similarity factors</span>
+                  <span>{isCurrent ? 'Clinical profile' : 'Similarity factors'}</span>
                 </div>
 
                 <div className="match-criteria">
-                  {visibleCriteria.map((crit) => (
-                    <span key={crit.label} className={`criteria-chip ${crit.matched ? 'matched' : 'unmatched'}`}>
+                  {c.matchCriteria.map((crit) => (
+                    <span
+                      key={crit.label}
+                      className={`criteria-chip ${isCurrent ? 'reference' : crit.matched ? 'matched' : 'unmatched'}`}
+                    >
                       {crit.label}
                     </span>
                   ))}
-                  {c.matchCriteria.length > 4 && (
-                    <button
-                      type="button"
-                      className="more-pill"
-                      aria-expanded={isExpanded}
-                      onClick={() => setExpandedCase(isExpanded ? null : c.caseId)}
-                    >
-                      {isExpanded ? 'Hide' : `+${c.matchCriteria.length - 4} more`}
-                    </button>
-                  )}
                 </div>
               </div>
 
               <div className="case-source">Source: {c.source}</div>
 
-              {c.isRare && (
-                <div className="rare-note">
-                  Rare presentation — consider with caution. Limited comparative data.
-                </div>
-              )}
+              
             </div>
           );
         })}

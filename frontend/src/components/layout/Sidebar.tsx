@@ -3,7 +3,7 @@ import { getPatientProfile } from '../../data/mockData';
 import { useWorkflow } from '../../context/WorkflowContext';
 import { StepNavigation } from './StepNavigation';
 import { fetchCases } from '../../services/caseService';
-import { STUDY_CASES, STUDY_LABELS, STUDY_NAMES, mrnFromId } from '../../config/studyCases';
+import { STUDY_CASES } from '../../config/studyCases';
 import type { StudyCase } from '../../types';
 
 function ConfirmModal({
@@ -104,8 +104,7 @@ export function Sidebar() {
     setShowConfirm(false);
   };
 
-  const selectedCaseLabel = selectedPatientId ? STUDY_LABELS[selectedPatientId] ?? '?' : '?';
-  const selectedCaseTitle = patient ? `Case ${selectedCaseLabel} \u00b7 ${patient.name}` : 'Select case';
+  const selectedCaseTitle = patient ? `${patient.name} - (${selectedPatientId})` : 'Select case';
 
   return (
     <aside className="sidebar">
@@ -132,7 +131,6 @@ export function Sidebar() {
               <div className="sidebar-case-menu" role="listbox" aria-label="Select patient case">
                 {orderedCases.map((c) => {
                   const optionPatient = getPatientProfile(c.patient_id);
-                  const label = STUDY_LABELS[c.patient_id] ?? '?';
                   const isSelected = c.patient_id === selectedPatientId;
                   return (
                     <button
@@ -144,9 +142,8 @@ export function Sidebar() {
                       aria-selected={isSelected}
                     >
                       <span className="sidebar-case-option-main">
-                        Case {label} {'\u00b7'} {STUDY_NAMES[c.patient_id] ?? optionPatient.name}
+                        {optionPatient.name} - ({c.patient_id})
                       </span>
-                      <span className="sidebar-case-option-meta">MRN {mrnFromId(c.patient_id)}</span>
                     </button>
                   );
                 })}

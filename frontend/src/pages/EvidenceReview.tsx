@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useWorkflow } from '../context/WorkflowContext';
+import { fetchCase } from '../services/caseService';
 import { PageHeader } from '../components/layout/PageHeader';
 import { StepFooter } from '../components/layout/StepFooter';
 import { TabBar } from '../components/layout/TabBar';
@@ -30,13 +31,58 @@ const uncertaintyExplanations: Record<string, string> = {
 // Gemeinsame Quelle mit Step 1 (data/missingDataCatalog.ts), damit die
 // Patientenuebersicht und dieser Reiter dieselben Punkte zeigen.
 const missingDataDetails = MISSING_DATA_ITEMS;
+const ONCOTYPE_MISSING_DATA_LABEL = 'Oncotype DX recurrence score not yet obtained';
+
+/**
+ * HER2 / HR are patient-level features, not treatment-level ones — the same
+ * study case repeats them inside every entry of `options[].features[]` (once
+ * per candidate regime). We just need one occurrence, so we scan the options
+ * until we find the named feature and read its "Yes"/"No" value.
+ */
+function extractPatientFeatureIsYes(studyCase: unknown, featureName: string): boolean | null {
+  const options = (studyCase as { options?: Array<{ features?: Array<{ name: string; value: string }> }> } | null)?.options ?? [];
+  for (const option of options) {
+    const match = option.features?.find((f) => f.name === featureName);
+    if (match) return match.value === 'Yes';
+  }
+  return null;
+}
 
 
 //Renders evidence for the selected cases and assessed treatment
 export function EvidenceReview() {
-  const { assessment, evidence, evidenceLoading } = useWorkflow();
+  const {
+    assessment,
+    evidence,
+    evidenceLoading,
+    evidenceVisitedTabs,
+    markEvidenceTabVisited,
+    markEvidenceTabsReviewed,
+    selectedPatientId,
+  } = useWorkflow();
   const [activeTab, setActiveTab] = useState<EvidenceTabId>('evidence');
-  const [visitedTabs, setVisitedTabs] = useState<EvidenceTabId[]>(['evidence']);
+  const [her2Positive, setHer2Positive] = useState<boolean | null>(null);
+  const [hrPositive, setHrPositive] = useState<boolean | null>(null);
+
+  // Patient-level HER2/HR status, read straight from the study case so the two
+  // conditional cautions below can apply regardless of which regimen the
+  // model predicted for this patient.
+  useEffect(() => {
+    if (!selectedPatientId) {
+      setHer2Positive(null);
+      setHrPositive(null);
+      return;
+    }
+    let cancelled = false;
+    fetchCase(selectedPatientId).then((studyCase) => {
+      if (cancelled) return;
+      setHer2Positive(extractPatientFeatureIsYes(studyCase, 'HER2'));
+      setHrPositive(extractPatientFeatureIsYes(studyCase, 'HR'));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedPatientId]);
 
   const tabs = useMemo(
     () => [
@@ -48,6 +94,10 @@ export function EvidenceReview() {
     ],
     [],
   );
+
+  useEffect(() => {
+    markEvidenceTabVisited('evidence');
+  }, [markEvidenceTabVisited]);
 
   if (evidenceLoading || !evidence) {
     return (
@@ -62,12 +112,27 @@ export function EvidenceReview() {
   const handleTabChange = (tabId: string) => {
     const nextTab = tabId as EvidenceTabId;
     setActiveTab(nextTab);
-    setVisitedTabs((prev) => (prev.includes(nextTab) ? prev : [...prev, nextTab]));
+    markEvidenceTabVisited(nextTab);
   };
 
-  const reviewedCount = visitedTabs.length;
+  const reviewedCount = evidenceVisitedTabs.length;
   const allTabsVisited = reviewedCount === tabs.length;
+
+  useEffect(() => {
+    if (allTabsVisited) markEvidenceTabsReviewed();
+  }, [allTabsVisited, markEvidenceTabsReviewed]);
+
   const selectedTreatmentLabel = assessment?.selectedTreatment ? getAssessmentTreatmentLabel(assessment.selectedTreatment) : 'Selected treatment';
+  const showOncotypeMissingData =
+    assessment?.selectedTreatment === 'CYCLOPHOSPHAMIDE + DOXORUBICIN' &&
+    her2Positive === false &&
+    hrPositive === true;
+  const visibleMissingDataDetails = missingDataDetails.filter(
+    (item) => item.item !== ONCOTYPE_MISSING_DATA_LABEL || showOncotypeMissingData,
+  );
+  const visibleKeyReasoningFactors = evidence.keyReasoningFactors.filter(
+    (factor) => !factor.factor.toLowerCase().includes('oncotype') || showOncotypeMissingData,
+  );
 
   /** Resolve source IDs referenced in evidence items and published cohorts */
   const referencedSourceIds = useMemo(
@@ -93,6 +158,41 @@ export function EvidenceReview() {
     [referencedSourceIds],
   );
 
+  /**
+   * Evidence-against items that depend on this patient's receptor status
+   * rather than being fixed per regimen. Kept out of mockData.ts, which is
+   * static per treatment, so they only appear for patients they actually
+   * apply to.
+   */
+  const conditionalCautions = useMemo(() => {
+    const items: Array<{ text: string; source?: string; suppressBadge?: boolean }> = [];
+    const treatmentId = assessment?.selectedTreatment;
+
+    if (treatmentId === 'CYCLOPHOSPHAMIDE + DOXORUBICIN' && her2Positive) {
+      items.push({
+        text: 'This treatment regimen does not include HER2-targeted therapy.',
+        source: 'Patient context',
+      });
+    }
+
+    if (treatmentId === 'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB' && her2Positive && hrPositive) {
+      items.push({
+        text: 'Limited evidence exists for this combination in patients who are both HER2-positive and HR-positive.',
+        source: 'Patient context',
+      });
+    }
+
+    if (treatmentId === 'CYCLOPHOSPHAMIDE + DOXORUBICIN' && !her2Positive && hrPositive) {
+      items.push({
+        text: 'Genomic risk stratification (Oncotype DX recurrence score) is missing; potential risk of overtreatment with chemotherapy.',
+        source: 'Missing Data',
+        suppressBadge: true,
+      });
+    }
+
+    return items;
+  }, [assessment?.selectedTreatment, her2Positive, hrPositive]);
+
   //Flag evidence with missing or caution badge
   const getBadge = (text: string) => {
     if (/missing|caution/i.test(text)) {
@@ -102,9 +202,9 @@ export function EvidenceReview() {
   };
 
   /** Render a single evidence item — citation chips only for registry-backed claims */
-  const renderEvidenceItem = (text: string, source: string | undefined) => {
+  const renderEvidenceItem = (text: string, source: string | undefined, suppressBadge = false) => {
     const sourceUrl = getSourceUrl(source);
-    const badge = getBadge(text);
+    const badge = suppressBadge ? null : getBadge(text);
     const isPatientContext = isPatientContextSource(source);
     const citationNumber = source ? citationNumberBySource.get(source) : undefined;
 
@@ -180,22 +280,23 @@ export function EvidenceReview() {
             <div className="card evidence-card variant-for">
               <h4 style={{ color: 'var(--success)' }}>✓ Evidence For</h4>
               <ul className="evidence-list">
-                {evidence.evidenceFor.map((e) => renderEvidenceItem(e.text, e.source))}
+                {evidence.evidenceFor.map((e) => renderEvidenceItem(e.text, e.source, e.suppressBadge))}
               </ul>
             </div>
             <div className="card evidence-card variant-against">
               <h4 style={{ color: 'var(--danger)' }}>✗ Evidence Against / Cautions</h4>
               <ul className="evidence-list">
-                {evidence.evidenceAgainst.map((e) => renderEvidenceItem(e.text, e.source))}
+                {evidence.evidenceAgainst.map((e) => renderEvidenceItem(e.text, e.source, e.suppressBadge))}
+                {conditionalCautions.map((e) => renderEvidenceItem(e.text, e.source, e.suppressBadge))}
               </ul>
             </div>
           </div>
 
-          {evidence.keyReasoningFactors.length > 0 && (
+          {visibleKeyReasoningFactors.length > 0 && (
             <div className="card">
               <h4>Key Reasoning Factors</h4>
               <div className="reasoning-factors">
-                {evidence.keyReasoningFactors.map((f) => (
+                {visibleKeyReasoningFactors.map((f) => (
                   <div key={f.factor} className={`reasoning-factor direction-${f.direction}`}>
                     <span className="factor-name">{f.factor}</span>
                     <span className={`weight-badge weight-${f.weight}`}>{f.weight}</span>
@@ -210,7 +311,7 @@ export function EvidenceReview() {
 
       {activeTab === 'missing' && (
         <div className="missing-detail-grid">
-          {missingDataDetails.map((item, i) => (
+          {visibleMissingDataDetails.map((item, i) => (
             <div key={i} className="missing-detail-card">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.3rem' }}>
                 <h5>{item.item}</h5>
@@ -236,7 +337,7 @@ export function EvidenceReview() {
                 <p style={{ fontSize: '0.8rem', margin: '0 0 0.35rem' }}>{flag.description}</p>
                 {flag.relatedTreatments && (
                   <div className="risk-related">
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Related:</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Drugs with a similar risk:</span>
                     {flag.relatedTreatments.map((t) => (
                       <span key={t} className="tag">{t}</span>
                     ))}

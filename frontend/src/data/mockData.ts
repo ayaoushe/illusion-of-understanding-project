@@ -1,7 +1,7 @@
-
 import type {
   Patient,
   AiEvidenceSynthesis,
+  EvidenceItem,
   PublishedCohort,
   WorkflowStep,
   RiskFlag,
@@ -10,12 +10,12 @@ import { STUDY_NAMES, mrnFromId } from '../config/studyCases';
 
 //Workflowsteps
 export const WORKFLOW_STEPS: WorkflowStep[] = [
-  { id: 'overview', label: 'Patient Overview', shortLabel: 'Overview', number: 1 },
-  { id: 'assessment', label: 'Human Initial Assessment', shortLabel: 'Assessment', number: 2 },
-  { id: 'evidence', label: 'AI Evidence Synthesis', shortLabel: 'Evidence', number: 3 },
-  { id: 'treatment', label: 'Treatment Comparison', shortLabel: 'Treatment', number: 4 },
-  { id: 'similar', label: 'Similar Cases', shortLabel: 'Cases', number: 5 },
-  { id: 'reflection', label: 'Final Reflection', shortLabel: 'Reflection', number: 6 },
+  { id: 'overview', label: 'Patient Overview', shortLabel: 'Patient Overview', number: 1 },
+  { id: 'assessment', label: 'Human Initial Assessment', shortLabel: 'Clinician Assessment', number: 2 },
+  { id: 'evidence', label: 'AI Evidence Synthesis', shortLabel: 'Evidence for and against Initial Decision', number: 3 },
+  { id: 'treatment', label: 'Treatment Comparison', shortLabel: 'Top three AI Treatment Options', number: 4 },
+  { id: 'similar', label: 'Similar Cases', shortLabel: 'Illustration of Similar Cases', number: 5 },
+  { id: 'reflection', label: 'Final Reflection', shortLabel: 'Clinician Reflection', number: 6 },
 ];
 
 
@@ -75,35 +75,43 @@ export const mockRiskFlags = [
   {
     id: 'cardiac',
     title: 'Cardiotoxicity Risk',
-    severity: 'moderate' as const,
+    severity: 'medium' as const,
     description: 'Anthracyclines (doxorubicin) and HER2-targeted agents (trastuzumab/pertuzumab) carry a risk of LVEF decline; baseline and on-treatment cardiac monitoring is required.',
     relatedTreatments: ['CYCLOPHOSPHAMIDE + DOXORUBICIN', 'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB'],
   },
   {
     id: 'myelosuppression',
     title: 'Myelosuppression / Neutropenia Risk',
-    severity: 'moderate' as const,
+    severity: 'medium' as const,
     description: 'Combination chemotherapy regimens carry meaningful neutropenia risk; growth-factor support and dose delays may be needed.',
     relatedTreatments: ['CYCLOPHOSPHAMIDE + DOXORUBICIN', 'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE', 'PACLITAXEL', 'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB'],
   },
   {
-    id: 'bone-health',
+    id: 'bone-health-ovarian-suppression',
     title: 'Bone Density / Fracture Risk',
     severity: 'low' as const,
-    description: 'Aromatase inhibitors and ovarian suppression accelerate bone loss; baseline DEXA and calcium/vitamin D or bisphosphonate planning should be considered.',
-    relatedTreatments: ['ANASTROZOLE', 'LETROZOLE', 'LETROZOLE + PALBOCICLIB', 'LEUPROLIDE'],
+    description: 'Ovarian suppression accelerate bone loss; baseline DEXA and calcium/vitamin D or bisphosphonate planning should be considered.',
+    relatedTreatments: [ 'LEUPROLIDE'],
+  },
+    {
+    id: 'bone-health-aromatase-inhibitor',
+    title: 'Bone Density / Fracture Risk',
+    severity: 'low' as const,
+    description: 'Aromatase inhibitors accelerate bone loss; baseline DEXA and calcium/vitamin D or bisphosphonate planning should be considered.',
+    relatedTreatments: ['ANASTROZOLE', 'LETROZOLE', 'LETROZOLE + PALBOCICLIB'],
   },
   {
     id: 'thromboembolic',
     title: 'Thromboembolic / Endometrial Risk',
-    severity: 'moderate' as const,
+    severity: 'medium' as const,
     description: 'Tamoxifen is associated with increased risk of venous thromboembolism and endometrial changes; gynecologic monitoring is advised.',
     relatedTreatments: ['TAMOXIFEN'],
   },
+  
   {
     id: 'hepatic-renal',
     title: 'Hepatic / Renal Function Concern',
-    severity: 'moderate' as const,
+    severity: 'medium' as const,
     description: 'Capecitabine and combination chemotherapy require adequate hepatic and renal clearance; dose adjustments may be needed if function is impaired.',
     relatedTreatments: ['CAPECITABINE', 'CYCLOPHOSPHAMIDE + DOXORUBICIN'],
   },
@@ -114,6 +122,8 @@ export const mockRiskFlags = [
     description: 'Taxane-based regimens (paclitaxel) carry a dose-dependent risk of peripheral neuropathy, which can affect quality of life and treatment adherence.',
     relatedTreatments: ['PACLITAXEL', 'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB'],
   },
+   
+  
 ];
 
 
@@ -123,8 +133,8 @@ function createTreatmentEvidenceProfile(params: {
   uncertaintyLevel: AiEvidenceSynthesis['uncertaintyLevel'];
   uncertaintySummary: string;
   uncertaintyDescription: string;
-  evidenceFor: Array<{ text: string; source: string }>;
-  evidenceAgainst: Array<{ text: string; source: string }>;
+  evidenceFor: EvidenceItem[];
+  evidenceAgainst: EvidenceItem[];
   missingData: string[];
   riskFlags: RiskFlag[];
   publishedCohorts: PublishedCohort[];
@@ -153,6 +163,7 @@ const commonMissingData = [
   'Menopausal status not formally confirmed',
   'Baseline bone density (DEXA) not assessed',
   'Germline BRCA1/2 testing not yet performed',
+  'Oncotype DX recurrence score not yet obtained',
 ];
 
 /**
@@ -163,7 +174,7 @@ const commonMissingData = [
  */
 export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
   ANASTROZOLE: createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'moderate',
+    uncertaintyLevel: 'medium',
     uncertaintySummary: 'Anastrozole is well supported for postmenopausal, HR-positive early breast cancer, but menopausal status and bone health are unconfirmed.',
     uncertaintyDescription: 'The ATAC trial provides strong long-term evidence for anastrozole over tamoxifen in postmenopausal HR-positive disease, but confirmation of menopausal status and baseline bone density would improve confidence.',
     evidenceFor: [
@@ -177,9 +188,9 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
       { text: 'Aromatase inhibitors accelerate bone loss and increase fracture risk, which guidelines recommend assessing before treatment.', source: 'ASCO_BONE_HEALTH_JCO' },
     ],
     missingData: commonMissingData,
-    riskFlags: [mockRiskFlags[2]],
+    riskFlags: [mockRiskFlags[3]],
     publishedCohorts: [
-      { cohortName: 'ATAC: Anastrozole vs tamoxifen in postmenopausal early breast cancer', population: 'Postmenopausal women with HR-positive early-stage breast cancer', similarityLevel: 'Moderate', matchingFactors: ['HR-positive disease', 'Early-stage', 'Adjuvant endocrine setting'], limitationFactors: ['Requires confirmed postmenopausal status', 'Long follow-up trial population may differ demographically'], implication: 'Strong support for anastrozole if postmenopausal status is confirmed.', sourceLabel: 'ATAC_ANASTROZOLE_LANCET_ONCOL', sourceUrl: '' },
+      { cohortName: 'ATAC: Anastrozole vs tamoxifen in postmenopausal early breast cancer', population: 'Postmenopausal women with HR-positive early-stage breast cancer', similarityLevel: 'medium', matchingFactors: ['HR-positive disease', 'Early-stage', 'Adjuvant endocrine setting'], limitationFactors: ['Requires confirmed postmenopausal status', 'Long follow-up trial population may differ demographically'], implication: 'Strong support for anastrozole if postmenopausal status is confirmed.', sourceLabel: 'ATAC_ANASTROZOLE_LANCET_ONCOL', sourceUrl: '' },
     ],
     sources: [],
     reasoningFactors: [
@@ -190,7 +201,7 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
   }),
 
   LETROZOLE: createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'moderate',
+    uncertaintyLevel: 'medium',
     uncertaintySummary: 'Letrozole is a well-evidenced first-line aromatase inhibitor for HR-positive disease, with efficacy comparable to or better than tamoxifen.',
     uncertaintyDescription: 'BIG 1-98 supports letrozole as at least as effective as tamoxifen in postmenopausal HR-positive breast cancer, though menopausal confirmation and bone-health baseline remain outstanding.',
     evidenceFor: [
@@ -202,9 +213,9 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
       { text: 'Baseline bone density is unknown.', source: 'Missing data' },
     ],
     missingData: commonMissingData,
-    riskFlags: [mockRiskFlags[2]],
+    riskFlags: [mockRiskFlags[3]],
     publishedCohorts: [
-      { cohortName: 'BIG 1-98: Letrozole vs tamoxifen as initial adjuvant therapy', population: 'Postmenopausal women with endocrine-responsive early breast cancer', similarityLevel: 'Moderate', matchingFactors: ['HR-positive disease', 'Early-stage', 'Adjuvant endocrine setting'], limitationFactors: ['Requires confirmed postmenopausal status'], implication: 'Supports letrozole as an effective first-line endocrine option.', sourceLabel: 'BIG198_LETROZOLE_NEJM', sourceUrl: '' },
+      { cohortName: 'BIG 1-98: Letrozole vs tamoxifen as initial adjuvant therapy', population: 'Postmenopausal women with endocrine-responsive early breast cancer', similarityLevel: 'medium', matchingFactors: ['HR-positive disease', 'Early-stage', 'Adjuvant endocrine setting'], limitationFactors: ['Requires confirmed postmenopausal status'], implication: 'Supports letrozole as an effective first-line endocrine option.', sourceLabel: 'BIG198_LETROZOLE_NEJM', sourceUrl: '' },
     ],
     sources: [],
     reasoningFactors: [
@@ -214,7 +225,7 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
   }),
 
   'LETROZOLE + PALBOCICLIB': createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'moderate',
+    uncertaintyLevel: 'medium',
     uncertaintySummary: 'Adding palbociclib to letrozole meaningfully extends progression-free survival in HR-positive/HER2-negative disease, but this benefit is best established in the advanced/metastatic setting.',
     uncertaintyDescription: 'PALOMA-2 strongly supports this combination for HR-positive, HER2-negative advanced disease; applicability to earlier-stage disease and hematologic monitoring needs remain considerations.',
     evidenceFor: [
@@ -226,9 +237,9 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
       { text: 'Neutropenia was the most common toxicity with palbociclib and requires regular blood count monitoring.', source: 'PALOMA2_LETROZOLE_PALBOCICLIB_NEJM' },
     ],
     missingData: commonMissingData,
-    riskFlags: [mockRiskFlags[1], mockRiskFlags[2]],
+    riskFlags: [mockRiskFlags[1], mockRiskFlags[3]],
     publishedCohorts: [
-      { cohortName: 'PALOMA-2: Palbociclib plus letrozole as first-line therapy', population: 'HR-positive, HER2-negative advanced breast cancer, no prior systemic therapy for advanced disease', similarityLevel: 'Moderate', matchingFactors: ['HR-positive', 'HER2-negative', 'Endocrine-based combination'], limitationFactors: ['Advanced/metastatic trial population', 'Higher hematologic toxicity than endocrine monotherapy'], implication: 'Supports combination therapy when disease extent and monitoring capacity allow.', sourceLabel: 'PALOMA2_LETROZOLE_PALBOCICLIB_NEJM', sourceUrl: '' },
+      { cohortName: 'PALOMA-2: Palbociclib plus letrozole as first-line therapy', population: 'HR-positive, HER2-negative advanced breast cancer, no prior systemic therapy for advanced disease', similarityLevel: 'medium', matchingFactors: ['HR-positive', 'HER2-negative', 'Endocrine-based combination'], limitationFactors: ['Advanced/metastatic trial population', 'Higher hematologic toxicity than endocrine monotherapy'], implication: 'Supports combination therapy when disease extent and monitoring capacity allow.', sourceLabel: 'PALOMA2_LETROZOLE_PALBOCICLIB_NEJM', sourceUrl: '' },
     ],
     sources: [],
     reasoningFactors: [
@@ -263,7 +274,7 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
   }),
 
   LEUPROLIDE: createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'moderate',
+    uncertaintyLevel: 'medium',
     uncertaintySummary: 'Ovarian suppression with leuprolide adds benefit mainly in premenopausal, higher-risk HR-positive disease, most clearly when paired with an aromatase inhibitor or tamoxifen.',
     uncertaintyDescription: 'The SOFT trial supports ovarian suppression in premenopausal HR-positive breast cancer, particularly in younger patients or those who remain premenopausal after chemotherapy; confirmation of menopausal status and prior chemotherapy exposure would sharpen this recommendation.',
     evidenceFor: [
@@ -273,11 +284,12 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
     evidenceAgainst: [
       { text: 'Menopausal status has not been formally confirmed, which affects whether ovarian suppression adds meaningful benefit.', source: 'Missing data' },
       { text: 'Adding ovarian suppression was associated with a higher frequency of menopausal-type side effects than endocrine therapy alone.', source: 'SOFT_OVARIAN_SUPPRESSION_NEJM' },
+      { text: 'Additional aromatase inhibitors need to be added after a few weeks of treatment.', source: '' },
     ],
     missingData: commonMissingData,
     riskFlags: [mockRiskFlags[2]],
     publishedCohorts: [
-      { cohortName: 'SOFT: Ovarian suppression added to endocrine therapy', population: 'Premenopausal women with HR-positive early breast cancer', similarityLevel: 'Moderate', matchingFactors: ['HR-positive disease', 'Early-stage', 'Candidate for ovarian suppression'], limitationFactors: ['Requires confirmed premenopausal status', 'Benefit varies by age and chemotherapy history'], implication: 'Reasonable if the patient is confirmed premenopausal and at meaningful recurrence risk.', sourceLabel: 'SOFT_OVARIAN_SUPPRESSION_NEJM', sourceUrl: '' },
+      { cohortName: 'SOFT: Ovarian suppression added to endocrine therapy', population: 'Premenopausal women with HR-positive early breast cancer', similarityLevel: 'medium', matchingFactors: ['HR-positive disease', 'Early-stage', 'Candidate for ovarian suppression'], limitationFactors: ['Requires confirmed premenopausal status', 'Benefit varies by age and chemotherapy history'], implication: 'Reasonable if the patient is confirmed premenopausal and at meaningful recurrence risk.', sourceLabel: 'SOFT_OVARIAN_SUPPRESSION_NEJM', sourceUrl: '' },
     ],
     sources: [],
     reasoningFactors: [
@@ -287,7 +299,7 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
   }),
 
   CAPECITABINE: createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'moderate',
+    uncertaintyLevel: 'medium',
     uncertaintySummary: 'Capecitabine has the clearest evidence base as an escalation strategy for HER2-negative disease with residual tumor after neoadjuvant chemotherapy.',
     uncertaintyDescription: 'CREATE-X establishes a survival benefit for capecitabine specifically in HER2-negative patients with residual invasive disease after neoadjuvant chemotherapy; applicability outside that setting is less direct.',
     evidenceFor: [
@@ -311,7 +323,7 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
   }),
 
   PACLITAXEL: createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'moderate',
+    uncertaintyLevel: 'medium',
     uncertaintySummary: 'Taxane-based chemotherapy is well supported for early-stage breast cancer, with the main open questions relating to neuropathy risk and cardiac baseline.',
     uncertaintyDescription: 'Large patient-level meta-analyses support taxane-containing regimens for reducing recurrence in early breast cancer; neuropathy risk and incomplete cardiac workup temper confidence.',
     evidenceFor: [
@@ -325,7 +337,7 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
     missingData: commonMissingData,
     riskFlags: [mockRiskFlags[1], mockRiskFlags[5]],
     publishedCohorts: [
-      { cohortName: 'EBCTCG: Taxane-containing chemotherapy in early breast cancer', population: 'Patients with early-stage operable breast cancer across 86 randomised trials', similarityLevel: 'Moderate', matchingFactors: ['Early-stage disease', 'Chemotherapy-eligible'], limitationFactors: ['Aggregate trial population, not individually matched', 'Neuropathy risk not captured in efficacy endpoints'], implication: 'Supports taxane-based chemotherapy with neuropathy monitoring.', sourceLabel: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET', sourceUrl: '' },
+      { cohortName: 'EBCTCG: Taxane-containing chemotherapy in early breast cancer', population: 'Patients with early-stage operable breast cancer across 86 randomised trials', similarityLevel: 'medium', matchingFactors: ['Early-stage disease', 'Chemotherapy-eligible'], limitationFactors: ['Aggregate trial population, not individually matched', 'Neuropathy risk not captured in efficacy endpoints'], implication: 'Supports taxane-based chemotherapy with neuropathy monitoring.', sourceLabel: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET', sourceUrl: '' },
     ],
     sources: [],
     reasoningFactors: [
@@ -335,7 +347,7 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
   }),
 
   'CYCLOPHOSPHAMIDE + DOXORUBICIN': createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'moderate',
+    uncertaintyLevel: 'medium',
     uncertaintySummary: 'Anthracycline-based combination chemotherapy has strong outcome data for node-positive early breast cancer, but cardiotoxicity risk requires a documented baseline LVEF.',
     uncertaintyDescription: 'Patient-level meta-analyses consistently show anthracycline-based regimens reduce recurrence and mortality versus non-anthracycline or no chemotherapy; the main caution is unconfirmed cardiac baseline before starting doxorubicin.',
     evidenceFor: [
@@ -350,19 +362,20 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
     missingData: commonMissingData,
     riskFlags: [mockRiskFlags[0], mockRiskFlags[1], mockRiskFlags[4]],
     publishedCohorts: [
-      { cohortName: 'EBCTCG: Anthracycline-based chemotherapy in early breast cancer', population: 'Node-positive and node-negative early breast cancer across 86 randomised trials', similarityLevel: 'Moderate', matchingFactors: ['Node-positive disease', 'Early-stage', 'Chemotherapy-eligible'], limitationFactors: ['Aggregate trial population, not individually matched', 'Cardiac fitness at baseline not accounted for'], implication: 'Strong support for this regimen once baseline cardiac function is confirmed adequate.', sourceLabel: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET', sourceUrl: '' },
-      { cohortName: 'EBCTCG: Polychemotherapy regimen comparisons', population: 'Early breast cancer patients across 123 randomised trials comparing chemotherapy regimens', similarityLevel: 'Moderate', matchingFactors: ['Node-positive disease', 'Anthracycline-based regimen'], limitationFactors: ['Aggregate trial population, not individually matched'], implication: 'Confirms anthracycline-based regimens outperform CMF for higher-risk disease.', sourceLabel: 'EBCTCG_POLYCHEMO_REGIMENS_LANCET', sourceUrl: '' },
+      { cohortName: 'EBCTCG: Anthracycline-based chemotherapy in early breast cancer', population: 'Node-positive and node-negative early breast cancer across 86 randomised trials', similarityLevel: 'medium', matchingFactors: ['Node-positive disease', 'Early-stage', 'Chemotherapy-eligible'], limitationFactors: ['Aggregate trial population, not individually matched', 'Cardiac fitness at baseline not accounted for'], implication: 'Strong support for this regimen once baseline cardiac function is confirmed adequate.', sourceLabel: 'EBCTCG_ANTHRACYCLINE_TAXANE_LANCET', sourceUrl: '' },
+      { cohortName: 'EBCTCG: Polychemotherapy regimen comparisons', population: 'Early breast cancer patients across 123 randomised trials comparing chemotherapy regimens', similarityLevel: 'medium', matchingFactors: ['Node-positive disease', 'Anthracycline-based regimen'], limitationFactors: ['Aggregate trial population, not individually matched'], implication: 'Confirms anthracycline-based regimens outperform CMF for higher-risk disease.', sourceLabel: 'EBCTCG_POLYCHEMO_REGIMENS_LANCET', sourceUrl: '' },
     ],
     sources: [],
     reasoningFactors: [
       { factor: 'Nodal involvement', weight: 'high', direction: 'supports' },
       { factor: 'Baseline cardiac workup', weight: 'high', direction: 'cautions' },
       { factor: 'Myelosuppression risk', weight: 'medium', direction: 'cautions' },
+      { factor: 'Oncotype recurrence score unavailable', weight: 'high', direction: 'cautions' },
     ],
   }),
 
   'CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE': createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'moderate',
+    uncertaintyLevel: 'medium',
     uncertaintySummary: 'Classic CMF chemotherapy remains a reasonable non-anthracycline option, though modern anthracycline/taxane-based regimens generally show superior outcomes.',
     uncertaintyDescription: 'Large meta-analyses show CMF reduces recurrence versus no chemotherapy, but anthracycline-based regimens are generally more effective — CMF is most relevant when anthracyclines are contraindicated (e.g., unconfirmed or reduced cardiac function).',
     evidenceFor: [
@@ -386,7 +399,7 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
   }),
 
   'PACLITAXEL + PERTUZUMAB + TRASTUZUMAB': createTreatmentEvidenceProfile({
-    uncertaintyLevel: 'moderate',
+    uncertaintyLevel: 'medium',
     uncertaintySummary: 'Dual HER2 blockade with pertuzumab and trastuzumab plus a taxane is strongly supported for HER2-positive disease, though baseline cardiac function must be confirmed first.',
     uncertaintyDescription: 'CLEOPATRA established a substantial survival benefit for adding pertuzumab to trastuzumab and taxane chemotherapy in HER2-positive disease; the regimen requires confirmed baseline and on-treatment cardiac monitoring given trastuzumab-related cardiotoxicity risk.',
     evidenceFor: [
@@ -397,11 +410,12 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
       { text: 'Baseline LVEF has not been documented.', source: 'Missing data' },
       { text: 'HER2-targeted therapy (trastuzumab/pertuzumab) carries a recognized cardiotoxicity risk; guidelines recommend baseline and every-3-month LVEF monitoring.', source: 'ESC_CARDIOONCOLOGY_JACC' },
       { text: 'The trial combining pertuzumab, trastuzumab and taxane chemotherapy reported meaningful rates of neutropenia and diarrhea requiring monitoring.', source: 'CLEOPATRA_PERTUZUMAB_TRASTUZUMAB_NEJM' },
+      {text: 'Dual HER2 blockade in combination with paclitaxel has been less extensively studied than with other taxanes.', source: ''},
     ],
     missingData: commonMissingData,
     riskFlags: [mockRiskFlags[0], mockRiskFlags[1], mockRiskFlags[5]],
     publishedCohorts: [
-      { cohortName: 'CLEOPATRA: Pertuzumab, trastuzumab and taxane chemotherapy', population: 'HER2-positive breast cancer treated with pertuzumab, trastuzumab, and taxane chemotherapy', similarityLevel: 'Moderate', matchingFactors: ['HER2-positive disease', 'Chemotherapy-eligible'], limitationFactors: ['Original trial population was metastatic; here applied in an earlier-stage context', 'Requires confirmed baseline cardiac function'], implication: 'Strong support for dual HER2 blockade once cardiac clearance is confirmed.', sourceLabel: 'CLEOPATRA_PERTUZUMAB_TRASTUZUMAB_NEJM', sourceUrl: '' },
+      { cohortName: 'CLEOPATRA: Pertuzumab, trastuzumab and taxane chemotherapy', population: 'HER2-positive breast cancer treated with pertuzumab, trastuzumab, and taxane chemotherapy', similarityLevel: 'medium', matchingFactors: ['HER2-positive disease', 'Chemotherapy-eligible'], limitationFactors: ['Original trial population was metastatic; here applied in an earlier-stage context', 'Requires confirmed baseline cardiac function'], implication: 'Strong support for dual HER2 blockade once cardiac clearance is confirmed.', sourceLabel: 'CLEOPATRA_PERTUZUMAB_TRASTUZUMAB_NEJM', sourceUrl: '' },
     ],
     sources: [],
     reasoningFactors: [

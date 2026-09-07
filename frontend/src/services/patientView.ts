@@ -78,7 +78,7 @@ export interface PatientView {
   imaging: Array<{ type: string; date: string; findings: string }>;
   comorbidities: Array<{ name: string; status: string; implications: string }>;
   medications: Array<{ name: string; dose: string; frequency: string; relevance: string }>;
-  contraindications: Array<{ factor: string; severity: 'high' | 'moderate' | 'low'; detail: string }>;
+  contraindications: Array<{ factor: string; severity: 'high' | 'medium' | 'low'; detail: string }>;
   qolConcerns: string[];
   patientPreferences: { priorityQoL: string; hospitalPreference: string; familyInvolvement: string };
   missingData: string[];
@@ -341,7 +341,7 @@ export function buildPatientView(c: StudyCase): PatientView {
   if (her2) {
     contraindications.push({
       factor: 'Cardiotoxicity (trastuzumab)',
-      severity: 'moderate',
+      severity: 'medium',
       detail: 'LVEF monitoring required before and during HER2-targeted therapy.',
     });
   }
@@ -355,7 +355,7 @@ export function buildPatientView(c: StudyCase): PatientView {
   if (isMetastatic) {
     contraindications.push({
       factor: 'Curative-intent local therapy',
-      severity: 'moderate',
+      severity: 'medium',
       detail: 'Metastatic stage — systemic treatment approach takes priority.',
     });
   }
@@ -369,18 +369,17 @@ export function buildPatientView(c: StudyCase): PatientView {
   if (renalReduced) {
     contraindications.push({
       factor: 'Nephrotoxic agents',
-      severity: 'moderate',
+      severity: 'medium',
       detail: 'Reduced eGFR — dose adjustment for renally cleared drugs may apply.',
     });
   }
   if (contraindications.length === 0) {
-  contraindications.push({
-    factor: 'No major contraindications identified',
-    severity: 'low',
-    detail: 'No major treatment-limiting contraindication documented.',
-  });
-}
-
+    contraindications.push({
+      factor: 'No major contraindications identified',
+      severity: 'low',
+      detail: 'No major treatment-limiting contraindication documented.',
+    });
+  }
   // Mockdaten die nicht im eigentlichen Datenset vorkommen
 
   const qolConcerns: string[] = ['Maintaining daily functioning'];
@@ -418,7 +417,7 @@ export function buildPatientView(c: StudyCase): PatientView {
     dateOfBirth: `${birthYear}-${dobMonth}-${dobDay}`,
     age,
     gender: clinical.sex ?? 'Female',
-    priority: isMetastatic ? 'HIGH' : 'MODERATE',
+    priority: isMetastatic ? 'HIGH' : 'medium',
     diagnosis: {
       primaryDiagnosis: clinical.histology?.cancer_type_detailed ?? 'Breast cancer',
       stage,

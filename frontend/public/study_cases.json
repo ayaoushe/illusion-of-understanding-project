@@ -375,6 +375,7 @@
       "stage": {
         "coarse": "Stage 1-3",
         "clinical_group": null,
+        "clinical_summary": "Regional to lymph nodes",
         "pathological_group": "0",
         "registry_path_group": null
       },
@@ -423,7 +424,31 @@
     },
     "similar_cases": [
       {
+        "patient_id": "P-0039112",
+        "relation": "current",
+        "match_percent": null,
+        "features": {
+          "CURRENT_AGE_DEID": 40.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 0.864698095,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [],
+        "regime": null,
+        "os_months": null,
+        "os_status": null
+      },
+      {
         "patient_id": "P-0019492",
+        "relation": "candidate",
         "match_percent": 91,
         "features": {
           "CURRENT_AGE_DEID": 42.0,
@@ -453,13 +478,13 @@
           "TMB_NONSYNONYMOUS",
           "TUMOR_PURITY"
         ],
-        "is_counterfactual": false,
         "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
         "os_months": 57.7,
         "os_status": "0:LIVING"
       },
       {
         "patient_id": "P-0027273",
+        "relation": "candidate",
         "match_percent": 59,
         "features": {
           "CURRENT_AGE_DEID": 40.0,
@@ -487,13 +512,13 @@
           "SMOKING_PREDICTIONS_3_CLASSES",
           "MSI_TYPE"
         ],
-        "is_counterfactual": false,
         "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
         "os_months": 38.0,
         "os_status": "0:LIVING"
       },
       {
         "patient_id": "P-0042716",
+        "relation": "candidate",
         "match_percent": 26,
         "features": {
           "CURRENT_AGE_DEID": 36.0,
@@ -521,10 +546,538 @@
           "SMOKING_PREDICTIONS_3_CLASSES",
           "MSI_TYPE"
         ],
-        "is_counterfactual": true,
         "regime": "LETROZOLE",
         "os_months": 54.0,
         "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0051674",
+        "relation": "candidate",
+        "match_percent": 16,
+        "features": {
+          "CURRENT_AGE_DEID": 36.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.594094285,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE",
+        "os_months": 43.6,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0036877",
+        "relation": "candidate",
+        "match_percent": 19,
+        "features": {
+          "CURRENT_AGE_DEID": 41.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 0.0,
+          "TUMOR_PURITY": 40.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LEUPROLIDE",
+        "os_months": 57.8,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0076347",
+        "relation": "candidate",
+        "match_percent": 18,
+        "features": {
+          "CURRENT_AGE_DEID": 34.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.46104171,
+          "TUMOR_PURITY": 40.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LEUPROLIDE",
+        "os_months": 18.6,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0077361",
+        "relation": "candidate",
+        "match_percent": 18,
+        "features": {
+          "CURRENT_AGE_DEID": 41.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.281388946,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB",
+        "os_months": 17.5,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0062954",
+        "relation": "candidate",
+        "match_percent": 16,
+        "features": {
+          "CURRENT_AGE_DEID": 41.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.281388946,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB",
+        "os_months": 31.3,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0066435",
+        "relation": "candidate",
+        "match_percent": 16,
+        "features": {
+          "CURRENT_AGE_DEID": 36.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 0.820347237,
+          "TUMOR_PURITY": 40.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "PACLITAXEL",
+        "os_months": 27.5,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0020544",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 41.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.72939619,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "PACLITAXEL",
+        "os_months": 76.5,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0014244",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 39.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Do not report",
+          "TMB_NONSYNONYMOUS": 2.594094285,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "LYMPH_NODES",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES"
+        ],
+        "regime": "TAMOXIFEN",
+        "os_months": 48.4,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0036322",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 38.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.594094285,
+          "TUMOR_PURITY": 50.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "BONE",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "TAMOXIFEN",
+        "os_months": 57.9,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0013059",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 40.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.957439395,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE + PALBOCICLIB",
+        "os_months": 12.5,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0040200",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 38.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.45879238,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE + PALBOCICLIB",
+        "os_months": 16.3,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0078158",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 38.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.46104171,
+          "TUMOR_PURITY": 50.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "LIVER",
+          "LUNG",
+          "MSI_TYPE"
+        ],
+        "regime": "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE",
+        "os_months": 14.8,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0030529",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 41.0,
+          "HR": "No",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.72939619,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "LIVER",
+          "BONE",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE",
+        "os_months": 4.5,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0018551",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 42.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Do not report",
+          "TMB_NONSYNONYMOUS": 3.45879238,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "SMOKING_PREDICTIONS_3_CLASSES"
+        ],
+        "regime": "CAPECITABINE",
+        "os_months": 8.4,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0001751",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 41.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Unknown",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.218310601,
+          "TUMOR_PURITY": 40.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "MSI_TYPE"
+        ],
+        "regime": "CAPECITABINE",
+        "os_months": 5.8,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0004195",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 41.0,
+          "HR": "No",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 5.872318186,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "STAGE_HIGHEST_RECORDED",
+          "LUNG",
+          "MSI_TYPE"
+        ],
+        "regime": "ANASTROZOLE",
+        "os_months": 19.9,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0001846",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 42.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Unknown",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.327465902,
+          "TUMOR_PURITY": null
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "BONE",
+          "LUNG",
+          "MSI_TYPE"
+        ],
+        "regime": "ANASTROZOLE",
+        "os_months": 1.4,
+        "os_status": "1:DECEASED"
       }
     ]
   },
@@ -904,6 +1457,7 @@
       "stage": {
         "coarse": "Stage 1-3",
         "clinical_group": "1A",
+        "clinical_summary": "Localized",
         "pathological_group": "1A",
         "registry_path_group": "1A"
       },
@@ -957,7 +1511,31 @@
     },
     "similar_cases": [
       {
+        "patient_id": "P-0011019",
+        "relation": "current",
+        "match_percent": null,
+        "features": {
+          "CURRENT_AGE_DEID": 63.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 0.0,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [],
+        "regime": null,
+        "os_months": null,
+        "os_status": null
+      },
+      {
         "patient_id": "P-0039982",
+        "relation": "candidate",
         "match_percent": 75,
         "features": {
           "CURRENT_AGE_DEID": 61.0,
@@ -986,13 +1564,47 @@
           "MSI_TYPE",
           "TUMOR_PURITY"
         ],
-        "is_counterfactual": false,
         "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
         "os_months": 22.7,
         "os_status": "0:LIVING"
       },
       {
+        "patient_id": "P-0025775",
+        "relation": "candidate",
+        "match_percent": 28,
+        "features": {
+          "CURRENT_AGE_DEID": 61.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.45879238,
+          "TUMOR_PURITY": 40.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "os_months": 59.4,
+        "os_status": "0:LIVING"
+      },
+      {
         "patient_id": "P-0030955",
+        "relation": "candidate",
         "match_percent": 33,
         "features": {
           "CURRENT_AGE_DEID": 65.0,
@@ -1021,13 +1633,47 @@
           "TMB_NONSYNONYMOUS",
           "TUMOR_PURITY"
         ],
-        "is_counterfactual": false,
         "regime": "LETROZOLE",
         "os_months": 61.5,
         "os_status": "0:LIVING"
       },
       {
+        "patient_id": "P-0089451",
+        "relation": "candidate",
+        "match_percent": 24,
+        "features": {
+          "CURRENT_AGE_DEID": 75.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.46104171,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "LETROZOLE",
+        "os_months": 6.4,
+        "os_status": "0:LIVING"
+      },
+      {
         "patient_id": "P-0023679",
+        "relation": "candidate",
         "match_percent": 28,
         "features": {
           "CURRENT_AGE_DEID": 66.0,
@@ -1056,9 +1702,480 @@
           "MSI_TYPE",
           "TUMOR_PURITY"
         ],
-        "is_counterfactual": true,
         "regime": "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE",
         "os_months": 51.0,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0020545",
+        "relation": "candidate",
+        "match_percent": 25,
+        "features": {
+          "CURRENT_AGE_DEID": 61.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.594094285,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE",
+        "os_months": 72.8,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0020749",
+        "relation": "candidate",
+        "match_percent": 25,
+        "features": {
+          "CURRENT_AGE_DEID": 60.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.594094285,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "ANASTROZOLE",
+        "os_months": 76.0,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0019577",
+        "relation": "candidate",
+        "match_percent": 25,
+        "features": {
+          "CURRENT_AGE_DEID": 65.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.72939619,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "MSI_TYPE"
+        ],
+        "regime": "ANASTROZOLE",
+        "os_months": 67.1,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0070819",
+        "relation": "candidate",
+        "match_percent": 17,
+        "features": {
+          "CURRENT_AGE_DEID": 62.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.281388946,
+          "TUMOR_PURITY": 70.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "CAPECITABINE",
+        "os_months": 24.6,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0044901",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 65.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 5.18818857,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "CAPECITABINE",
+        "os_months": 8.1,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0020188",
+        "relation": "candidate",
+        "match_percent": 16,
+        "features": {
+          "CURRENT_AGE_DEID": 65.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.72939619,
+          "TUMOR_PURITY": 10.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "MSI_TYPE"
+        ],
+        "regime": "LEUPROLIDE",
+        "os_months": 75.4,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0081149",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 65.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.640694473,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "LEUPROLIDE",
+        "os_months": 14.9,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0046131",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 61.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 0.864698095,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LIVER",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "PACLITAXEL",
+        "os_months": 45.4,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0009364",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 64.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 27.40415153,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "LIVER",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "PACLITAXEL",
+        "os_months": 30.0,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0008760",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 63.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 5.872318186,
+          "TUMOR_PURITY": 90.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE + PALBOCICLIB",
+        "os_months": 6.0,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0041222",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 65.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.72939619,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "LYMPH_NODES",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE + PALBOCICLIB",
+        "os_months": 53.8,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0021182",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 62.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 4.323490475,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "LUNG",
+          "MSI_TYPE"
+        ],
+        "regime": "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB",
+        "os_months": 75.4,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0008653",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 64.0,
+          "HR": "No",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 0.978719698,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HER2",
+          "LIVER",
+          "LUNG",
+          "MSI_TYPE"
+        ],
+        "regime": "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB",
+        "os_months": 93.5,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0020272",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 61.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 4.323490475,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "BONE",
+          "MSI_TYPE"
+        ],
+        "regime": "TAMOXIFEN",
+        "os_months": 73.6,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0014824",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 65.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Missing",
+          "TMB_NONSYNONYMOUS": 4.323490475,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "BONE"
+        ],
+        "regime": "TAMOXIFEN",
+        "os_months": 75.8,
         "os_status": "0:LIVING"
       }
     ]
@@ -1439,8 +2556,9 @@
       "stage": {
         "coarse": "Stage 1-3",
         "clinical_group": "1A",
+        "clinical_summary": "Localized",
         "pathological_group": null,
-        "registry_path_group": "99"
+        "registry_path_group": null
       },
       "diagnosis": {
         "days_before_first_line": 90,
@@ -1481,7 +2599,31 @@
     },
     "similar_cases": [
       {
+        "patient_id": "P-0050258",
+        "relation": "current",
+        "match_percent": null,
+        "features": {
+          "CURRENT_AGE_DEID": 50.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.72939619,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [],
+        "regime": null,
+        "os_months": null,
+        "os_status": null
+      },
+      {
         "patient_id": "P-0020178",
+        "relation": "candidate",
         "match_percent": 91,
         "features": {
           "CURRENT_AGE_DEID": 51.0,
@@ -1511,13 +2653,48 @@
           "TMB_NONSYNONYMOUS",
           "TUMOR_PURITY"
         ],
-        "is_counterfactual": false,
         "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
         "os_months": 73.4,
         "os_status": "0:LIVING"
       },
       {
+        "patient_id": "P-0050417",
+        "relation": "candidate",
+        "match_percent": 33,
+        "features": {
+          "CURRENT_AGE_DEID": 48.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.45879238,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
+        "os_months": 46.3,
+        "os_status": "0:LIVING"
+      },
+      {
         "patient_id": "P-0019435",
+        "relation": "candidate",
         "match_percent": 39,
         "features": {
           "CURRENT_AGE_DEID": 50.0,
@@ -1545,13 +2722,116 @@
           "SMOKING_PREDICTIONS_3_CLASSES",
           "MSI_TYPE"
         ],
-        "is_counterfactual": false,
         "regime": "TAMOXIFEN",
         "os_months": 74.1,
         "os_status": "0:LIVING"
       },
       {
+        "patient_id": "P-0022521",
+        "relation": "candidate",
+        "match_percent": 33,
+        "features": {
+          "CURRENT_AGE_DEID": 51.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.594094285,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "TAMOXIFEN",
+        "os_months": 67.1,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0011176",
+        "relation": "candidate",
+        "match_percent": 31,
+        "features": {
+          "CURRENT_AGE_DEID": 52.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.936159093,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "LEUPROLIDE",
+        "os_months": 84.8,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0033837",
+        "relation": "candidate",
+        "match_percent": 16,
+        "features": {
+          "CURRENT_AGE_DEID": 51.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 17.2939619,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LEUPROLIDE",
+        "os_months": 60.4,
+        "os_status": "0:LIVING"
+      },
+      {
         "patient_id": "P-0058717",
+        "relation": "candidate",
         "match_percent": 17,
         "features": {
           "CURRENT_AGE_DEID": 57.0,
@@ -1579,10 +2859,410 @@
           "MSI_TYPE",
           "TUMOR_PURITY"
         ],
-        "is_counterfactual": true,
         "regime": "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE",
         "os_months": 34.9,
         "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0071902",
+        "relation": "candidate",
+        "match_percent": 16,
+        "features": {
+          "CURRENT_AGE_DEID": 48.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.640694473,
+          "TUMOR_PURITY": 40.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE",
+        "os_months": 22.5,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0050546",
+        "relation": "candidate",
+        "match_percent": 16,
+        "features": {
+          "CURRENT_AGE_DEID": 53.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.45879238,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "ANASTROZOLE",
+        "os_months": 41.2,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0036726",
+        "relation": "candidate",
+        "match_percent": 16,
+        "features": {
+          "CURRENT_AGE_DEID": 49.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.45879238,
+          "TUMOR_PURITY": 70.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "ANASTROZOLE",
+        "os_months": 35.4,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0031421",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 49.0,
+          "HR": "No",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 0.0,
+          "TUMOR_PURITY": 10.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "CAPECITABINE",
+        "os_months": 30.7,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0080214",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 49.0,
+          "HR": "No",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 4.922083419,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HER2",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "CAPECITABINE",
+        "os_months": 4.6,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0017422",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 50.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Do not report",
+          "TMB_NONSYNONYMOUS": 2.594094285,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "SMOKING_PREDICTIONS_3_CLASSES"
+        ],
+        "regime": "LETROZOLE",
+        "os_months": 19.3,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0060909",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 48.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 0.0,
+          "TUMOR_PURITY": 10.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LIVER",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE",
+        "os_months": 28.9,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0027312",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 48.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.72939619,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "LUNG",
+          "MSI_TYPE",
+          "TMB_NONSYNONYMOUS",
+          "TUMOR_PURITY"
+        ],
+        "regime": "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB",
+        "os_months": 68.0,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0066860",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 48.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.640694473,
+          "TUMOR_PURITY": 50.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB",
+        "os_months": 27.6,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0048245",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 49.0,
+          "HR": "No",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 4.323490475,
+          "TUMOR_PURITY": 10.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "PACLITAXEL",
+        "os_months": 14.7,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0055109",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 49.0,
+          "HR": "No",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.46104171,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HER2",
+          "LIVER",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "PACLITAXEL",
+        "os_months": 28.4,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0035322",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 50.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 4.323490475,
+          "TUMOR_PURITY": 40.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LUNG",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE + PALBOCICLIB",
+        "os_months": 17.8,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0021712",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 48.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 0.864698095,
+          "TUMOR_PURITY": 50.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "LUNG",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE + PALBOCICLIB",
+        "os_months": 19.7,
+        "os_status": "1:DECEASED"
       }
     ]
   },
@@ -1962,6 +3642,7 @@
       "stage": {
         "coarse": "Stage 1-3",
         "clinical_group": null,
+        "clinical_summary": "Localized",
         "pathological_group": "0",
         "registry_path_group": null
       },
@@ -2010,7 +3691,31 @@
     },
     "similar_cases": [
       {
+        "patient_id": "P-0068618",
+        "relation": "current",
+        "match_percent": null,
+        "features": {
+          "CURRENT_AGE_DEID": 44.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 6.562777893,
+          "TUMOR_PURITY": 40.0
+        },
+        "matched_fields": [],
+        "regime": null,
+        "os_months": null,
+        "os_status": null
+      },
+      {
         "patient_id": "P-0070513",
+        "relation": "candidate",
         "match_percent": 96,
         "features": {
           "CURRENT_AGE_DEID": 43.0,
@@ -2039,13 +3744,13 @@
           "MSI_TYPE",
           "TUMOR_PURITY"
         ],
-        "is_counterfactual": false,
         "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
         "os_months": 23.2,
         "os_status": "0:LIVING"
       },
       {
         "patient_id": "P-0022569",
+        "relation": "candidate",
         "match_percent": 43,
         "features": {
           "CURRENT_AGE_DEID": 54.0,
@@ -2072,13 +3777,145 @@
           "SMOKING_PREDICTIONS_3_CLASSES",
           "MSI_TYPE"
         ],
-        "is_counterfactual": false,
         "regime": "CYCLOPHOSPHAMIDE + DOXORUBICIN",
         "os_months": 68.3,
         "os_status": "0:LIVING"
       },
       {
+        "patient_id": "P-0076347",
+        "relation": "candidate",
+        "match_percent": 17,
+        "features": {
+          "CURRENT_AGE_DEID": 34.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.46104171,
+          "TUMOR_PURITY": 40.0
+        },
+        "matched_fields": [
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "LEUPROLIDE",
+        "os_months": 18.6,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0018926",
+        "relation": "candidate",
+        "match_percent": 16,
+        "features": {
+          "CURRENT_AGE_DEID": 44.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 0.0,
+          "TUMOR_PURITY": 40.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LIVER",
+          "BONE",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "LEUPROLIDE",
+        "os_months": 69.2,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0059936",
+        "relation": "candidate",
+        "match_percent": 17,
+        "features": {
+          "CURRENT_AGE_DEID": 43.0,
+          "HR": "No",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 4.101736183,
+          "TUMOR_PURITY": 40.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE",
+          "TUMOR_PURITY"
+        ],
+        "regime": "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB",
+        "os_months": 29.5,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0072073",
+        "relation": "candidate",
+        "match_percent": 16,
+        "features": {
+          "CURRENT_AGE_DEID": 43.0,
+          "HR": "No",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.640694473,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "PACLITAXEL + PERTUZUMAB + TRASTUZUMAB",
+        "os_months": 22.5,
+        "os_status": "0:LIVING"
+      },
+      {
         "patient_id": "P-0061267",
+        "relation": "candidate",
         "match_percent": 16,
         "features": {
           "CURRENT_AGE_DEID": 43.0,
@@ -2105,10 +3942,391 @@
           "SMOKING_PREDICTIONS_3_CLASSES",
           "TUMOR_PURITY"
         ],
-        "is_counterfactual": true,
         "regime": "ANASTROZOLE",
         "os_months": 29.0,
         "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0060393",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 44.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Indeterminate",
+          "TMB_NONSYNONYMOUS": 4.922083419,
+          "TUMOR_PURITY": 70.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "LUNG"
+        ],
+        "regime": "ANASTROZOLE",
+        "os_months": 13.1,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0024599",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 48.0,
+          "HR": "Yes",
+          "HER2": "Yes",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 3.45879238,
+          "TUMOR_PURITY": 60.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "HER2",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LIVER",
+          "BONE",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "TAMOXIFEN",
+        "os_months": 69.3,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0026660",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 45.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Instable",
+          "TMB_NONSYNONYMOUS": 22.14937539,
+          "TUMOR_PURITY": 90.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED"
+        ],
+        "regime": "TAMOXIFEN",
+        "os_months": 5.8,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0035735",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 43.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "No",
+          "LIVER": "No",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 6.91758476,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "LIVER",
+          "BONE",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE",
+        "os_months": 40.3,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0052842",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 46.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.594094285,
+          "TUMOR_PURITY": 20.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "LYMPH_NODES",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE",
+        "os_months": 38.1,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0017812",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 44.0,
+          "HR": "No",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Do not report",
+          "TMB_NONSYNONYMOUS": 5.18818857,
+          "TUMOR_PURITY": 50.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "SMOKING_PREDICTIONS_3_CLASSES"
+        ],
+        "regime": "CAPECITABINE",
+        "os_months": 6.3,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0033534",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 45.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "No",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Do not report",
+          "TMB_NONSYNONYMOUS": 0.0,
+          "TUMOR_PURITY": null
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES"
+        ],
+        "regime": "CAPECITABINE",
+        "os_months": 4.8,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0022391",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 43.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "No",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Former/Current Smoker",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 0.864698095,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "BONE",
+          "LUNG",
+          "MSI_TYPE"
+        ],
+        "regime": "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE",
+        "os_months": 74.2,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0052483",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 45.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Unknown",
+          "LIVER": "Unknown",
+          "BONE": "Unknown",
+          "LUNG": "Unknown",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.72939619,
+          "TUMOR_PURITY": 10.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "CYCLOPHOSPHAMIDE + FLUOROURACIL + METHOTREXATE",
+        "os_months": 41.4,
+        "os_status": "0:LIVING"
+      },
+      {
+        "patient_id": "P-0009155",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 44.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "No",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 1.957439395,
+          "TUMOR_PURITY": 80.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "LUNG",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE + PALBOCICLIB",
+        "os_months": 33.8,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0049596",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 44.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 2.594094285,
+          "TUMOR_PURITY": 50.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "LYMPH_NODES",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "LETROZOLE + PALBOCICLIB",
+        "os_months": 6.0,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0000407",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 43.0,
+          "HR": "No",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 1-3",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Indeterminate",
+          "TMB_NONSYNONYMOUS": 6.654931804,
+          "TUMOR_PURITY": null
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "STAGE_HIGHEST_RECORDED",
+          "LYMPH_NODES",
+          "SMOKING_PREDICTIONS_3_CLASSES"
+        ],
+        "regime": "PACLITAXEL",
+        "os_months": 13.7,
+        "os_status": "1:DECEASED"
+      },
+      {
+        "patient_id": "P-0002652",
+        "relation": "candidate",
+        "match_percent": 15,
+        "features": {
+          "CURRENT_AGE_DEID": 46.0,
+          "HR": "Yes",
+          "HER2": "No",
+          "STAGE_HIGHEST_RECORDED": "Stage 4",
+          "LYMPH_NODES": "Yes",
+          "LIVER": "Yes",
+          "BONE": "Yes",
+          "LUNG": "Yes",
+          "SMOKING_PREDICTIONS_3_CLASSES": "Never",
+          "MSI_TYPE": "Stable",
+          "TMB_NONSYNONYMOUS": 4.436621202,
+          "TUMOR_PURITY": 30.0
+        },
+        "matched_fields": [
+          "CURRENT_AGE_DEID",
+          "HR",
+          "LYMPH_NODES",
+          "SMOKING_PREDICTIONS_3_CLASSES",
+          "MSI_TYPE"
+        ],
+        "regime": "PACLITAXEL",
+        "os_months": 76.9,
+        "os_status": "1:DECEASED"
       }
     ]
   }

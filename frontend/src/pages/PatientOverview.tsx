@@ -85,7 +85,7 @@ export function PatientOverview() {
       <TabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
       {activeTab === 'summary' && (
-        <div className="overview-grid">
+        <div className="overview-grid overview-summary-grid">
           <ClinicalInfoCard title="Diagnosis">
             <p className="value">{view.diagnosis.primaryDiagnosis}</p>
             <p className="muted">ICD-10: {view.diagnosis.icd10} — {view.diagnosis.stage}</p>
@@ -133,7 +133,7 @@ export function PatientOverview() {
 
           <ClinicalInfoCard title="Documented Tumor Sites">
             {activeMetastases.length > 0 ? (
-              <ul className="comorbidity-list">
+              <ul className="comorbidity-list tumor-site-list">
                 {activeMetastases.map((m) => (
                   <li key={m.site}>
                     <strong>{m.site}</strong>
@@ -160,19 +160,7 @@ export function PatientOverview() {
       )}
 
       {activeTab === 'risks' && (
-        <div className="overview-grid">
-          <ClinicalInfoCard title="Comorbidities" variant="highlight">
-            <ul className="comorbidity-list">
-              {view.comorbidities.map((c) => (
-                <li key={c.name}>
-                  <strong>{c.name}</strong>
-                  <span className="detail">{c.status}</span>
-                  <p className="implication">{c.implications}</p>
-                </li>
-              ))}
-            </ul>
-          </ClinicalInfoCard>
-
+        <div className="overview-grid risk-overview-grid">
           <ClinicalInfoCard title="Current Medications" variant="info">
             <ul className="medication-list">
               {view.medications.map((m) => (
@@ -184,17 +172,37 @@ export function PatientOverview() {
             </ul>
           </ClinicalInfoCard>
 
-          <ClinicalInfoCard title="Contraindications" variant="warning">
-            <ul className="contraindication-list">
-              {view.contraindications.map((c) => (
-                <li key={c.factor} className={`contra-${c.severity}`}>
-                  <strong>{c.factor}</strong>
-                  <span className={`severity-badge severity-${c.severity}`}>{c.severity}</span>
-                  <p>{c.detail}</p>
+          <ClinicalInfoCard title="Comorbidities" variant="highlight">
+            <ul className="comorbidity-list">
+              {view.comorbidities.map((c) => (
+                <li key={c.name}>
+                  <div className="comorbidity-header">
+                    <strong>{c.name}</strong>
+                    <span className="detail">{c.status}</span>
+                  </div>
+                  <p className="implication">{c.implications}</p>
                 </li>
               ))}
             </ul>
           </ClinicalInfoCard>
+
+          {view.contraindications.length > 0 && (
+            <ClinicalInfoCard title="Contraindications" variant="warning">
+              <ul className="contraindication-list">
+                {view.contraindications.map((c) => (
+                  <li key={c.factor} className={`contra-${c.severity}`}>
+                    <div className="contraindication-header">
+                      <strong>{c.factor}</strong>
+                      {c.factor !== 'No major contraindications identified' && (
+                        <span className="detail">{c.severity}</span>
+                      )}
+                    </div>
+                    <p>{c.detail}</p>
+                  </li>
+                ))}
+              </ul>
+            </ClinicalInfoCard>
+          )}
         </div>
       )}
 

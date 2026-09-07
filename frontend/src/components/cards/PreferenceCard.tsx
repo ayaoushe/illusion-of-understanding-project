@@ -1,7 +1,5 @@
 //Card design for Preferences in Patient Overview
 
-import { useState } from 'react';
-
 interface PreferenceCardProps {
   concerns: string[];
   preferences: {
@@ -12,8 +10,6 @@ interface PreferenceCardProps {
 }
 
 export function PreferenceCard({ concerns, preferences }: PreferenceCardProps) {
-  const [expanded, setExpanded] = useState(false);
-
   return (
     <div className="card preference-card">
       <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.95rem', fontWeight: 600 }}>Quality of Life & Preferences</h4>
@@ -23,7 +19,7 @@ export function PreferenceCard({ concerns, preferences }: PreferenceCardProps) {
           Key Concerns
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-          {concerns.slice(0, 3).map((c) => (
+          {concerns.map((c) => (
             <span key={c} style={{
               padding: '0.2rem 0.5rem',
               background: 'rgba(6, 182, 212, 0.1)',
@@ -35,40 +31,7 @@ export function PreferenceCard({ concerns, preferences }: PreferenceCardProps) {
               {c}
             </span>
           ))}
-          {concerns.length > 3 && !expanded && (
-            <button
-              type="button"
-              onClick={() => setExpanded(true)}
-              style={{
-                padding: '0.2rem 0.5rem',
-                background: 'transparent',
-                border: '1px solid #cbd5e1',
-                borderRadius: '6px',
-                fontSize: '0.75rem',
-                color: '#64748b',
-                cursor: 'pointer',
-              }}
-            >
-              +{concerns.length - 3} more
-            </button>
-          )}
         </div>
-        {expanded && concerns.length > 3 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginTop: '0.35rem' }}>
-            {concerns.slice(3).map((c) => (
-              <span key={c} style={{
-                padding: '0.2rem 0.5rem',
-                background: 'rgba(6, 182, 212, 0.1)',
-                color: '#0891b2',
-                borderRadius: '6px',
-                fontSize: '0.8rem',
-                border: '1px solid rgba(6, 182, 212, 0.25)',
-              }}>
-                {c}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>

@@ -1,4 +1,3 @@
-
 """
 Erzeugt aus MSK CHORD 2024 das Modell und alles, was das Frontend anzeigt.
 
@@ -388,7 +387,13 @@ SIMILAR_FIELDS = [
     "LIVER", "BONE", "LUNG", "SMOKING_PREDICTIONS_3_CLASSES", "MSI_TYPE",
     "TMB_NONSYNONYMOUS", "TUMOR_PURITY",
 ]
-N_SIMILAR = 3
+# 5 Karten fest: aktueller Fall, 2 supporting (AI-Match, Doctor-Match), 2 not-supporting
+N_SIMILAR = 5
+
+# Pro Regime im Trainingsset werden die 2 besten Nachbarn behalten (2, nicht 1: falls
+# AI-Empfehlung und tatsächliche Arzt-Wahl zufällig auf dasselbe Regime fallen, braucht
+# das Frontend trotzdem zwei unterschiedliche Patientinnen zum Zeigen).
+REGIME_POOL_TOP_K = 2
 
 #Alter hebt den match score an
 def _age_similarity_score(target_age, neighbor_age):
@@ -410,30 +415,16 @@ def _age_similarity_score(target_age, neighbor_age):
     return 0.0
 
 
-# Counterfactual ist true, wenn ein ähnlicher Nachbar sich in einem wichtigen decision field unterscheided
-def _is_counterfactual(target_row, candidate_row):
-    decision_fields = ["STAGE_HIGHEST_RECORDED", "HR", "HER2", "LYMPH_NODES", "LIVER", "BONE", "LUNG"]
-    target_age = target_row.get("CURRENT_AGE_DEID")
-    candidate_age = candidate_row.get("CURRENT_AGE_DEID")
-    if target_age is not None and candidate_age is not None:
-        try:
-            diff = abs(float(target_age) - float(candidate_age))
-        except (TypeError, ValueError):
-            diff = 0
-        if diff >= 8:
-            return True
-
-    for field in decision_fields:
-        if str(target_row.get(field)) == "nan" or str(candidate_row.get(field)) == "nan":
-            continue
-        if str(target_row.get(field)) != str(candidate_row.get(field)):
-            return True
-
-    return False
-
-
-# Für alle Patienten werden die top similar RF Nachbarn gefunden und nach counterfactual geflagged
-def build_similar_cases(all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat, top3_by_pid=None):
+# Für alle Patienten werden die RF-Nachbarn gefunden und nach Regime gruppiert.
+#
+# WICHTIG: Zum Build-Zeitpunkt ist nicht bekannt, welches Regime der Arzt live in
+# Step 2 (HumanAssessment) auswählen wird — das passiert erst zur Laufzeit im
+# Browser. Die Pipeline kann also nicht mehr fest entscheiden, welcher Nachbar
+# "supporting_doctor" ist. Stattdessen liefert sie hier für JEDES im Trainingsset
+# vorkommende Regime die 2 besten Treffer, und das Frontend (similarCaseView.ts)
+# wählt zur Laufzeit anhand von assessment.selectedTreatment (Arzt) und
+# c.prediction (AI Top-1) die passenden Karten aus diesem Pool aus.
+def build_similar_cases(all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat):
     rf = pipe.named_steps["rf"]
     pre = pipe.named_steps["pre"]
     leaves_train = rf.apply(pre.transform(X_train))
@@ -451,22 +442,12 @@ def build_similar_cases(all_ids, pipe, X_train, y_train, pid_train, X_test, pid_
             return None
         return float(v) if isinstance(v, (int, float, np.number)) else str(v)
 
-    def is_supportive_outcome(candidate):
-        status = str(candidate.get("os_status", "")).upper()
-        months = candidate.get("os_months")
-        if status.startswith("1:") or status.startswith("DECEASED") or "DECEASED" in status:
-            return False if months is None else months >= 24
-        if months is not None:
-            return months >= 12
-        return True
-
     out = {}
     for pid in all_ids:
         pos = int(np.where(pid_test.values == pid)[0][0])
         prox = (leaves_train == leaves_test[pos]).mean(axis=1)
         target = row_of(pid)
         target_age = value(target["CURRENT_AGE_DEID"])
-        top3 = set(top3_by_pid.get(pid, [])) if top3_by_pid else set()
 
         ranked_candidates = []
         for i in np.argsort(-prox):
@@ -487,51 +468,41 @@ def build_similar_cases(all_ids, pipe, X_train, y_train, pid_train, X_test, pid_
                 elif str(r[field]) == str(target[field]):
                     matched_fields.append(field)
 
-            candidate_regime = str(y_train.iloc[i])
-            is_treatment_counterfactual = bool(top3 and candidate_regime not in top3)
-            is_clinical_counterfactual = _is_counterfactual(target, r)
-            is_counterfactual = is_treatment_counterfactual or (not top3 and is_clinical_counterfactual)
-
             ranked_candidates.append({
                 "patient_id": npid,
+                "relation": "candidate",
                 "match_percent": round(combined_score * 100),
                 "features": {f: value(r[f]) for f in SIMILAR_FIELDS},
                 "matched_fields": matched_fields,
-                "is_counterfactual": is_counterfactual,
-                "regime": candidate_regime,
+                "regime": str(y_train.iloc[i]),
                 "os_months": round(float(pat_idx.loc[npid, "OS_MONTHS"]), 1) if pd.notna(pat_idx.loc[npid, "OS_MONTHS"]) else None,
                 "os_status": str(pat_idx.loc[npid, "OS_STATUS"]),
             })
 
-        ranked_candidates.sort(key=lambda item: (item["is_counterfactual"], -item["match_percent"]))
+        # match_percent (RF-proximity + Alters-Bonus) bestimmt "bester Match", nicht die
+        # reine RF-Proximity-Reihenfolge oben, daher hier explizit sortieren.
+        ranked_candidates.sort(key=lambda c: -c["match_percent"])
 
-        viable_supporting = [c for c in ranked_candidates if not c["is_counterfactual"] and is_supportive_outcome(c)]
-        supporting = viable_supporting[:2]
-        if len(supporting) < 2:
-            supporting = [c for c in ranked_candidates if not c["is_counterfactual"]][:2]
+        by_regime = {}
+        for c in ranked_candidates:
+            by_regime.setdefault(c["regime"], []).append(c)
 
-        if not supporting:
-            supporting = ranked_candidates[:2]
+        pool = []
+        for regime_candidates in by_regime.values():
+            pool.extend(regime_candidates[:REGIME_POOL_TOP_K])
 
-        counterfactual = next((c for c in ranked_candidates if c["is_counterfactual"] and c["regime"] not in top3), None)
-        if counterfactual is None:
-            counterfactual = next((c for c in ranked_candidates if c["is_counterfactual"]), None)
+        current_case = {
+            "patient_id": pid,
+            "relation": "current",
+            "match_percent": None,
+            "features": {f: value(target[f]) for f in SIMILAR_FIELDS},
+            "matched_fields": [],
+            "regime": None,
+            "os_months": None,
+            "os_status": None,
+        }
 
-        if counterfactual is None and top3:
-            counterfactual = next((c for c in ranked_candidates if c["regime"] not in top3), None)
-
-        if counterfactual is None and ranked_candidates:
-            counterfactual = ranked_candidates[min(len(ranked_candidates) - 1, 2)]
-
-        selected = supporting + ([counterfactual] if counterfactual not in supporting and counterfactual is not None else [])
-        if len(selected) < N_SIMILAR:
-            for candidate in ranked_candidates:
-                if candidate not in selected:
-                    selected.append(candidate)
-                if len(selected) >= N_SIMILAR:
-                    break
-
-        out[pid] = selected[:N_SIMILAR]
+        out[pid] = [current_case] + pool
     return out
 
 
@@ -633,15 +604,12 @@ def main():
 
     # echte klinische Felder aus MSK CHORD anhängen (siehe build_clinical_context)
     clinical = build_clinical_context(all_ids, labels, pat, samp)
-    top3_by_pid = {
-        pid: [regime for regime, _ in sorted(prob_map.items(), key=lambda kv: kv[1], reverse=True)[:3]]
-        for pid, prob_map in {
-            pid: {classes[i]: float(proba[pos, i]) for i in range(len(classes))}
-            for pos, pid in enumerate(pid_test.values)
-        }.items()
-    }
+    # Nachbarn nach Regime gruppiert (Top 2 je Regime) — welcher Nachbar später als
+    # supporting_ai / supporting_doctor / not_supporting angezeigt wird, entscheidet
+    # das Frontend zur Laufzeit anhand von c.prediction (AI) und
+    # assessment.selectedTreatment (Arzt, erst in Step 2 im Browser gewählt).
     similar = build_similar_cases(
-        all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat, top3_by_pid
+        all_ids, pipe, X_train, y_train, pid_train, X_test, pid_test, raw, df, pat
     )
     for entry in predictions:
         entry["clinical"] = clinical.get(entry["patient_id"], {})

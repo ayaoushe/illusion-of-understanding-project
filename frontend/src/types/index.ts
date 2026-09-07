@@ -59,7 +59,7 @@ export interface Patient {
 export interface RiskFlag {
   id: string;
   title: string;
-  severity: 'high' | 'moderate' | 'low';
+  severity: 'high' | 'medium' | 'low';
   description: string;
   relatedTreatments?: string[];
 }
@@ -67,12 +67,13 @@ export interface RiskFlag {
 export interface EvidenceItem {
   text: string;
   source?: string;
+  suppressBadge?: boolean;
 }
 
 export interface PublishedCohort {
   cohortName: string;
   population: string;
-  similarityLevel: 'High' | 'Moderate' | 'Partial';
+  similarityLevel: 'High' | 'medium' | 'Partial';
   matchingFactors: string[];
   limitationFactors: string[];
   implication: string;
@@ -83,7 +84,7 @@ export interface PublishedCohort {
 export interface AiEvidenceSynthesis {
   title: string;
   disclaimer: string;
-  uncertaintyLevel: 'low' | 'moderate' | 'high';
+  uncertaintyLevel: 'low' | 'medium' | 'high';
   uncertaintySummary: string;
   uncertaintyDescription: string;
   evidenceFor: EvidenceItem[];
@@ -114,8 +115,8 @@ export interface TreatmentOption {
   qolImpact: string;
   monitoring: string;
   strength: string;
-  evidenceStrength: 'strong' | 'moderate' | 'limited';
-  uncertainty: 'low' | 'moderate' | 'high';
+  evidenceStrength: 'strong' | 'medium' | 'limited';
+  uncertainty: 'low' | 'medium' | 'high';
   missingData: string[];
   sources: Array<{ title: string; url: string }>;
 }
@@ -123,14 +124,19 @@ export interface TreatmentOption {
 export interface SimilarCase {
   caseId: string;
   isRare?: boolean;
-  isCounterfactual?: boolean;
   matchCriteria: Array<{ label: string; matched: boolean }>;
   presentation: string;
   treatmentUsed: string;
   outcome: string;
   source: string;
-  matchScore: number;
+  relation: CaseRelation;
+  relationLabel: string;
+  relationDescription: string;
+  matchScore: number | null;
 }
+
+export type CaseRelation = 'current' | 'supporting_ai' | 'supporting_doctor' | 'not_supporting';
+
 
 /** Echte klinische Felder aus MSK CHORD, gefiltert auf "vor Start der Erstlinie". */
 export interface ClinicalContext {
@@ -176,13 +182,14 @@ export interface ClinicalContext {
 export interface SimilarNeighbor {
   rank: number;
   patient_id: string;
-  match_percent: number;
-  regime: string;
+  match_percent: number | null;
+  regime: string | null;
   features: Record<string, string | number | null>;
   matched_fields: string[];
-  is_counterfactual?: boolean;
   os_months: number | null;
-  os_status: string;
+  os_status: string | null;
+  relation: CaseRelation;
+  
 }
 
 export interface StudyCase {

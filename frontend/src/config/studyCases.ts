@@ -1,9 +1,9 @@
 // Die 4 Fälle, die im Experiment gezeigt werden (Reihenfolge A–D).
 export const STUDY_CASES = [
   'P-0039112', // A
-  'P-0011019', // B
+  //'P-0011019', // B
   'P-0050258', // C
-  'P-0068618', // D
+  //'P-0068618', // D
 ] as const;
 
 export type StudyLabel = 'A' | 'B' | 'C' | 'D';

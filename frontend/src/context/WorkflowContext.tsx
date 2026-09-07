@@ -25,6 +25,8 @@ interface WorkflowContextValue {
   assessmentComplete: boolean;
   evidence: AiEvidenceSynthesis | null;
   evidenceLoading: boolean;
+  evidenceTabsReviewed: boolean;
+  evidenceVisitedTabs: string[];
   reflection: FinalReflection | null;
   telemetry: InteractionTelemetry;
   selectedPatientId: string | null;
@@ -38,6 +40,8 @@ interface WorkflowContextValue {
   submitReflection: (data: FinalReflection) => void;
   recordInteraction: (event: { type: string; payload?: string }) => void;
   startAssessment: () => void;
+  markEvidenceTabVisited: (tabId: string) => void;
+  markEvidenceTabsReviewed: () => void;
   selectPatient: (patientId: string) => void;
   changePatient: (newPatientId: string, confirmFn?: () => boolean) => void;
 }
@@ -54,6 +58,8 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
   const [assessment, setAssessment] = useState<HumanAssessment | null>(null);
   const [evidence, setEvidence] = useState<AiEvidenceSynthesis | null>(null);
   const [evidenceLoading, setEvidenceLoading] = useState(false);
+  const [evidenceTabsReviewed, setEvidenceTabsReviewed] = useState(false);
+  const [evidenceVisitedTabs, setEvidenceVisitedTabs] = useState<string[]>([]);
   const [reflection, setReflection] = useState<FinalReflection | null>(null);
   const [telemetry, setTelemetry] = useState<InteractionTelemetry>(initialTelemetry);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
@@ -70,9 +76,11 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     (stepId: WorkflowStepId) => {
       if (!selectedPatientId) return false;
       if (!GATED_STEPS.includes(stepId)) return true;
-      return assessmentComplete;
+      if (!assessmentComplete) return false;
+      if (['treatment', 'similar', 'reflection'].includes(stepId)) return evidenceTabsReviewed;
+      return true;
     },
-    [assessmentComplete, selectedPatientId],
+    [assessmentComplete, evidenceTabsReviewed, selectedPatientId],
   );
 
   // Find current step
@@ -103,10 +111,22 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     setTelemetry((t) => ({ ...t, assessmentStartTime: Date.now() }));
   }, []);
 
+  const markEvidenceTabsReviewed = useCallback(() => {
+    setEvidenceTabsReviewed(true);
+  }, []);
+
+  const markEvidenceTabVisited = useCallback((tabId: string) => {
+    setEvidenceVisitedTabs((previous) => (
+      previous.includes(tabId) ? previous : [...previous, tabId]
+    ));
+  }, []);
+
   const submitAssessment = useCallback(async (data: HumanAssessment) => {
     const completed: HumanAssessment = { ...data, completedAt: new Date().toISOString() };
     const patientId = selectedPatientId ?? '4821-7734';
     setAssessment(completed);
+    setEvidenceTabsReviewed(false);
+    setEvidenceVisitedTabs([]);
     setTelemetry((t) => ({ ...t, assessmentSubmitTime: Date.now() }));
     setEvidenceLoading(true);
     try {
@@ -129,6 +149,8 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
   const selectPatient = useCallback((patientId: string) => {
     setSelectedPatientId(patientId);
     setCurrentStep('overview');
+    setEvidenceTabsReviewed(false);
+    setEvidenceVisitedTabs([]);
     setTelemetry((t) => ({ ...t, evidenceInteractions: [...t.evidenceInteractions, `selected:${patientId}`] }));
   }, []);
 
@@ -139,6 +161,8 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
       setAssessment(null);
       setEvidence(null);
       setReflection(null);
+      setEvidenceTabsReviewed(false);
+      setEvidenceVisitedTabs([]);
       setTelemetry(initialTelemetry);
       setCurrentStep('overview');
     }
@@ -153,6 +177,8 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     assessmentComplete,
     evidence,
     evidenceLoading,
+    evidenceTabsReviewed,
+    evidenceVisitedTabs,
     reflection,
     telemetry,
     selectedPatientId,
@@ -166,6 +192,8 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     submitReflection,
     recordInteraction,
     startAssessment,
+    markEvidenceTabVisited,
+    markEvidenceTabsReviewed,
     selectPatient,
     changePatient,
   };
