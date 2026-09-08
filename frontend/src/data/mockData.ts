@@ -284,7 +284,6 @@ export const mockTreatmentEvidenceById: Record<string, AiEvidenceSynthesis> = {
     evidenceAgainst: [
       { text: 'Menopausal status has not been formally confirmed, which affects whether ovarian suppression adds meaningful benefit.', source: 'Missing data' },
       { text: 'Adding ovarian suppression was associated with a higher frequency of menopausal-type side effects than endocrine therapy alone.', source: 'SOFT_OVARIAN_SUPPRESSION_NEJM' },
-      { text: 'Additional aromatase inhibitors need to be added after a few weeks of treatment.', source: '' },
     ],
     missingData: commonMissingData,
     riskFlags: [mockRiskFlags[2]],
